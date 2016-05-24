@@ -1,0 +1,22 @@
+---
+layout: default
+title: Home
+---
+
+<div class="posts">
+  {% for post in site.posts %}
+  {% if post.tags contains 'news' %}
+  <div class="post">
+    <h1 class="post-title">
+      <a href="{{ post.url | prepend: site.baseurl }}">
+        {{ post.title }}
+      </a>
+    </h1>
+
+    <span class="post-date">{{ post.date | date: '%Y-%m-%d' }}</span>
+
+    {{post.subtitle}}
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
