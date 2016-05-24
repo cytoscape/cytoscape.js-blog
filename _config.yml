@@ -7,7 +7,7 @@ permalink:           pretty
 title:               Cytoscape.js
 tagline:             News and tutorials
 url:                 http://blog.js.cytoscape.org
-baseurl:             http://blog.js.cytoscape.org
+baseurl:             ""
 paginate:            5
 excerpt_separator:   <!--more-->
 
