@@ -126,6 +126,10 @@ p {
   margin-bottom: 1rem;
 }
 
+pre p {
+  margin: 0;
+}
+
 strong {
   color: #303030;
 }
