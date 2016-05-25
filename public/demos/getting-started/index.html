@@ -5,9 +5,8 @@
 <head>
     <meta charset="utf-8"></meta>
     <title>Tutorial 1: Getting Started</title>
+    <script src="cytoscape.js"></script>
 </head>
-
-<script src="cytoscape.js"></script>
 
 <style>
     #cy {
@@ -22,17 +21,19 @@
 <body>
     <div id="cy"></div>
     <script>
-        var cy = cytoscape({
+      var cy = cytoscape({
         container: document.getElementById('cy'),
         elements: [
-            {data: {id: 'a'}},
-            {data: {id: 'b'}},
-            {data: {
-                id: 'ab',
-                source: 'a',
-                target: 'b'
-                }
-            }]
-        });
+          { data: { id: 'a' } },
+          { data: { id: 'b' } },
+          {
+            data: {
+              id: 'ab',
+              source: 'a',
+              target: 'b'
+            }
+          }]
+      });
     </script>
 </body>
+</html>

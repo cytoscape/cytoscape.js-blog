@@ -10,6 +10,8 @@ This is the first in a series of tutorials about Cytoscape.js.
 Cytoscape.js is a graph theory library for analysis and visualization.
 This encompasses a variety of uses, from network biology to social network analysis.
 
+*Tutorial by  [Joseph Stahl](http://josephstahl.com)*
+
 ## A simple site
 First, create a directory for this tutorial. I will be using `getting-started/`.
 [Download Cytoscape.js](http://js.cytoscape.org) and copy `cytoscape.js` to the project folder.
@@ -19,10 +21,12 @@ In `index.html`, enter the following to get started with Cytoscape.js:
 
 ```html
 <!doctype html>
+<html>
 <head>
     <title>Tutorial 1: Getting Started</title>
+    <script src='cytoscape.js'></script>
 </head>
-<script src='cytoscape.js'></script>
+</html>
 ```
 
 This creates a very simple webpage, consisting only of a title and a script so far.
@@ -47,7 +51,7 @@ Now let's make a graph!
 Adding a graph to this page can be broken down into two parts.
 
 1. Provide an area to draw the graph
-2. Create a graph instance by providing it with two nodes and an edge.
+2. Create a graph instance
 
 ### An area to draw the graph
 First, there must be an area to draw the graph.
@@ -59,17 +63,19 @@ Naming the element makes it easy to later access and modify this element for sty
 
 ```html
 <!doctype html>
+<html>
 <head>
     <title>Tutorial 1: Getting Started</title>
+    <script src='cytoscape.js'></script>
 </head>
-<script src='cytoscape.js'></script>
 
 <body>
     <div id="cy"></div>
 </body>
+</html>
 ```
 
-Next, the style of the graph area must be slightly modified via CSS (putting a graph into a 0 pixel wide `div` element is rather uninteresting).
+Next, the style of the graph area must be slightly modified via CSS (putting a graph into a 0 area `div` element is rather uninteresting).
 To accomplish this, add the following CSS code between `<head>` and `<body>`:
 
 ```html
@@ -85,11 +91,16 @@ To accomplish this, add the following CSS code between `<head>` and `<body>`:
 ```
 
 This expands the `div` element to take up the entire height and width of the broswer window, providing maximum space to the graph.
+Other sizes are possible too, such as `400px` or `50%`.
 
 
 ### Creating a graph instance
 Now comes the interesting part! To start, add a `<script>` tag in `<body>` **after the `<div>` element**.
-> Placing `<script>` after the `cy` element is crucial. Otherwise, the graph will try to draw within an element that has not yet been created. Not good!   
+Placing `<script>` after the `<div id="cy">` element is crucial. Otherwise, the graph will try to draw within an element that has not yet been created. Not good!
+
+*Note: If using [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded),
+the `script` tag may be placed anywhere.
+In this case, `var cy = ...` will be located within an anonymous function provided to the Event Listener.*    
 
 Within the `<script>` tag, add the following:
 
@@ -97,12 +108,13 @@ Within the `<script>` tag, add the following:
 var cy = cytoscape({
   container: document.getElementById('cy'),
   elements: [
-    {data: {id: 'a'}},
-    {data: {id: 'b'}},
-    {data: {
-      id: 'ab',
-      source: 'a',
-      target: 'b'
+    { data: { id: 'a' } },
+    { data: { id: 'b' } },
+    {
+      data: {
+        id: 'ab',
+        source: 'a',
+        target: 'b'
       }
     }]
 });
@@ -112,22 +124,24 @@ var cy = cytoscape({
 `var cy = cytoscape({ ... })` creates a new graph instance, using `cytoscape` which was previously embedded via the `<script>` tag.
 Then, an array of elements are added to the graph.
 
-- `{data: {id: 'a'}}` is a node named *a*
-- `{data: {id: 'b'}}` is a node named *b*
-- `{data: {id: 'ab', source: 'a', target: 'b'}}` is an edge between nodes *a* and *b*.
+- `{ data: { id: 'a' } }` is a node with an id of *a*
+- `{ data: { id: 'b' } }` is a node with an id of *b*
+- `{ data: { id: 'ab', source: 'a', target: 'b' } }` is an edge between nodes *a* and *b*.
 
-> Cytoscape.js can automatically infer which data are nodes and which are edges, as is done here.
-> A user may also [specify groups manually](http://js.cytoscape.org/#ele.group), with (for example) `group: 'nodes'`, useful for keeping track of more complicated graphs.
+Cytoscape.js can automatically infer which data are nodes and which are edges, as is done here.
+A user may also [specify groups manually](http://js.cytoscape.org/#ele.group), with (for example) `group: 'nodes'`, useful for keeping track of more complicated graphs.
 
 By now, `index.html` should be finished and resemble this:
 
 ```html
 <!doctype html>
+
+<html>
+
 <head>
     <title>Tutorial 1: Getting Started</title>
+    <script src="cytoscape.js"></script>
 </head>
-
-<script src='cytoscape.js'></script>
 
 <style>
     #cy {
@@ -142,20 +156,22 @@ By now, `index.html` should be finished and resemble this:
 <body>
     <div id="cy"></div>
     <script>
-        var cy = cytoscape({
-            container: document.getElementById('cy'),
-            elements: [
-                {data: {id: 'a'}},
-                {data: {id: 'b'}},
-                {data: {
-                    id: 'ab',
-                    source: 'a',
-                    target: 'b'
-                    }
-                }]
-        });
+      var cy = cytoscape({
+        container: document.getElementById('cy'),
+        elements: [
+          { data: { id: 'a' } },
+          { data: { id: 'b' } },
+          {
+            data: {
+              id: 'ab',
+              source: 'a',
+              target: 'b'
+            }
+          }]
+      });
     </script>
 </body>
+</html>
 ```
 
 Open `index.html` in your favorite web browser and celebrate!
@@ -167,16 +183,17 @@ The initialization of the graph may be modified to change default style options,
 
 ```javascript
 var cy = cytoscape({
-    container: document.getElementById('cy'),
-    elements: [
-        {data: {id: 'a'}},
-        {data: {id: 'b'}},
-        {data: {
-            id: 'ab',
-            source: 'a',
-            target: 'b'
-        }
-        }],
+  container: document.getElementById('cy'),
+  elements: [
+    { data: { id: 'a' } },
+    { data: { id: 'b' } },
+    {
+      data: {
+        id: 'ab',
+        source: 'a',
+        target: 'b'
+      }
+    }],
     style: [
         {
             selector: 'node',
@@ -191,6 +208,7 @@ var cy = cytoscape({
 Next up is displaying labels in the graph so that nodes can be identified.
 Labels are added via the `'label`' property of style.
 Since labels are already provided (via the `id` property of `data`), we'll use those.
+If other `data` properties are provided, such as `firstname`, those could be used instead.
 
 ```javascript
 style: [
@@ -204,7 +222,7 @@ style: [
     }]
 ```
 
-The final "essential" component of a graph in Cytoscape.js is the layout.
+The final common component of a graph in Cytoscape.js is the layout.
 Like `style`, `elements`, and `containers`, `layout` is also specified as a part of the object passed to `cytoscape` during construction.
 To the existing `cy` object, add (after `elements`):
 
@@ -219,39 +237,49 @@ Let's add some more points and edges to the graph.
 
 ```javascript
 elements: [
-    // nodes
-    {data: {id: 'a'}},
-    {data: {id: 'b'}},
-    {data: {id: 'c'}},
-    {data: {id: 'd'}},
-    {data: {id: 'e'}},
-    {data: {id: 'f'}},
-    // edges
-    {data: {
-        id: 'ab',
-        source: 'a',
-        target: 'b'
-    }},
-    {data: {
-        id: 'cd',
-        source: 'c',
-        target: 'd'
-    }},
-    {data: {
-        id: 'ef',
-        source: 'e',
-        target: 'f'
-    }},
-    {data: {
-        id: 'ac',
-        source: 'a',
-        target: 'd'
-    }},
-    {data: {
-        id: 'be',
-        source: 'b',
-        target: 'e'
-    }}
+  // nodes
+  { data: { id: 'a' } },
+  { data: { id: 'b' } },
+  { data: { id: 'c' } },
+  { data: { id: 'd' } },
+  { data: { id: 'e' } },
+  { data: { id: 'f' } },
+  // edges
+  {
+    data: {
+      id: 'ab',
+      source: 'a',
+      target: 'b'
+    }
+  },
+  {
+    data: {
+      id: 'cd',
+      source: 'c',
+      target: 'd'
+    }
+  },
+  {
+    data: {
+      id: 'ef',
+      source: 'e',
+      target: 'f'
+    }
+  },
+  {
+    data: {
+      id: 'ac',
+      source: 'a',
+      target: 'd'
+    }
+  },
+  {
+    data: {
+      id: 'be',
+      source: 'b',
+      target: 'e'
+    }
+  }
 ],
 ```
 
@@ -263,7 +291,7 @@ Try it out with:
 ```javascript
 for (var i = 0; i < 10; i++) {
     cy.add({
-        data: {id: 'node' + i}
+        data: { id: 'node' + i }
         }
     );
     var source = 'node' + i;
@@ -280,10 +308,11 @@ for (var i = 0; i < 10; i++) {
 This adds 10 new nodes to the graph with half the edges going to `a` and half going to `b`.
 If you examine the graph now, you may notice that the layout has been messed up.
 To fix this, add a call to [`cy.layout()`](http://js.cytoscape.org/#cy.layout) after you are done adding nodes and edges.
+Here we're using `circle`, one of the [many layouts availble in Cytoscape.js](http://js.cytoscape.org/#layouts).
 
 ```javascript
 cy.layout({
-    name: 'grid'
+    name: 'circle'
 });
 ```
 
@@ -299,6 +328,8 @@ Once a graph has been created, it can be manipulated via a variety of methods, a
 
 Take a look at my finished graphs:
 
-- [Getting started]({{site.baseurl}}/assets/getting-started/index.html)
-- [Style & Layout]({{site.baseurl}}/assets/getting-started/index-layout.html)
-- [Adding nodes with `cy.add()`]({{site.baseurl}}/assets/getting-started/index-addingNodes.html)
+- [Getting started]({{site.baseurl}}/public/demos/getting-started/index.html)
+- [Style & Layout]({{site.baseurl}}/public/demos/getting-started/index-layout.html)
+- [Adding nodes with `cy.add()`]({{site.baseurl}}/public/demos/getting-started/index-addingNodes.html)
+
+Source code [available on Github](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/getting-started)

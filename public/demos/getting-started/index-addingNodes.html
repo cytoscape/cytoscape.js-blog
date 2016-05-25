@@ -5,9 +5,8 @@
 <head>
     <meta charset="utf-8"></meta>
     <title>Tutorial 1: Getting Started</title>
+    <script src="cytoscape.js"></script>
 </head>
-
-<script src="cytoscape.js"></script>
 
 <style>
     #cy {
@@ -23,29 +22,30 @@
     <div id="cy"></div>
     <script>
         var cy = cytoscape({
-            container: document.getElementById('cy'),
-            elements: [
-                {data: {id: 'a'}},
-                {data: {id: 'b'}},
-                {data: {
-                    id: 'ab',
-                    source: 'a',
-                    target: 'b'
-                }
-                }],
-            style: [
-                {
-                    selector: 'node',
-                    style: {
-                        'shape': 'hexagon',
-                        'background-color': 'red',
-                        'label': 'data(id)'
-                    }
-                }]
+          container: document.getElementById('cy'),
+          elements: [
+            { data: { id: 'a' } },
+            { data: { id: 'b' } },
+            {
+              data: {
+                id: 'ab',
+                source: 'a',
+                target: 'b'
+              }
+            }],
+          style: [
+            {
+              selector: 'node',
+              style: {
+                'shape': 'hexagon',
+                'background-color': 'red',
+                'label': 'data(id)'
+              }
+            }]
         });
         for (var i = 0; i < 10; i++) {
             cy.add({
-                data: {id: 'node' + i}
+                data: { id: 'node' + i }
                 }
             );
             var source = 'node' + i;
