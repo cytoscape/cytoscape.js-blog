@@ -198,7 +198,7 @@ var cy = cytoscape({
         {
             selector: 'node',
             style: {
-                'shape': 'hexagon',
+                shape: 'hexagon',
                 'background-color': 'red'
             }
         }]      
@@ -215,9 +215,9 @@ style: [
     {
         selector: 'node',
         style: {
-            'shape': 'hexagon',
+            shape: 'hexagon',
             'background-color': 'red',
-            'label': 'data(id)'
+            label: 'data(id)'
         }
     }]
 ```
