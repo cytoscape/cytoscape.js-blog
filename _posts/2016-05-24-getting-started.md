@@ -286,7 +286,7 @@ elements: [
 By now you might be wondering if there's a faster way to add elements to the graph, and there is!
 After the graph has been made, it can be accessed via the variable `cy`.
 This allows us to use functions such as [`cy.add(...)`](http://js.cytoscape.org/#cy.add) to automate adding variables.
-Try it out with: 
+Try it out with:
 
 ```javascript
 for (var i = 0; i < 10; i++) {
