@@ -89,18 +89,51 @@ var GlyElements = {
     // Remaining data excluded for brevity
   ],
   edges: [
-    { data: { id: 'step1', enzyme: 'Hexokinase', source: 0, target: 1 } },
-    { data: { id: 'step2', enzyme: 'Phosphoglucose isomerase', source: 1, target: 2 } },
-    { data: { id: 'step3', enzyme: 'Phosphofructokinase', source: 2, target: 3 } },
-    { data: { id: 'step4', enzyme: 'Fructose-bisphosphate aldolase', source: 3, target: 4 } },
-    { data: { id: 'step5', enzyme: 'Triosephosphate isomerase', source: 4, target: 5 } },
-    // DHAP is in equilibrium with GADP; only GADP moves pathway forward
-    { data: { id: 'step5-reverse', enzyme: 'Triosephosphate isomerase', source: 5, target: 4 } },
-    { data: { id: 'step6', enzyme: 'Glyceraldehyde 3-phosphate dehydrogenase',
+    {
+      data: {
+        id: 'step1',
+        enzyme: 'Hexokinase',
+        source: 0, target: 1
+      }
+    }, {
+      data: {
+        id: 'step2',
+        enzyme: 'Phosphoglucose isomerase',
+        source: 1, target: 2
+      }
+    }, {
+      data: {
+        id: 'step3',
+        enzyme: 'Phosphofructokinase',
+        source: 2, target: 3
+      }
+    }, {
+      data: {
+        id: 'step4',
+        enzyme: 'Fructose-bisphosphate aldolase',
+        source: 3, target: 4
+      }
+    }, {
+      data: {
+        id: 'step5',
+        enzyme: 'Triosephosphate isomerase',
+        source: 4, target: 5
+      }
+    }, {
+      data: {
+        // DHAP is in equilibrium with GADP; only GADP moves pathway forward
+        id: 'step5-reverse',
+        enzyme: 'Triosephosphate isomerase',
+        source: 5, target: 4
+      }
+    }, {
+      data: {
+        id: 'step6',
+        enzyme: 'Glyceraldehyde 3-phosphate dehydrogenase',
         // 4 is GADP, 5 is DHAP and is therefore skipped over
-        source: 4,
-        target: 6 } }
-    // Remaining data excluded for brevity
+        source: 4, target: 6
+      }
+    }
   ]
 };
 ```
@@ -124,8 +157,8 @@ glycolysis/
 ## Waiting for `<div>`: Ensuring `cytoscape.js` has a container to use
 [Last time]({% post_url 2016-05-24-getting-started %}), it was possible to place `var cy = cytoscape({...})` after the `<div>` element to make sure that the graph had a container to use.
 Because of putting `<script src='glycolysis.js'></script>` in `<head>`, ordering will not work this time.
-Instead, using an event listener will make sure that no graph-related code is run before the DOM has finished being laid out.
-Add `document.addEventListener` to the top of the file, as follows: 
+Instead, using an event listener will make sure that no graph-related code is run before the [DOM has finished being laid out](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded).
+Add [`document.addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) to the top of the file, as follows: 
 
 ```javscript
 document.addEventListener("DOMContentLoaded", function() { ... });
@@ -133,17 +166,20 @@ document.addEventListener("DOMContentLoaded", function() { ... });
 
 All remaining code will go inside of the anonymous function (which will be executed once the DOM layout is finished).
 
-## An empty graph
+## A basic graph
 Now that we are sure there is a `<div>` element to draw within, it's time to call `cytoscape()`.
 
 ```javascript
   var cy = cytoscape({
     container: document.getElementById('cy'),
+    elements: GlyElements,
     style: [
       {
         selector: 'node',
         style: {
-          label: 'data(molecule)'
+          label: 'data(molecule)',
+          'width': '200px',
+          'height': '200px'
         }
       }, {
         selector: 'edge',
@@ -159,27 +195,19 @@ Remember that this will all be indented within the function. As done previously,
 The object passed to `cytoscape()` also contains some style directives for the graph.
 In [getting-started]({% post_url 2016-05-24-getting-started %}), the `id` property was used for labels; now, `molecule` will be used to provide more descriptive names.
 Edges are given labels in the same manner as nodes: specify that a style is being applied to them via a [selector](http://js.cytoscape.org/#selectors) then provide properties as a `style` object.
-Currently, only a `label` style is applied so that viewers of the graph can tell what enzyme is involved in each step.
+A `label` style is applied to both the nodes and edges so that viewers of the graph can tell what metabolite or enzyme is involved in each step.
+For nodes, the [`width` and `height` properties](http://js.cytoscape.org/#style/node-body) properties make each node 200px wide and 200px tall—large enough to hold the images.
 
-Unlike the Getting Started example, no elements are specified during initialization of the graph (and consequently no layout, since there are no elements to lay out).
-These will be added later by using the `GlyElements` object defined earlier.
+You may notice that `layout` has not been specified yet.
+It's much more complex here than in Tutorial 1 and so will be covered in its own section. 
 
-## Populating the graph
-Due to previously specifying a JSON object (recall `GlyElements`?), adding elements to this graph is extraordinarily easy.
-Add the following right underneath `var cy = cytoscape({...})`:
-
-```javascript
-  cy.add(GlyElements);
-```
-
-Easy, right? Now that elements have been added, it's time to style them. The following code directly follows `cy.add(GlyElements)`.
+## Adding images
+The following code directly follows graph initialization in `var cy = cytoscape()`:
 
 ```javascript
   cy.nodes().forEach(function(ele) {
-    cy.style().selector('#' + ele.id())
+    cy.style().selector('node#' + ele.id())
       .style({
-        'width': 200,
-        'height': 200,
         'background-opacity': 0,
         'background-image': 'assets/' + ele.data().image,
         'background-fit': 'contain',
@@ -198,20 +226,19 @@ The function is a long chain of function calls which select nodes, modify their 
 [`cy.style()`](http://js.cytoscape.org/#cy.style) returns a style object for the entire graph.
 Since only the style of a single node will be modified at a time, a [selector](http://js.cytoscape.org/#selectors) call is chained next.
 Selectors use a [CSS-esque string for selecting elements, detailed in the Cytoscape.js documentation](http://js.cytoscape.org/#selectors/notes-amp-caveats).
-`'#' + ele.id()` will select individual elements to ensure that an image is only applied to that element.
+`'node#' + ele.id()` will select individual nodes to ensure that an image is only applied to that node.
 The [`'#'` character](http://js.cytoscape.org/#selectors/group-class-amp-id) tells the `selector()` function that it will be matching elements based on ID.
-String concatenation is used to join `'#'` with `ele.id()` (recall that `ele` is passed to this function via `forEach()`) to form the completed selector string.
+String concatenation is used to join `'node#'` with `ele.id()` (recall that `ele` is passed to this function via `forEach()`) to form the completed selector string.
 
-At this point, the graph's style object has been narrowed down to the style referring to a single element.
+At this point, the graph's style object has been narrowed down to the style referring to a single node.
 Now it is time to modify that style.
 `style()` is again called, this time to get the style of the single object provided by the selector.
 Unlike last time, a new style is provided via the object passed to `style()`.
 
-- [`'width'` and `'height'`](http://js.cytoscape.org/#style/node-body) properties make each node 200px wide—large enough to hold the images.
 - [`'background-opacity'`](http://js.cytoscape.org/#style/node-body) makes the back of the node transparent instead of the usual gray color.
 - [`'background-image'`, `'background-fit'`, and `'background-clip'`](http://js.cytoscape.org/#style/background-image) all refer to the background images being used (the metabolite SVGs).
   - `'background-image': 'assets/' + ele.data().image` concatenates `assets/` (the folder where the SVG images are stored) with the image filename previously specified in `gly_elements.js`.
-  [ele.data()](http://js.cytoscape.org/#eles.data) provides an easy way to access the data of an element; in this case, the `image` value is retrieved.
+  [`ele.data()`](http://js.cytoscape.org/#eles.data) provides an easy way to access the data of an element; in this case, the `image` value is retrieved.
   - `'background-fit: 'contain'` shrinks the images as needed to fit within the 200px nodes
   - `'background-clip': 'none'` ensures that images that square images within round nodes are not cropped. Alternatively, node shaped could be changed to `square` when initializing the graph.
 
@@ -244,28 +271,38 @@ glycolysis/
     +-- index.html
 ```
 
+If you try viewing the graph now, it will look like (and this is putting it generously) a mess.
+Time to add a layout and fix this!
+
 ## Laying out the graph
 Now that all nodes are added and have images, it's time to lay out the graph.
 Order is important here to make sure that all intermediate metabolites are laid out in the right order.
 
-We'll start with a [`grid` layout](http://js.cytoscape.org/#layouts/grid).
+We'll return to the graph initialization, so add a `layout` property right after `style`.
+Since the graph will be laid out vertically, we'll use a [`grid` layout](http://js.cytoscape.org/#layouts/grid).
 
 ```javascript
- cy.layout({
-    name: 'grid'
- });
+  var cy = cytoscape({ 
+    // container, elements, and style have been omitted here for concision
+    layout: {
+      name: 'grid'
+    }
+  });
 ```
  
-However, at this point the graph looks crowded and hard to read.
+At this point, the graph will be spaced out but not yet arranged in the most sensible order.
 Some other options should be specified to get a better looking layout.
 
 ```javascript
-  cy.layout({
-    name: 'grid',
-    fit: false,
-    columns: 1,
-    avoidOverlap: true,
-    avoidOverlapPadding: 80
+  var cy = cytoscape({ 
+    // container, elements, and style have been omitted here for concision
+    layout: {
+      name: 'grid',
+      fit: false,
+      columns: 2,
+      avoidOverlap: true,
+      avoidOverlapPadding: 80
+      }
   });
 ```
 
@@ -281,21 +318,23 @@ Since only one column is available to Cytoscape.js, it places DHAP underneath GA
 To fix this, we'll create two columns in the graph but place everything except DHAP in the left-hand column.
 This way, DHAP will stick out to the right, making it easy to recognize that DHAP is in equilibrium with GADP and not a predecessor of 1,3BPG.
 
-To create this layout, modify the object passed to `cy.layout()` slightly.
+To create this layout, modify the object passed to `layout` slightly.
 
 ```javascript
-  cy.layout({
-    name: 'grid',
-    fit: false, // it's okay if some of the graph is hidden off-screen because viewport scrolls
-    columns: 2,
-    avoidOverlap: true,
-    avoidOverlapPadding: 80,
-    position: function(ele) {
-      if (ele.data().molecule === 'DHAP') {
-        // DHAP is, as usual, a special case
-        return { row: ele.id(), col: 1 }; // layout to right of GADP
+  var cy = cytoscape({
+    // container, elements, and style have been omitted here for concision
+    layout: {
+      name: 'grid',
+      fit: false,
+      columns: 2,
+      avoidOverlap: true,
+      avoidOverlapPadding: 80,
+      position: function(ele) {
+        if (ele.data().molecule === 'DHAP') {
+          return { row: ele.id() - 1, col: 1 };
+        }
+        return { row: ele.id(), col: 0 };
       }
-      return { row: ele.id(), col: 0 };
     }
   });
 ```
@@ -307,11 +346,13 @@ The most straightforward way to handle DHAP is to examine the name of the molecu
 This is retrieved the same way as the image filename, with `ele.data().molecule`.
 If the node's molecule name is 'DHAP', it's put in the second column; otherwise, the first column.
 All nodes are put in rows matching their ID—another advantage to using incrementing integers for IDs.
+The row of DHAP is decremented by 1 so that it appears directly to the right of GADP rather than diagonal to it.
 
-Finally, let's [lock the elements](http://js.cytoscape.org/#nodes.lock) to make sure that users don't mess up our careful layout!
+Finally, let's [lock the elements](http://js.cytoscape.org/#init-opts/autolock) to make sure that users don't mess up our careful layout!
+Add the following after graph initialization and before the `forEach()` background image call.
 
 ```javascript
-  cy.nodes().lock();
+  cy.autolock(true);
 ```
 
 This will lock the graph in the current layout, preventing users from dragging nodes around (but not from scrolling the viewpoint).
@@ -329,23 +370,23 @@ Then, each time a "Next Step" button is clicked, the graph will scroll to focus 
 The process of animating the graph is broken down into several steps:
 
 1. Focusing on the first element of the graph after loading
-2. Creating an advanceViewport function to find the next element and focus on it
-  - Another function will be uesd for finding the next element
+2. Creating an advanceByButton function to focus on the next element
+  - Another function will be used for finding the next element
   - The function created in Step 1 (for focusing on an element) can be reused for focusing on the next element
-3. Adding a button to the graph which will execute the advanceViewport function
+3. Adding a button to the graph which will execute the advanceByButton function
 
 ## Focusing on the first element
 
 First of all, a function must be written that can focus on an element passed to it.
 We'll call it `panIn(target)`, where `target` is a Cytoscape.js element. 
-`function panIn(target) {...}` should be placed right after `cy.nodes().lock()`, within the Event Listener function. 
+`function panIn(target) {...}` should be placed right after the `forEach()` call which applies background images, within the Event Listener function. 
 
 ```javascript
   function panIn(target) {
     cy.animate({
       fit: {
         eles: target,
-        padding: 40
+        padding: 200
       },
       duration: 700,
       easing: 'linear',
@@ -361,7 +402,7 @@ I've specified the options necessary for this tutorial but more options [are doc
 
 - `fit:`
   - `eles: target` will focus the viewport around `target`. `target` is initially the first element (glucose) but will change as the user advances the view with the "Next Step" button.
-  - `padding: 40` adds white space around `target` to help things look less crowded
+  - `padding: 200` adds white space around `target` to help things look less crowded. Large padding means users can see nearby nodes.
 - `duration: 700` tells Cytoscape.js to draw the animation out for 700ms (so that enzyme text may be read)
 - `easing: 'linear'` causes the animation to proceed at a steady rate instead of speeding up initially then slowing down (`linear` is the default if `easing` is unspecified)
 - `queue: true` will queue up animations so that successive clicks of "Next Step" will advance the graph several steps.
@@ -391,11 +432,11 @@ Once the initial node has been found, zooming in on it is easy.
 This will call `panIn(target)` with `startNode` (glucose) as the target.
 If you reload `index.html`, the graph should now focus on only the first element (glucose) instead of all elements.
 
-## Writing `advanceViewport()`
+## Writing `advanceByButton(previous)`
 
-Cytoscape.js has a special query, `':selected'`, which we will use to our advance to advance the viewport.
-This affords more flexibility than storing the node in a `currentView` variable, which would not allow users to click on different parts of the graph and animate from there.
-To start out, it's important to select the first node (glucose). Modify the previous code to insert a call to `cy.select()`:
+To start out, it's important to select the first node (glucose).
+Selection status will be used later when determining whch node will be panned to during animation.
+Modify the previous code to insert a call to `select()`:
 
 ```javascript
   var startNode = cy.$('node[molecule = "Glucose"]');
@@ -406,32 +447,33 @@ To start out, it's important to select the first node (glucose). Modify the prev
 [`eles.select()`](http://js.cytoscape.org/#eles.select) will mark whichever node(s) it is called on as selected.
 In this case, only a single node (the glucose node) is selected. 
 
-Now that the starting node is selected, it's time to write the `advanceViewport()` function.
-Add it immediately after `panIn(target)`.
+Now that the starting node is selected, it's time to write the `advanceByButton()` function.
+`advanceByButton()` takes one argument, `previous`, the previously selected node.
+Determining the selected node will be done by a function which is called when the "Next Step" button is clicked.
+Add `advanceByButton(previous)` immediately after `panIn(target)`.
 
 ```javascript
-  function advanceViewport() {
-    var oldSelect = cy.$(':selected');
-    oldSelect.unselect();
-    var nextSelect = findSuccessor(oldSelect);
+  function advaceByButton(previous) {
+    previous.unselect();
+    var nextSelect = findSuccessor(previous);
     nextSelect.select();
     panIn(nextSelect);
   }
 ```
 
-`findSuccessor(oldSelect)` will be covered soon.
-The `':selected'` selector string comes in handy here, since the selected node can be found even if it has changed (via user interaction) since the last call to `advanceViewport()`.
-`oldSelect.unselect()` will [unselect](http://js.cytoscape.org/#eles.unselect) the selected node so that only one element (the successor) is selected at a time.
+`findSuccessor(previous)` will be covered soon.
+`previous.unselect()` will [unselect](http://js.cytoscape.org/#eles.unselect) the selected node so that only one element (the successor) is selected at a time.
+Note that by default Cytoscape.js will unselect elements when new elements are selected so this not strictly necessary.
+
 `var nextSelect = findSuccessor(oldSelect)` finds the next element from `oldSelect`.
 Because some special treatment is required for DHAP (to avoid getting stuck in a loop), I chose to break `findSuccessor` out into its own function.
 Finally, the next element is selected and the animation is run, reusing the `panIn(target)` function previously defined.
 
 ## Writing `findSuccessor(selected)`
 As usual, the edge case of DHAP makes things more complicated.
-Normally, the successor is whichever node has the highest ID relative to the current node.
-This will work for normally advancing through the graph because GADP (with id = 4) will have two successors, but the "correct" successor is 1,3BPG (id = 6) which will be chosen rather than DHAP (id = 5) after comparing IDs.
-However, this approach must be modified since users are allowed to select their own elements. If a user selects DHAP, its only successor is GADP but DHAP has a higher ID than GADP.
-Additionally, there is no guarantee that `selected` will be a node. If a user has selected an edge, then the behavior for finding connected nodes will change.
+The successor is whichever node has the highest ID relative to the current node, excluding the current node.
+There is no guarantee that `selected` will be a node.
+If a user has selected an edge, then the behavior for finding connected nodes will change.
 
 ```javascript
   function findSuccessor(selected) {
@@ -439,8 +481,7 @@ Additionally, there is no guarantee that `selected` will be a node. If a user ha
     if (selected.isEdge()) {
       connectedNodes = selected.target();
     } else {
-      connectedNodes = selected.connectedEdges().targets();
-      connectedNodes = connectedNodes.difference(selected);
+      connectedNodes = selected.outgoers().nodes();
     }
     var successor = connectedNodes.max(function(ele) {
       return Number(ele.id());
@@ -453,9 +494,7 @@ First, `var connectedNodes` is declared. `connectedNodes` is then modified in th
 The `if/else` block handles cases where the user has manually selected an edge instead of the nodes that are normally selected.
 If an edge is selected, [`selected.target()`](http://js.cytoscape.org/#edge.target) returns its target, paying attention to edge direction.
 If edge direction is unimportant, [`selected.connectedNodes()`](http://js.cytoscape.org/#edges.connectedNodes) may be used, which will return both the source and target.
-When a node is selected, `selected.connectedEdges().targets()` is used, which combines [`connectedEdges()`](http://js.cytoscape.org/#nodes.connectedEdges) with [`targets()`](http://js.cytoscape.org/#edges.targets) to find all targets of the selected node.
-Then, [`difference(selected)`](http://js.cytoscape.org/#eles.difference) is called on `connectedNodes` to make sure that the currently selected node does not end up in the new collection.
-This is necessary for handling DHAP, which is put into the `connectedNodes` collection when it is selected (because `connectedEdges()` includes the edge from GADP with DHAP as a target). 
+When a node is selected, `selected.outgoers().nodes()` is used, which combines [`outgoers()`](http://js.cytoscape.org/#nodes.outgoers) with `nodes()` to find nodes connected to the selected node.
 Usually `connectedNodes` is just one target, except for GADP which has two targets (DHAP and 1,3BPG).
 In the case of two targets, the successor is defined to be the one with the highest ID.
 
@@ -489,35 +528,32 @@ Reopen `index.html` and add the following CSS style within the `<style>` tag, ri
     }
 ```
 
-Now return to `glycolysis.js`. In the interest of keeping things tidy, we'll create a function which returns a button we can append to the document.
+Then make a button element in `<body>`, after the `cy` element.
+
+```html
+<body>
+    <div id='cy'></div>
+    <input type='button' id='advance' value='Next Step'>
+</body>
+```
+
+Now return to `glycolysis.js`.
+To add a function to this button, we need to select it and give it a function to run when clicked.
+This can be done with `document.getElementById('advance')` and `addEventListener()`.
 
 ```javascript
-  function makeAdvanceButton() {
-    var advanceButton = document.createElement('input');
-    advanceButton.type = 'button';
-    advanceButton.id = 'advance';
-    advanceButton.value = "Next Step";
-    advanceButton.onclick = advanceViewport;
-    return advanceButton;
-  }
+  var advanceButton = document.getElementById('advance');
+  advanceButton.addEventListener('click', function() {
+    var previous = cy.$(':selected');
+    advaceByButton(previous);
+  });
 ```
 
 Again, this function goes inside the function being passed to `addEventListener()`.
-After creating the `'input'` element, a few properties are modified: 
-
-- `advanceButton.type = 'button'` marks the element as a button instead of another input such as a form
-- `advanceButton.id = 'advance'` will apply the CSS style previously defined in `index.html`
-- `advanceButton.value = "Next Step"` gives the input button a label so users know what id does
-- `advanceButton.onclick = advanceViewport` assigns an action to the button. In this case, when the button is clicked, the `advanceViewport()` function will run.
-
-Finally, the button is returned with `return advanceButton`. To add the newly created button to the webpage, place the following at the very bottom of the function given to `addEventListener()`:
-
-```javascript
-  document.body.appendChild(makeAdvanceButton());
-```
-
-This is a bit of DOM manipulation to add the newly created button to the webpage.
-This is done within `glycolysis.js` instead of simply adding a `<input>` tag to `index.html` because `advanceViewport()` is within `glycolysis.js`. 
+After getting the `'advance'` element, a function is declared to handle a click event.
+Cytoscape.js has a special query, [`':selected'`](http://js.cytoscape.org/#selectors/state), which we will use to our advantage to advance the viewport.
+This affords more flexibility than storing the node in a `currentView` variable, which would not allow users to click on different parts of the graph and animate from there.
+The previously selected element is stored in `previous` and passed to `advanceByButton(previous)`, which uses the previously selected element to find the next element in the graph.
 
 
 # Improving the graph
@@ -525,32 +561,98 @@ This is done within `glycolysis.js` instead of simply adding a `<input>` tag to 
 ## Looping back to the beginning
 Currently, the graph will reach pyruvate and the "Next Step" button will lose its effect (since pyruvate is the final metabolite and has no successor).
 One possibility is adding an edge back from pyruvate to glucose but this reduces accuracy of the graph—glucose cannot be produced from pyruvate.
-Instead, we'll modify `advanceViewport()` to recognize when it is at the last element and loop back to the beginning.
-`oldSelect` and `nextSelect` will refer to the same element when the graph has reached pyruvate, so comparing them will allow us to recognize this and return to the beginning.
+Instead, we'll modify `advanceByButton()` to recognize when it is at the last element and loop back to the beginning.
+
+There are two possibilities here for recognizing when we are at the end of the graph:
+
+1. `nextSelect` is undefined because there is no successor to the final element
+2. `previous` refers to pyruvate, which is the final element.
+
+I'll be using option 2 but option 1 is equally easy to implement.
 
 ```javascript
-  function advanceViewport() {
-    var oldSelect = cy.$(':selected');
-    oldSelect.unselect();
-    var nextSelect = findSuccessor(oldSelect);
-    if (oldSelect.id() === cy.$('#10').id()) {
+  function advaceByButton(previous) {
+    previous.unselect();
+    var nextSelect = findSuccessor(previous);
+    if (previous.id() === cy.nodes('#10').id()) {
       // loop back to beginning instead of repeating pyruvate
-      nextSelect = cy.$('#0');
+      nextSelect = cy.nodes('#0');
     }
     nextSelect.select();
     panIn(nextSelect);
   }
 ```
 
-The ID of `oldSelect` is compared with the ID of pyruvate and if equal, `nextSelect` is changed to the first element of the graph, glucose.
-These steps are easily accomplished with `cy.$('#0')`, another [selector which matches against element IDs](http://js.cytoscape.org/#selectors/group-class-amp-id).
+The ID of `previous` is compared with the ID of pyruvate and if equal, `nextSelect` is changed to the first element of the graph, glucose.
+These steps are easily accomplished with `cy.nodes('#0')`, another [selector which matches against element IDs](http://js.cytoscape.org/#selectors/group-class-amp-id).
+
+## A better style
+The current appearance of the graph leaves something to be desired; edges should be more visible and labels would look better if the stood out more.
+[Plenty of style options](http://js.cytoscape.org/#style) are available so we'll make use of them in the graph declaration.
+You can play around with various properties but I've settled on these for producing a reasonably good-looking graph:
+
+```javascript
+  var cy = cytoscape({
+    container: document.getElementById('cy'),
+    elements: GlyElements,
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(molecule)',
+          'width': '200px',
+          'height': '200px',
+          'color': 'blue',
+          'font-size': '26px',
+          'text-halign': 'right',
+          'text-valign': 'center'
+        }
+      }, {
+        selector: 'edge',
+        style: {
+          'label': 'data(enzyme)',
+          'text-background-color': 'yellow',
+          'text-background-opacity': 0.4,
+          'width': '6px',
+          'target-arrow-shape': 'triangle',
+          'control-point-step-size': '140px'
+        }
+      }
+    ],
+    layout: {} // omitted for concision
+  });
+```
+
+## More animation options
+Right now, users can only animate the graph by clicking the "Next Step" button.
+They are able to select nodes by clicking and then running the animation from there, but it's possible to save them a step.
+We'll add an event listener that will pan whenever a node is clicked, saving the user from having to use the "Next Step" button.
+
+[`cy.on()`](http://js.cytoscape.org/#cy.on) permits handling any event that occurs in graph area.
+In this case, we're only interested in tap events on nodes so we'll use a selector to narrow this down: `cy.on('tap', 'node', function)`.
+Now all that's left is to write the function:
+
+```javascript
+  cy.on('tap', 'node', function(event) {
+    var target = event.cyTarget;
+    cy.nodes().unselect();
+    target.select();
+    panIn(target);
+  });
+```
+
+By passing [`event`](http://js.cytoscape.org/#events) to the function, the target of the event can be read with `event.cyTarget`.
+This function includes much of the functionality of `advanceByButton(previous)`; however, `advanceByButton(previous)` expects to be passed the previously selected node while this function does not care about the previously selected node.
+Instead, animation will skip forward or back to center on the tapped node.
+This node is selected and all other are unselected.
+Then, `panIn(target)` is called, just as it is in `advanceByButton(previous)`. 
 
 # Conclusion
 Now you should have a fully working glycolysis graph, looking similar to this: 
 
 ![finished graph]({{site.baseurl}}/public/demos/glycolysis/assets/finished_graph.png)
 
-You can [interact with my finished graph]({{site.baseurl}}/public/demos/glycolysis/index.html) or [view the source code]((https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/glycolysis)
+You can [interact with my finished graph]({{site.baseurl}}/public/demos/glycolysis/index.html) or [view the source code](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/glycolysis)
 
 Thanks to:
 - Metabolite SVGs: modified from Thomas Shafee (Own work) [<a href="http://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>], <a href="https://commons.wikimedia.org/wiki/File%3AGlycolysis_metabolic_pathway_3_annotated.svg">via Wikimedia Commons</a>
