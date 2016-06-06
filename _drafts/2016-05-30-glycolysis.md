@@ -78,14 +78,14 @@ Edges have four `data` properties:
 
 var GlyElements = {
   nodes: [
-    { data: { id: 0, molecule: 'Glucose', image: 'glucose.svg' } },
-    { data: { id: 1, molecule: 'G6P', image: 'g6p.svg' } },
-    { data: { id: 2, molecule: 'F6P', image: 'f6p.svg' } },
-    { data: { id: 3, molecule: 'F1,6BP', image: 'f16bp.svg' } },
+    { data: { id: 0, molecule: 'Glucose', image: 'assets/glucose.svg' } },
+    { data: { id: 1, molecule: 'G6P', image: 'assets/g6p.svg' } },
+    { data: { id: 2, molecule: 'F6P', image: 'assets/f6p.svg' } },
+    { data: { id: 3, molecule: 'F1,6BP', image: 'assets/f16bp.svg' } },
     // GADP & DHAP is in equilibrium
-    { data: { id: 4, molecule: 'GADP', image: 'gadp.svg' } },
-    { data: { id: 5, molecule: 'DHAP', image: 'dhap.svg' } }, 
-    { data: { id: 6, molecule: '1,3BPG', image: '13bpg.svg' } }
+    { data: { id: 4, molecule: 'GADP', image: 'assets/gadp.svg' } },
+    { data: { id: 5, molecule: 'DHAP', image: 'assets/dhap.svg' } }, 
+    { data: { id: 6, molecule: '1,3BPG', image: 'assets/13bpg.svg' } }
     // Remaining data excluded for brevity
   ],
   edges: [
@@ -177,7 +177,7 @@ Now that we are sure there is a `<div>` element to draw within, it's time to cal
       {
         selector: 'node',
         style: {
-          label: 'data(molecule)',
+          'label': 'data(molecule)',
           'width': '200px',
           'height': '200px'
         }
@@ -202,51 +202,44 @@ You may notice that `layout` has not been specified yet.
 It's much more complex here than in Tutorial 1 and so will be covered in its own section. 
 
 ## Adding images
-The following code directly follows graph initialization in `var cy = cytoscape()`:
+Return to the `style` property and add the following:
 
 ```javascript
-  cy.nodes().forEach(function(ele) {
-    cy.style().selector('node#' + ele.id())
-      .style({
-        'background-opacity': 0,
-        'background-image': 'assets/' + ele.data().image,
-        'background-fit': 'contain',
-        'background-clip': 'none'
-      })
-      .update();
+  var cy = cytoscape({
+    container: document.getElementById('cy'),
+    elements: GlyElements,
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(molecule)',
+          'width': '200px',
+          'height': '200px',
+          'background-opacity': 0,
+          'background-image': 'data(image)',
+          'background-fit': 'contain',
+          'background-clip': 'none'
+        }
+      }, {
+        selector: 'edge',
+        style: {
+          'label': 'data(enzyme)'
+        }
+      }
+    ]
   });
 ```
 
-[`cy.nodes().forEach(function);`](http://js.cytoscape.org/#eles.forEach) will apply a function to each node of the graph—useful since we have to modify each node's `background-image` property, among others.
-`cy.nodes()` is a quick way to get an array of all nodes of the graph.
-`forEach()` provides `ele`, `i`, and `eles` to the passed function. In this case, only `ele` is used because styling is node-specific and does not require knowledge of the index of the node (`i`) or information about the other nodes (`eles`).
-
-`forEach()` is passed an anonymous function which will modify the style of each element.
-The function is a long chain of function calls which select nodes, modify their style, and update the graph with the newly styled nodes.
-[`cy.style()`](http://js.cytoscape.org/#cy.style) returns a style object for the entire graph.
-Since only the style of a single node will be modified at a time, a [selector](http://js.cytoscape.org/#selectors) call is chained next.
-Selectors use a [CSS-esque string for selecting elements, detailed in the Cytoscape.js documentation](http://js.cytoscape.org/#selectors/notes-amp-caveats).
-`'node#' + ele.id()` will select individual nodes to ensure that an image is only applied to that node.
-The [`'#'` character](http://js.cytoscape.org/#selectors/group-class-amp-id) tells the `selector()` function that it will be matching elements based on ID.
-String concatenation is used to join `'node#'` with `ele.id()` (recall that `ele` is passed to this function via `forEach()`) to form the completed selector string.
-
-At this point, the graph's style object has been narrowed down to the style referring to a single node.
-Now it is time to modify that style.
-`style()` is again called, this time to get the style of the single object provided by the selector.
-Unlike last time, a new style is provided via the object passed to `style()`.
+A background image may be added in a very similar manner to the label; `'data(image)'` is enough to tell Cytoscape.js to use the image stored in the `image` data property.
 
 - [`'background-opacity'`](http://js.cytoscape.org/#style/node-body) makes the back of the node transparent instead of the usual gray color.
 - [`'background-image'`, `'background-fit'`, and `'background-clip'`](http://js.cytoscape.org/#style/background-image) all refer to the background images being used (the metabolite SVGs).
-  - `'background-image': 'assets/' + ele.data().image` concatenates `assets/` (the folder where the SVG images are stored) with the image filename previously specified in `gly_elements.js`.
-  [`ele.data()`](http://js.cytoscape.org/#eles.data) provides an easy way to access the data of an element; in this case, the `image` value is retrieved.
+  - `'background-image': 'data(image)'` uses the filename previously defined in `gly_elements.js`.
   - `'background-fit: 'contain'` shrinks the images as needed to fit within the 200px nodes
   - `'background-clip': 'none'` ensures that images that square images within round nodes are not cropped. Alternatively, node shaped could be changed to `square` when initializing the graph.
 
-Finally, a call to `update()` is made to complete applying the new style to each element.
-
 *Note: styling the elements requires adding SVG elements which for this tutorial are written as relative URLs.
 To view images, you will likely need to point a webserver at the `glycolysis` directory (or whichever directory contains your work for this tutorial).
-Alternatively, you may change `'background-image': 'assets/' + ele.data().image'` to `'background-image': 'http://blog.js.cytoscape.org/public/demos/glycolysis/assets/' + ele.data().image` to use the SVGs hosted on Github Pages.*
 
 If using images stored locally, [download the SVGs here]({{site.baseurl}}/public/demos/glycolysis/assets/assets.zip).
 Unzip and make sure that your workspace is organized as follows: 
@@ -330,7 +323,7 @@ To create this layout, modify the object passed to `layout` slightly.
       avoidOverlap: true,
       avoidOverlapPadding: 80,
       position: function(ele) {
-        if (ele.data().molecule === 'DHAP') {
+        if (ele.data('molecule') === 'DHAP') {
           return { row: ele.id() - 1, col: 1 };
         }
         return { row: ele.id(), col: 0 };
@@ -343,7 +336,7 @@ As noted previously, `columns` has been bumped up to 2.
 Additionally, the `position` property is now specified.
 The value of `position` is a function which returns a `{ row: x, col: y}` type object, where `x` and `y` are grid coordinates for the object.
 The most straightforward way to handle DHAP is to examine the name of the molecule currently being laid out.
-This is retrieved the same way as the image filename, with `ele.data().molecule`.
+This is retrieved by looking up the value of `molecule` in the node's data object, with `ele.data('molecule')`.
 If the node's molecule name is 'DHAP', it's put in the second column; otherwise, the first column.
 All nodes are put in rows matching their ID—another advantage to using incrementing integers for IDs.
 The row of DHAP is decremented by 1 so that it appears directly to the right of GADP rather than diagonal to it.
@@ -389,7 +382,7 @@ We'll call it `panIn(target)`, where `target` is a Cytoscape.js element.
         padding: 200
       },
       duration: 700,
-      easing: 'linear',
+      easing: 'ease',
       queue: true
     });
   }
@@ -404,7 +397,7 @@ I've specified the options necessary for this tutorial but more options [are doc
   - `eles: target` will focus the viewport around `target`. `target` is initially the first element (glucose) but will change as the user advances the view with the "Next Step" button.
   - `padding: 200` adds white space around `target` to help things look less crowded. Large padding means users can see nearby nodes.
 - `duration: 700` tells Cytoscape.js to draw the animation out for 700ms (so that enzyme text may be read)
-- `easing: 'linear'` causes the animation to proceed at a steady rate instead of speeding up initially then slowing down (`linear` is the default if `easing` is unspecified)
+- `easing: 'ease'` gives the graph a nice transition between stationary and animated (`linear` is the default if `easing` is unspecified)
 - `queue: true` will queue up animations so that successive clicks of "Next Step" will advance the graph several steps.
 
 Now that a function which can animate viewport changes has been created, it's time to put it to use.
@@ -453,7 +446,7 @@ Determining the selected node will be done by a function which is called when th
 Add `advanceByButton(previous)` immediately after `panIn(target)`.
 
 ```javascript
-  function advaceByButton(previous) {
+  function advanceByButton(previous) {
     previous.unselect();
     var nextSelect = findSuccessor(previous);
     nextSelect.select();
@@ -545,7 +538,7 @@ This can be done with `document.getElementById('advance')` and `addEventListener
   var advanceButton = document.getElementById('advance');
   advanceButton.addEventListener('click', function() {
     var previous = cy.$(':selected');
-    advaceByButton(previous);
+    advanceByButton(previous);
   });
 ```
 
@@ -571,7 +564,7 @@ There are two possibilities here for recognizing when we are at the end of the g
 I'll be using option 2 but option 1 is equally easy to implement.
 
 ```javascript
-  function advaceByButton(previous) {
+  function advanceByButton(previous) {
     previous.unselect();
     var nextSelect = findSuccessor(previous);
     if (previous.id() === cy.nodes('#10').id()) {
@@ -605,7 +598,11 @@ You can play around with various properties but I've settled on these for produc
           'color': 'blue',
           'font-size': '26px',
           'text-halign': 'right',
-          'text-valign': 'center'
+          'text-valign': 'center',
+          'background-opacity': 0,
+          'background-image': 'data(image)',
+          'background-fit': 'contain',
+          'background-clip': 'none'
         }
       }, {
         selector: 'edge',
@@ -655,5 +652,6 @@ Now you should have a fully working glycolysis graph, looking similar to this:
 You can [interact with my finished graph]({{site.baseurl}}/public/demos/glycolysis/index.html) or [view the source code](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/glycolysis)
 
 Thanks to:
+
 - Metabolite SVGs: modified from Thomas Shafee (Own work) [<a href="http://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>], <a href="https://commons.wikimedia.org/wiki/File%3AGlycolysis_metabolic_pathway_3_annotated.svg">via Wikimedia Commons</a>
 - Pathway: [Glycolysis on Wikipedia](https://en.wikipedia.org/wiki/Glycolysis) by Wikipedia contributors, licensed under [CC-BY-SA](https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License)

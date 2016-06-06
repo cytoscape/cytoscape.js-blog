@@ -6,25 +6,25 @@ var GlyElements = {
       data: {
         id: 0,
         molecule: 'Glucose',
-        image: 'glucose.svg'
+        image: 'assets/glucose.svg'
       }
     }, {
       data: {
         id: 1,
         molecule: 'G6P',
-        image: 'g6p.svg'
+        image: 'assets/g6p.svg'
       }
     }, {
       data: {
         id: 2,
         molecule: 'F6P',
-        image: 'f6p.svg'
+        image: 'assets/f6p.svg'
       }
     }, {
       data: {
         id: 3,
         molecule: 'F1,6BP',
-        image: 'f16bp.svg'
+        image: 'assets/f16bp.svg'
       }
     },
     // GADP & DHAP is in equilibrium
@@ -32,43 +32,43 @@ var GlyElements = {
       data: {
         id: 4,
         molecule: 'GADP',
-        image: 'gadp.svg'
+        image: 'assets/gadp.svg'
       }
     }, {
       data: {
         id: 5,
         molecule: 'DHAP',
-        image: 'dhap.svg'
+        image: 'assets/dhap.svg'
       }
     }, {
       data: {
         id: 6,
         molecule: '1,3BPG',
-        image: '13bpg.svg'
+        image: 'assets/13bpg.svg'
       }
     }, {
       data: {
         id: 7,
         molecule: '3PG',
-        image: '3pg.svg'
+        image: 'assets/3pg.svg'
       }
     }, {
       data: {
         id: 8,
         molecule: '2PG',
-        image: '2pg.svg'
+        image: 'assets/2pg.svg'
       }
     }, {
       data: {
         id: 9,
         molecule: 'PEP',
-        image: 'pep.svg'
+        image: 'assets/pep.svg'
       }
     }, {
       data: {
         id: 10,
         molecule: 'Pyruvate',
-        image: 'pyruvate.svg'
+        image: 'assets/pyruvate.svg'
       }
     }
   ],

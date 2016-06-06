@@ -14,7 +14,11 @@ document.addEventListener("DOMContentLoaded", function() {
           'color': 'blue',
           'font-size': '26px',
           'text-halign': 'right',
-          'text-valign': 'center'
+          'text-valign': 'center',
+          'background-opacity': 0,
+          'background-image': 'data(image)',
+          'background-fit': 'contain',
+          'background-clip': 'none'
         }
       }, {
         selector: 'edge',
@@ -35,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
       avoidOverlap: true,
       avoidOverlapPadding: 80,
       position: function(ele) {
-        if (ele.data().molecule === 'DHAP') {
+        if (ele.data('molecule') === 'DHAP') {
           // DHAP is, as usual, a special case
           return { row: ele.id() - 1, col: 1 }; // layout to right of GADP
         }
@@ -46,17 +50,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   cy.autolock(true);
 
-  cy.nodes().forEach(function(ele) {
-    cy.style().selector('node#' + ele.id())
-      .style({
-        'background-opacity': 0,
-        'background-image': 'assets/' + ele.data().image,
-        'background-fit': 'contain',
-        'background-clip': 'none'
-      })
-      .update();
-  });
-
   function panIn(target) {
     cy.animate({
       fit: {
@@ -64,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
         padding: 200
       },
       duration: 700,
-      easing: 'linear',
+      easing: 'ease',
       queue: true
     });
   }
@@ -86,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
     return successor.ele;
   }
 
-  function advaceByButton(previous) {
+  function advanceByButton(previous) {
     // unselecting is not strictly necessary since cy defaults to single selection
     previous.unselect();
     var nextSelect = findSuccessor(previous);
@@ -101,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function() {
   var advanceButton = document.getElementById('advance');
   advanceButton.addEventListener('click', function() {
     var previous = cy.$(':selected');
-    advaceByButton(previous);
+    advanceByButton(previous);
   });
 
   cy.on('tap', 'node', function(event) {
