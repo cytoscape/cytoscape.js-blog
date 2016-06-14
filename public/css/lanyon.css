@@ -569,3 +569,15 @@ a.pagination-item:hover {
 .layout-reverse.sidebar-overlay #sidebar-checkbox:checked ~ .sidebar {
   box-shadow: -.25rem 0 .5rem rgba(0,0,0,.1);
 }
+
+.social-share {
+}
+
+.social-share a {
+  color: #888;
+  display: inline-block;
+  width: 2em;
+  text-align: center;
+  border: 1px solid #eee;
+  border-radius: 0.25em;
+}

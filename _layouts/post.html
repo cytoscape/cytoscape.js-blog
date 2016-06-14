@@ -6,4 +6,10 @@ layout: default
   <h1 class="post-title">{{ page.title }}</h1>
   <span class="post-date">{{ post.date | date: '%Y-%m-%d' }}</span>
   {{ content }}
+
+  <div class="social-share">
+    <a href="https://twitter.com/home?status={{ page.title }} {{ page.url | prepend: site.url }}"><i class="fa fa-twitter"></i></a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u={{ page.url | prepend: site.url }}"><i class="fa fa-facebook"></i></a>
+    <a href="https://plus.google.com/share?url={{ page.url | prepend: site.url }}"><i class="fa fa-google-plus"></i></a>
+  </div>
 </div>
