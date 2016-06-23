@@ -1,0 +1,219 @@
+{
+    "id": 167781199,
+    "id_str": "167781199",
+    "name": "Benjamin Enfield",
+    "screen_name": "BenjaminEnfield",
+    "location": "U.S UK Canada ",
+    "profile_location": null,
+    "description": "B.E Promotions - Co Owner of @Hits93Toronto for Major Distribution/RadioPlay/Promo to over 36M ppl DM ME - Credits @RocNation @DefJamRecords @XXL + More",
+    "url": "https://t.co/NpaILcTiFW",
+    "entities": {
+        "url": {
+            "urls": [
+                {
+                    "url": "https://t.co/NpaILcTiFW",
+                    "expanded_url": "http://hits93.com",
+                    "display_url": "hits93.com",
+                    "indices": [
+                        0,
+                        23
+                    ]
+                }
+            ]
+        },
+        "description": {
+            "urls": []
+        }
+    },
+    "protected": false,
+    "followers_count": 1152106,
+    "friends_count": 320697,
+    "listed_count": 2559,
+    "created_at": "Sat Jul 17 13:56:56 +0000 2010",
+    "favourites_count": 84957,
+    "utc_offset": -39600,
+    "time_zone": "Midway Island",
+    "geo_enabled": false,
+    "verified": true,
+    "statuses_count": 121169,
+    "lang": "en",
+    "status": {
+        "created_at": "Wed Jun 22 20:00:12 +0000 2016",
+        "id": 745707984341315600,
+        "id_str": "745707984341315584",
+        "text": "Need #Promotion?\n\n#MajorDistribution\n#MajorLabelSubmissions\n90 day #MajorRadioPlay\n400 #DJs \n#Mixtape \n#Promo \nDM ME https://t.co/aUqUFr5g5D",
+        "truncated": false,
+        "entities": {
+            "hashtags": [
+                {
+                    "text": "Promotion",
+                    "indices": [
+                        5,
+                        15
+                    ]
+                },
+                {
+                    "text": "MajorDistribution",
+                    "indices": [
+                        18,
+                        36
+                    ]
+                },
+                {
+                    "text": "MajorLabelSubmissions",
+                    "indices": [
+                        37,
+                        59
+                    ]
+                },
+                {
+                    "text": "MajorRadioPlay",
+                    "indices": [
+                        67,
+                        82
+                    ]
+                },
+                {
+                    "text": "DJs",
+                    "indices": [
+                        87,
+                        91
+                    ]
+                },
+                {
+                    "text": "Mixtape",
+                    "indices": [
+                        93,
+                        101
+                    ]
+                },
+                {
+                    "text": "Promo",
+                    "indices": [
+                        103,
+                        109
+                    ]
+                }
+            ],
+            "symbols": [],
+            "user_mentions": [],
+            "urls": [],
+            "media": [
+                {
+                    "id": 745707979324932100,
+                    "id_str": "745707979324932096",
+                    "indices": [
+                        117,
+                        140
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/CllJdM3WQAAd_bR.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/CllJdM3WQAAd_bR.jpg",
+                    "url": "https://t.co/aUqUFr5g5D",
+                    "display_url": "pic.twitter.com/aUqUFr5g5D",
+                    "expanded_url": "http://twitter.com/BenjaminEnfield/status/745707984341315584/photo/1",
+                    "type": "photo",
+                    "sizes": {
+                        "small": {
+                            "w": 680,
+                            "h": 248,
+                            "resize": "fit"
+                        },
+                        "medium": {
+                            "w": 1200,
+                            "h": 438,
+                            "resize": "fit"
+                        },
+                        "large": {
+                            "w": 1242,
+                            "h": 453,
+                            "resize": "fit"
+                        },
+                        "thumb": {
+                            "w": 150,
+                            "h": 150,
+                            "resize": "crop"
+                        }
+                    }
+                }
+            ]
+        },
+        "extended_entities": {
+            "media": [
+                {
+                    "id": 745707979324932100,
+                    "id_str": "745707979324932096",
+                    "indices": [
+                        117,
+                        140
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/CllJdM3WQAAd_bR.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/CllJdM3WQAAd_bR.jpg",
+                    "url": "https://t.co/aUqUFr5g5D",
+                    "display_url": "pic.twitter.com/aUqUFr5g5D",
+                    "expanded_url": "http://twitter.com/BenjaminEnfield/status/745707984341315584/photo/1",
+                    "type": "photo",
+                    "sizes": {
+                        "small": {
+                            "w": 680,
+                            "h": 248,
+                            "resize": "fit"
+                        },
+                        "medium": {
+                            "w": 1200,
+                            "h": 438,
+                            "resize": "fit"
+                        },
+                        "large": {
+                            "w": 1242,
+                            "h": 453,
+                            "resize": "fit"
+                        },
+                        "thumb": {
+                            "w": 150,
+                            "h": 150,
+                            "resize": "crop"
+                        }
+                    }
+                }
+            ]
+        },
+        "source": "<a href=\"http://www.crowdfireapp.com\" rel=\"nofollow\">Crowdfire App</a>",
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "geo": null,
+        "coordinates": null,
+        "place": null,
+        "contributors": null,
+        "is_quote_status": false,
+        "retweet_count": 0,
+        "favorite_count": 3,
+        "favorited": false,
+        "retweeted": false,
+        "possibly_sensitive": false,
+        "lang": "en"
+    },
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "131516",
+    "profile_background_image_url": "http://abs.twimg.com/images/themes/theme14/bg.gif",
+    "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme14/bg.gif",
+    "profile_background_tile": true,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/696030139583430657/zP-D1wFe_normal.jpg",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/696030139583430657/zP-D1wFe_normal.jpg",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/167781199/1454781492",
+    "profile_link_color": "31D8F5",
+    "profile_sidebar_border_color": "FFFFFF",
+    "profile_sidebar_fill_color": "EFEFEF",
+    "profile_text_color": "333333",
+    "profile_use_background_image": true,
+    "has_extended_profile": false,
+    "default_profile": false,
+    "default_profile_image": false,
+    "following": null,
+    "follow_request_sent": null,
+    "notifications": null
+}

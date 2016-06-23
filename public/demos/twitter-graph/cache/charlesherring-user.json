@@ -1,0 +1,120 @@
+{
+    "id": 16055039,
+    "id_str": "16055039",
+    "name": "Charles Herring",
+    "screen_name": "charlesherring",
+    "location": "Chicago, IL",
+    "profile_location": null,
+    "description": "@Lancope Specialist at @Cisco by day and @WitFoo Project Lead by night. Passionate about operationalizing the craft of #InfoSec.",
+    "url": "http://t.co/pLpqRN5DLI",
+    "entities": {
+        "url": {
+            "urls": [
+                {
+                    "url": "http://t.co/pLpqRN5DLI",
+                    "expanded_url": "http://f15hb0wn.com",
+                    "display_url": "f15hb0wn.com",
+                    "indices": [
+                        0,
+                        22
+                    ]
+                }
+            ]
+        },
+        "description": {
+            "urls": []
+        }
+    },
+    "protected": false,
+    "followers_count": 11075,
+    "friends_count": 410,
+    "listed_count": 75,
+    "created_at": "Sat Aug 30 14:44:22 +0000 2008",
+    "favourites_count": 102,
+    "utc_offset": -18000,
+    "time_zone": "Central Time (US & Canada)",
+    "geo_enabled": true,
+    "verified": false,
+    "statuses_count": 1581,
+    "lang": "en",
+    "status": {
+        "created_at": "Wed Jun 08 12:48:58 +0000 2016",
+        "id": 740526028771229700,
+        "id_str": "740526028771229697",
+        "text": "Join me and Det.Ritch @ConvergeDetroit: Evolving the Noise out InfoSec using Law Enforcement Paradigms #InfoSec https://t.co/69HsXQM5RA",
+        "truncated": false,
+        "entities": {
+            "hashtags": [
+                {
+                    "text": "InfoSec",
+                    "indices": [
+                        103,
+                        111
+                    ]
+                }
+            ],
+            "symbols": [],
+            "user_mentions": [
+                {
+                    "screen_name": "ConvergeDetroit",
+                    "name": "Converge Detroit",
+                    "id": 227853705,
+                    "id_str": "227853705",
+                    "indices": [
+                        22,
+                        38
+                    ]
+                }
+            ],
+            "urls": [
+                {
+                    "url": "https://t.co/69HsXQM5RA",
+                    "expanded_url": "http://convergedet2016.busyconf.com/activities/568e7ff429ffff4375000004",
+                    "display_url": "convergedet2016.busyconf.com/activities/568…",
+                    "indices": [
+                        112,
+                        135
+                    ]
+                }
+            ]
+        },
+        "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "geo": null,
+        "coordinates": null,
+        "place": null,
+        "contributors": null,
+        "is_quote_status": false,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "favorited": false,
+        "retweeted": false,
+        "possibly_sensitive": false,
+        "lang": "en"
+    },
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "2D2D37",
+    "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/841082401/20e9a8fbf0fa805ff9b5838046f1d002.png",
+    "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/841082401/20e9a8fbf0fa805ff9b5838046f1d002.png",
+    "profile_background_tile": true,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/459367099966558208/zqsiGrmL_normal.jpeg",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/459367099966558208/zqsiGrmL_normal.jpeg",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/16055039/1439333524",
+    "profile_link_color": "941603",
+    "profile_sidebar_border_color": "FFFFFF",
+    "profile_sidebar_fill_color": "7C1200",
+    "profile_text_color": "9B2307",
+    "profile_use_background_image": true,
+    "has_extended_profile": true,
+    "default_profile": false,
+    "default_profile_image": false,
+    "following": null,
+    "follow_request_sent": null,
+    "notifications": null
+}

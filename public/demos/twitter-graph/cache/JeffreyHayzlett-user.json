@@ -1,0 +1,135 @@
+{
+    "id": 14855279,
+    "id_str": "14855279",
+    "name": "Jeffrey Hayzlett",
+    "screen_name": "JeffreyHayzlett",
+    "location": "New York, NY",
+    "profile_location": {
+        "id": "27485069891a7938",
+        "url": "https://api.twitter.com/1.1/geo/id/27485069891a7938.json",
+        "place_type": "unknown",
+        "name": "New York, NY",
+        "full_name": "New York, NY",
+        "country_code": "",
+        "country": "",
+        "contained_within": [],
+        "bounding_box": null,
+        "attributes": {}
+    },
+    "description": "Primetime TV and podcast host on @CSuiteTV, @CSuiteRadio, & @playit. Subscribe to #AllBusiness on #iTunes: https://t.co/gcjiH5dcgT",
+    "url": "http://t.co/iYqianv2zl",
+    "entities": {
+        "url": {
+            "urls": [
+                {
+                    "url": "http://t.co/iYqianv2zl",
+                    "expanded_url": "http://hayzlett.com",
+                    "display_url": "hayzlett.com",
+                    "indices": [
+                        0,
+                        22
+                    ]
+                }
+            ]
+        },
+        "description": {
+            "urls": [
+                {
+                    "url": "https://t.co/gcjiH5dcgT",
+                    "expanded_url": "http://bit.ly/AllBiz-ITunes",
+                    "display_url": "bit.ly/AllBiz-ITunes",
+                    "indices": [
+                        107,
+                        130
+                    ]
+                }
+            ]
+        }
+    },
+    "protected": false,
+    "followers_count": 286908,
+    "friends_count": 282835,
+    "listed_count": 4964,
+    "created_at": "Wed May 21 11:41:00 +0000 2008",
+    "favourites_count": 2056,
+    "utc_offset": -14400,
+    "time_zone": "Eastern Time (US & Canada)",
+    "geo_enabled": true,
+    "verified": true,
+    "statuses_count": 40293,
+    "lang": "en",
+    "status": {
+        "created_at": "Wed Jun 22 19:01:34 +0000 2016",
+        "id": 745693226330316800,
+        "id_str": "745693226330316800",
+        "text": "If your in the NYC area, stop by the @CoLabFactory https://t.co/cEeuiXHdtg",
+        "truncated": false,
+        "entities": {
+            "hashtags": [],
+            "symbols": [],
+            "user_mentions": [
+                {
+                    "screen_name": "CoLabFactory",
+                    "name": "CoLab-Factory",
+                    "id": 1935141475,
+                    "id_str": "1935141475",
+                    "indices": [
+                        37,
+                        50
+                    ]
+                }
+            ],
+            "urls": [
+                {
+                    "url": "https://t.co/cEeuiXHdtg",
+                    "expanded_url": "https://twitter.com/CoLabFactory/status/745284111284109312",
+                    "display_url": "twitter.com/CoLabFactory/s…",
+                    "indices": [
+                        51,
+                        74
+                    ]
+                }
+            ]
+        },
+        "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "geo": null,
+        "coordinates": null,
+        "place": null,
+        "contributors": null,
+        "quoted_status_id": 745284111284109300,
+        "quoted_status_id_str": "745284111284109312",
+        "is_quote_status": true,
+        "retweet_count": 2,
+        "favorite_count": 3,
+        "favorited": false,
+        "retweeted": false,
+        "possibly_sensitive": false,
+        "lang": "en"
+    },
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "131516",
+    "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/389524654/twitter.gif",
+    "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/389524654/twitter.gif",
+    "profile_background_tile": false,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/628286906317451264/rFga4jS__normal.png",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/628286906317451264/rFga4jS__normal.png",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/14855279/1433939208",
+    "profile_link_color": "0E00D6",
+    "profile_sidebar_border_color": "EEEEEE",
+    "profile_sidebar_fill_color": "EFEFEF",
+    "profile_text_color": "333333",
+    "profile_use_background_image": true,
+    "has_extended_profile": false,
+    "default_profile": false,
+    "default_profile_image": false,
+    "following": null,
+    "follow_request_sent": null,
+    "notifications": null
+}

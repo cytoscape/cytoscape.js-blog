@@ -1,0 +1,187 @@
+{
+    "id": 583233410,
+    "id_str": "583233410",
+    "name": "Elsevier",
+    "screen_name": "ElsevierConnect",
+    "location": "New York, Amsterdam, London",
+    "profile_location": null,
+    "description": "Elsevier's official Twitter channel. Connecting communities and sharing stories in science, technology and health.",
+    "url": "http://t.co/6vsDZPi4fV",
+    "entities": {
+        "url": {
+            "urls": [
+                {
+                    "url": "http://t.co/6vsDZPi4fV",
+                    "expanded_url": "http://www.elsevierconnect.com",
+                    "display_url": "elsevierconnect.com",
+                    "indices": [
+                        0,
+                        22
+                    ]
+                }
+            ]
+        },
+        "description": {
+            "urls": []
+        }
+    },
+    "protected": false,
+    "followers_count": 29207,
+    "friends_count": 1622,
+    "listed_count": 654,
+    "created_at": "Thu May 17 22:49:30 +0000 2012",
+    "favourites_count": 132,
+    "utc_offset": -14400,
+    "time_zone": "Eastern Time (US & Canada)",
+    "geo_enabled": true,
+    "verified": false,
+    "statuses_count": 3221,
+    "lang": "en",
+    "status": {
+        "created_at": "Wed Jun 22 14:27:45 +0000 2016",
+        "id": 745624319116578800,
+        "id_str": "745624319116578816",
+        "text": "9 questions to test your global research savvy: https://t.co/6oPqhCzzQy #researchdata https://t.co/8UknGgH36D",
+        "truncated": false,
+        "entities": {
+            "hashtags": [
+                {
+                    "text": "researchdata",
+                    "indices": [
+                        72,
+                        85
+                    ]
+                }
+            ],
+            "symbols": [],
+            "user_mentions": [],
+            "urls": [
+                {
+                    "url": "https://t.co/6oPqhCzzQy",
+                    "expanded_url": "http://bit.ly/28Naw6M",
+                    "display_url": "bit.ly/28Naw6M",
+                    "indices": [
+                        48,
+                        71
+                    ]
+                }
+            ],
+            "media": [
+                {
+                    "id": 745624315488534500,
+                    "id_str": "745624315488534532",
+                    "indices": [
+                        86,
+                        109
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/Clj9XUyWgAQxqaW.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/Clj9XUyWgAQxqaW.jpg",
+                    "url": "https://t.co/8UknGgH36D",
+                    "display_url": "pic.twitter.com/8UknGgH36D",
+                    "expanded_url": "http://twitter.com/ElsevierConnect/status/745624319116578816/photo/1",
+                    "type": "photo",
+                    "sizes": {
+                        "medium": {
+                            "w": 800,
+                            "h": 417,
+                            "resize": "fit"
+                        },
+                        "small": {
+                            "w": 680,
+                            "h": 354,
+                            "resize": "fit"
+                        },
+                        "thumb": {
+                            "w": 150,
+                            "h": 150,
+                            "resize": "crop"
+                        },
+                        "large": {
+                            "w": 800,
+                            "h": 417,
+                            "resize": "fit"
+                        }
+                    }
+                }
+            ]
+        },
+        "extended_entities": {
+            "media": [
+                {
+                    "id": 745624315488534500,
+                    "id_str": "745624315488534532",
+                    "indices": [
+                        86,
+                        109
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/Clj9XUyWgAQxqaW.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/Clj9XUyWgAQxqaW.jpg",
+                    "url": "https://t.co/8UknGgH36D",
+                    "display_url": "pic.twitter.com/8UknGgH36D",
+                    "expanded_url": "http://twitter.com/ElsevierConnect/status/745624319116578816/photo/1",
+                    "type": "photo",
+                    "sizes": {
+                        "medium": {
+                            "w": 800,
+                            "h": 417,
+                            "resize": "fit"
+                        },
+                        "small": {
+                            "w": 680,
+                            "h": 354,
+                            "resize": "fit"
+                        },
+                        "thumb": {
+                            "w": 150,
+                            "h": 150,
+                            "resize": "crop"
+                        },
+                        "large": {
+                            "w": 800,
+                            "h": 417,
+                            "resize": "fit"
+                        }
+                    }
+                }
+            ]
+        },
+        "source": "<a href=\"http://www.spredfast.com\" rel=\"nofollow\">Spredfast app</a>",
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "geo": null,
+        "coordinates": null,
+        "place": null,
+        "contributors": null,
+        "is_quote_status": false,
+        "retweet_count": 4,
+        "favorite_count": 2,
+        "favorited": false,
+        "retweeted": false,
+        "possibly_sensitive": false,
+        "lang": "en"
+    },
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "FFFFFF",
+    "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+    "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+    "profile_background_tile": false,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/378800000609568559/be3575995f2bacd6f9d692fb1acccef1_normal.jpeg",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/378800000609568559/be3575995f2bacd6f9d692fb1acccef1_normal.jpeg",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/583233410/1402523410",
+    "profile_link_color": "00759B",
+    "profile_sidebar_border_color": "C0DEED",
+    "profile_sidebar_fill_color": "DDEEF6",
+    "profile_text_color": "333333",
+    "profile_use_background_image": false,
+    "has_extended_profile": false,
+    "default_profile": false,
+    "default_profile_image": false,
+    "following": null,
+    "follow_request_sent": null,
+    "notifications": null
+}

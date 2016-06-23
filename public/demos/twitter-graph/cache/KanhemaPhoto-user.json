@@ -1,0 +1,340 @@
+{
+    "id": 14975117,
+    "id_str": "14975117",
+    "name": "KanhemaPhoto",
+    "screen_name": "KanhemaPhoto",
+    "location": "San Francisco, CA",
+    "profile_location": null,
+    "description": "Producer @AJPlus | Investigative Reporter | Documentary https://t.co/tEVyaFxsZq | Data https://t.co/wbxDLWvIQ1 | #DataSecurity PGP https://t.co/Sq4kawvgeV",
+    "url": "https://t.co/7p1tgLitj8",
+    "entities": {
+        "url": {
+            "urls": [
+                {
+                    "url": "https://t.co/7p1tgLitj8",
+                    "expanded_url": "http://kanhemaphoto.com",
+                    "display_url": "kanhemaphoto.com",
+                    "indices": [
+                        0,
+                        23
+                    ]
+                }
+            ]
+        },
+        "description": {
+            "urls": [
+                {
+                    "url": "https://t.co/tEVyaFxsZq",
+                    "expanded_url": "http://theprinceofmalabo.com",
+                    "display_url": "theprinceofmalabo.com",
+                    "indices": [
+                        56,
+                        79
+                    ]
+                },
+                {
+                    "url": "https://t.co/wbxDLWvIQ1",
+                    "expanded_url": "http://hiddenempires.org",
+                    "display_url": "hiddenempires.org",
+                    "indices": [
+                        87,
+                        110
+                    ]
+                },
+                {
+                    "url": "https://t.co/Sq4kawvgeV",
+                    "expanded_url": "http://kanhemaphoto.com/PGP",
+                    "display_url": "kanhemaphoto.com/PGP",
+                    "indices": [
+                        131,
+                        154
+                    ]
+                }
+            ]
+        }
+    },
+    "protected": false,
+    "followers_count": 5955,
+    "friends_count": 4505,
+    "listed_count": 159,
+    "created_at": "Sun Jun 01 21:38:22 +0000 2008",
+    "favourites_count": 11464,
+    "utc_offset": -25200,
+    "time_zone": "Pacific Time (US & Canada)",
+    "geo_enabled": true,
+    "verified": false,
+    "statuses_count": 7070,
+    "lang": "en",
+    "status": {
+        "created_at": "Wed Jun 22 19:57:04 +0000 2016",
+        "id": 745707195996708900,
+        "id_str": "745707195996708864",
+        "text": "RT @oculus: Oculus Video now supports Reactions on all Facebook 360 videos in #GearVR! https://t.co/zHKWmF2zDa",
+        "truncated": false,
+        "entities": {
+            "hashtags": [
+                {
+                    "text": "GearVR",
+                    "indices": [
+                        78,
+                        85
+                    ]
+                }
+            ],
+            "symbols": [],
+            "user_mentions": [
+                {
+                    "screen_name": "oculus",
+                    "name": "Oculus",
+                    "id": 714758552,
+                    "id_str": "714758552",
+                    "indices": [
+                        3,
+                        10
+                    ]
+                }
+            ],
+            "urls": [],
+            "media": [
+                {
+                    "id": 745698166008275000,
+                    "id_str": "745698166008274945",
+                    "indices": [
+                        87,
+                        110
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/CllAh_aVYAEcZpP.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/CllAh_aVYAEcZpP.jpg",
+                    "url": "https://t.co/zHKWmF2zDa",
+                    "display_url": "pic.twitter.com/zHKWmF2zDa",
+                    "expanded_url": "http://twitter.com/oculus/status/745698211042463744/photo/1",
+                    "type": "photo",
+                    "sizes": {
+                        "medium": {
+                            "w": 1200,
+                            "h": 675,
+                            "resize": "fit"
+                        },
+                        "thumb": {
+                            "w": 150,
+                            "h": 150,
+                            "resize": "crop"
+                        },
+                        "small": {
+                            "w": 680,
+                            "h": 383,
+                            "resize": "fit"
+                        },
+                        "large": {
+                            "w": 2048,
+                            "h": 1152,
+                            "resize": "fit"
+                        }
+                    },
+                    "source_status_id": 745698211042463700,
+                    "source_status_id_str": "745698211042463744",
+                    "source_user_id": 714758552,
+                    "source_user_id_str": "714758552"
+                }
+            ]
+        },
+        "extended_entities": {
+            "media": [
+                {
+                    "id": 745698166008275000,
+                    "id_str": "745698166008274945",
+                    "indices": [
+                        87,
+                        110
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/CllAh_aVYAEcZpP.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/CllAh_aVYAEcZpP.jpg",
+                    "url": "https://t.co/zHKWmF2zDa",
+                    "display_url": "pic.twitter.com/zHKWmF2zDa",
+                    "expanded_url": "http://twitter.com/oculus/status/745698211042463744/photo/1",
+                    "type": "photo",
+                    "sizes": {
+                        "medium": {
+                            "w": 1200,
+                            "h": 675,
+                            "resize": "fit"
+                        },
+                        "thumb": {
+                            "w": 150,
+                            "h": 150,
+                            "resize": "crop"
+                        },
+                        "small": {
+                            "w": 680,
+                            "h": 383,
+                            "resize": "fit"
+                        },
+                        "large": {
+                            "w": 2048,
+                            "h": 1152,
+                            "resize": "fit"
+                        }
+                    },
+                    "source_status_id": 745698211042463700,
+                    "source_status_id_str": "745698211042463744",
+                    "source_user_id": 714758552,
+                    "source_user_id_str": "714758552"
+                }
+            ]
+        },
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "geo": null,
+        "coordinates": null,
+        "place": null,
+        "contributors": null,
+        "retweeted_status": {
+            "created_at": "Wed Jun 22 19:21:22 +0000 2016",
+            "id": 745698211042463700,
+            "id_str": "745698211042463744",
+            "text": "Oculus Video now supports Reactions on all Facebook 360 videos in #GearVR! https://t.co/zHKWmF2zDa",
+            "truncated": false,
+            "entities": {
+                "hashtags": [
+                    {
+                        "text": "GearVR",
+                        "indices": [
+                            66,
+                            73
+                        ]
+                    }
+                ],
+                "symbols": [],
+                "user_mentions": [],
+                "urls": [],
+                "media": [
+                    {
+                        "id": 745698166008275000,
+                        "id_str": "745698166008274945",
+                        "indices": [
+                            75,
+                            98
+                        ],
+                        "media_url": "http://pbs.twimg.com/media/CllAh_aVYAEcZpP.jpg",
+                        "media_url_https": "https://pbs.twimg.com/media/CllAh_aVYAEcZpP.jpg",
+                        "url": "https://t.co/zHKWmF2zDa",
+                        "display_url": "pic.twitter.com/zHKWmF2zDa",
+                        "expanded_url": "http://twitter.com/oculus/status/745698211042463744/photo/1",
+                        "type": "photo",
+                        "sizes": {
+                            "medium": {
+                                "w": 1200,
+                                "h": 675,
+                                "resize": "fit"
+                            },
+                            "thumb": {
+                                "w": 150,
+                                "h": 150,
+                                "resize": "crop"
+                            },
+                            "small": {
+                                "w": 680,
+                                "h": 383,
+                                "resize": "fit"
+                            },
+                            "large": {
+                                "w": 2048,
+                                "h": 1152,
+                                "resize": "fit"
+                            }
+                        }
+                    }
+                ]
+            },
+            "extended_entities": {
+                "media": [
+                    {
+                        "id": 745698166008275000,
+                        "id_str": "745698166008274945",
+                        "indices": [
+                            75,
+                            98
+                        ],
+                        "media_url": "http://pbs.twimg.com/media/CllAh_aVYAEcZpP.jpg",
+                        "media_url_https": "https://pbs.twimg.com/media/CllAh_aVYAEcZpP.jpg",
+                        "url": "https://t.co/zHKWmF2zDa",
+                        "display_url": "pic.twitter.com/zHKWmF2zDa",
+                        "expanded_url": "http://twitter.com/oculus/status/745698211042463744/photo/1",
+                        "type": "photo",
+                        "sizes": {
+                            "medium": {
+                                "w": 1200,
+                                "h": 675,
+                                "resize": "fit"
+                            },
+                            "thumb": {
+                                "w": 150,
+                                "h": 150,
+                                "resize": "crop"
+                            },
+                            "small": {
+                                "w": 680,
+                                "h": 383,
+                                "resize": "fit"
+                            },
+                            "large": {
+                                "w": 2048,
+                                "h": 1152,
+                                "resize": "fit"
+                            }
+                        }
+                    }
+                ]
+            },
+            "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+            "in_reply_to_status_id": null,
+            "in_reply_to_status_id_str": null,
+            "in_reply_to_user_id": null,
+            "in_reply_to_user_id_str": null,
+            "in_reply_to_screen_name": null,
+            "geo": null,
+            "coordinates": null,
+            "place": null,
+            "contributors": null,
+            "is_quote_status": false,
+            "retweet_count": 12,
+            "favorite_count": 26,
+            "favorited": false,
+            "retweeted": false,
+            "possibly_sensitive": false,
+            "lang": "en"
+        },
+        "is_quote_status": false,
+        "retweet_count": 12,
+        "favorite_count": 0,
+        "favorited": false,
+        "retweeted": false,
+        "possibly_sensitive": false,
+        "lang": "en"
+    },
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "000000",
+    "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/378800000090550193/62c742d0a5c4f1eb0bedd78729cb5d67.jpeg",
+    "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/378800000090550193/62c742d0a5c4f1eb0bedd78729cb5d67.jpeg",
+    "profile_background_tile": true,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/720150294995144704/kEMexPLw_normal.jpg",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/720150294995144704/kEMexPLw_normal.jpg",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/14975117/1448554017",
+    "profile_link_color": "E81C4F",
+    "profile_sidebar_border_color": "000000",
+    "profile_sidebar_fill_color": "252429",
+    "profile_text_color": "666666",
+    "profile_use_background_image": true,
+    "has_extended_profile": false,
+    "default_profile": false,
+    "default_profile_image": false,
+    "following": null,
+    "follow_request_sent": null,
+    "notifications": null
+}

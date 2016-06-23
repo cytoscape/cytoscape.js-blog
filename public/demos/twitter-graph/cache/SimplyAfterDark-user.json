@@ -1,0 +1,194 @@
+{
+    "id": 376302246,
+    "id_str": "376302246",
+    "name": "Erik Christian",
+    "screen_name": "SimplyAfterDark",
+    "location": "Austin, TX",
+    "profile_location": null,
+    "description": "Introverted Entrepreneur. Founder of the Wealthy Spiritpreneur Podcast. One finds limits by pushing them. . . Passionate about Network Marketing and #Blogging",
+    "url": "http://t.co/FXEdX4h1Rf",
+    "entities": {
+        "url": {
+            "urls": [
+                {
+                    "url": "http://t.co/FXEdX4h1Rf",
+                    "expanded_url": "http://www.erikchristianjohnson.com",
+                    "display_url": "erikchristianjohnson.com",
+                    "indices": [
+                        0,
+                        22
+                    ]
+                }
+            ]
+        },
+        "description": {
+            "urls": []
+        }
+    },
+    "protected": false,
+    "followers_count": 289295,
+    "friends_count": 286922,
+    "listed_count": 2634,
+    "created_at": "Mon Sep 19 17:09:11 +0000 2011",
+    "favourites_count": 304,
+    "utc_offset": -25200,
+    "time_zone": "Pacific Time (US & Canada)",
+    "geo_enabled": false,
+    "verified": false,
+    "statuses_count": 56743,
+    "lang": "en",
+    "status": {
+        "created_at": "Wed Jun 22 20:02:32 +0000 2016",
+        "id": 745708570017153000,
+        "id_str": "745708570017153024",
+        "text": "25 Real Reasons why it's Brilliant to Work from Home https://t.co/8gs45ugmFZ Please #RT #Business https://t.co/H1xWOHTfJc",
+        "truncated": false,
+        "entities": {
+            "hashtags": [
+                {
+                    "text": "RT",
+                    "indices": [
+                        84,
+                        87
+                    ]
+                },
+                {
+                    "text": "Business",
+                    "indices": [
+                        88,
+                        97
+                    ]
+                }
+            ],
+            "symbols": [],
+            "user_mentions": [],
+            "urls": [
+                {
+                    "url": "https://t.co/8gs45ugmFZ",
+                    "expanded_url": "http://buff.ly/28J7kuQ",
+                    "display_url": "buff.ly/28J7kuQ",
+                    "indices": [
+                        53,
+                        76
+                    ]
+                }
+            ],
+            "media": [
+                {
+                    "id": 745708565420249100,
+                    "id_str": "745708565420249088",
+                    "indices": [
+                        98,
+                        121
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/CllJ_UPXEAANRBm.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/CllJ_UPXEAANRBm.jpg",
+                    "url": "https://t.co/H1xWOHTfJc",
+                    "display_url": "pic.twitter.com/H1xWOHTfJc",
+                    "expanded_url": "http://twitter.com/SimplyAfterDark/status/745708570017153024/photo/1",
+                    "type": "photo",
+                    "sizes": {
+                        "medium": {
+                            "w": 450,
+                            "h": 396,
+                            "resize": "fit"
+                        },
+                        "small": {
+                            "w": 450,
+                            "h": 396,
+                            "resize": "fit"
+                        },
+                        "thumb": {
+                            "w": 150,
+                            "h": 150,
+                            "resize": "crop"
+                        },
+                        "large": {
+                            "w": 450,
+                            "h": 396,
+                            "resize": "fit"
+                        }
+                    }
+                }
+            ]
+        },
+        "extended_entities": {
+            "media": [
+                {
+                    "id": 745708565420249100,
+                    "id_str": "745708565420249088",
+                    "indices": [
+                        98,
+                        121
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/CllJ_UPXEAANRBm.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/CllJ_UPXEAANRBm.jpg",
+                    "url": "https://t.co/H1xWOHTfJc",
+                    "display_url": "pic.twitter.com/H1xWOHTfJc",
+                    "expanded_url": "http://twitter.com/SimplyAfterDark/status/745708570017153024/photo/1",
+                    "type": "photo",
+                    "sizes": {
+                        "medium": {
+                            "w": 450,
+                            "h": 396,
+                            "resize": "fit"
+                        },
+                        "small": {
+                            "w": 450,
+                            "h": 396,
+                            "resize": "fit"
+                        },
+                        "thumb": {
+                            "w": 150,
+                            "h": 150,
+                            "resize": "crop"
+                        },
+                        "large": {
+                            "w": 450,
+                            "h": 396,
+                            "resize": "fit"
+                        }
+                    }
+                }
+            ]
+        },
+        "source": "<a href=\"http://bufferapp.com\" rel=\"nofollow\">Buffer</a>",
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "geo": null,
+        "coordinates": null,
+        "place": null,
+        "contributors": null,
+        "is_quote_status": false,
+        "retweet_count": 0,
+        "favorite_count": 2,
+        "favorited": false,
+        "retweeted": false,
+        "possibly_sensitive": false,
+        "lang": "en"
+    },
+    "contributors_enabled": false,
+    "is_translator": false,
+    "is_translation_enabled": false,
+    "profile_background_color": "FFFFFF",
+    "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/647817740095369216/dcX20mW8.jpg",
+    "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/647817740095369216/dcX20mW8.jpg",
+    "profile_background_tile": false,
+    "profile_image_url": "http://pbs.twimg.com/profile_images/571373090559369216/ix4MTYzx_normal.jpeg",
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/571373090559369216/ix4MTYzx_normal.jpeg",
+    "profile_banner_url": "https://pbs.twimg.com/profile_banners/376302246/1401462258",
+    "profile_link_color": "DD2E44",
+    "profile_sidebar_border_color": "FFFFFF",
+    "profile_sidebar_fill_color": "FFFFFF",
+    "profile_text_color": "000000",
+    "profile_use_background_image": true,
+    "has_extended_profile": false,
+    "default_profile": false,
+    "default_profile_image": false,
+    "following": null,
+    "follow_request_sent": null,
+    "notifications": null
+}
