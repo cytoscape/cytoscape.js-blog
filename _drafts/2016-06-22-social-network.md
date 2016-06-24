@@ -8,8 +8,8 @@ tags:
 
 # Introduction
 
-This tutorial is the third part in a series of tutorials about [Cytoscape.js](http://js.cytoscape.org) written by [Joseph Stahl[(http://josephstahl.com/) for Google Summer of Code 2016.
-For readers new to Cytoscape.js, [part 1]({% post_url 2016-05-24-getting-started %}) and [part 2]({% post_url 2016-05-30-glycolysis %}) are recommended reading.
+This tutorial is the third part in a series of tutorials about [Cytoscape.js](http://js.cytoscape.org) written by [Joseph Stahl](http://josephstahl.com/) for Google Summer of Code 2016.
+For readers new to Cytoscape.js, [part 1]({% post_url 2016-05-24-getting-started %}) and [part 2]({% post_url 2016-06-08-glycolysis %}) are recommended reading.
 
 Due to the [Twitter API](https://dev.twitter.com/rest/public) being rate-limited, this tutorial will use existing data.
 **This means that when running the graph, you *must* specify cytoscape as the Twitter username on the webpage**.
@@ -566,11 +566,11 @@ The graph is quite boring though, so next we'll add some style and give the user
 
 # Style and Layout
 
-Because style and layout options were already covered in [part 1]({% post_url 2016-05-24-getting-started %}) and [part 2]({% post_url 2016-05-30-glycolysis %}), I won't go into as much detail here.
+Because style and layout options were already covered in [part 1]({% post_url 2016-05-24-getting-started %}) and [part 2]({% post_url 2016-06-08-glycolysis %}), I won't go into as much detail here.
 
 ## Defining layouts
 
-Unlike previous tutorials, we'll give users a choice between two layout options: concentric and force-directed. We'll default to `concentricLayout` (this option is set in the `options` object in the `submitButton` listener. To allow for switching between them, we'll create [layout objects](http://js.cytoscape.org/#layouts) with ['makeLayout()'](http://js.cytoscape.org/#cy.makeLayout).
+Unlike previous tutorials, we'll give users a choice between two layout options: concentric and force-directed. We'll default to `concentricLayout` (this option is set in the `options` object in the `submitButton` listener. To allow for switching between them, we'll create [layout objects](http://js.cytoscape.org/#layouts) with [`makeLayout()`](http://js.cytoscape.org/#cy.makeLayout).
 
 ### Concentric layout
 
@@ -735,7 +735,7 @@ In the `DOMContentLoaded` listener, add the following statement:
   });
 ```
 
-This uses the [`cy.on()`](http://js.cytoscape.org/#cy.on) listener to bind to node selection. [Part 2]({% post_url 2016-05-30-glycolysis %}) has a discussion of events for those interested. I'll be focusing on the `.qtip()` part for this tutorial.
+This uses the [`cy.on()`](http://js.cytoscape.org/#cy.on) listener to bind to node selection. [Part 2]({% post_url 2016-06-08-glycolysis %}) has a discussion of events for those interested. I'll be focusing on the `.qtip()` part for this tutorial.
 
 The qTip extension was loaded in `index.html`, so we're free to use `.qtip()` here.
 The object passed to the Cytoscape.js qTip extension is identical to [normal qTip](http://qtip2.com/guides#content) in terms of `content` and `style` but some of the values are different. For `text`, we'll be using a function `qtipText()` that builds an HTML string from the data of a Cytoscape.js node. For `title`, we can easily extract the name of a user from a selected node with `data('fullName')`. The `style` property is there to make things look nice.
