@@ -12,7 +12,7 @@ This tutorial is the third part in a series of tutorials about [Cytoscape.js](ht
 For readers new to Cytoscape.js, [part 1]({% post_url 2016-05-24-getting-started %}) and [part 2]({% post_url 2016-06-08-glycolysis %}) are recommended reading.
 
 Due to the [Twitter API](https://dev.twitter.com/rest/public) being rate-limited, this tutorial will use existing data.
-**This means that when running the graph, you *must* specify cytoscape as the Twitter username on the webpage**.
+**This means that when running the graph, you *must* specify `cytoscape` as the Twitter username on the webpage**.
 For readers interested in using their own data, I've made a [Node.js server available](https://github.com/cytoscape/cytoscape.js-tutorials/tree/master/twitterAPI_express) with [instructions in README.md](https://github.com/cytoscape/cytoscape.js-tutorials/blob/master/twitterAPI_express/README.md).
 
 In this tutorial, I will focus on loading elements into Cytoscape.js from JSON files that may be located on other servers.
@@ -44,6 +44,7 @@ Like before, we'll start with `index.html` so that the graph has an element to d
 <body>
     <div id='cy'></div>
 </body>
+</html>
 ``` 
 
 **Note that `cytoscape.js` is now in an `assets/` folder.**
@@ -70,7 +71,7 @@ The value will be set later by getting the value of an input field.
 
 `var cy = window.cy = cytoscape({ ... })` is the standard Cytoscape.js initialization pattern, with a slight modification (`window.cy`) to make this instance of Cytoscape.js visible globally to help with debugging.
 
-# Adding the first user
+# Adding the center user
 
 ## The HTML side
 
@@ -110,6 +111,7 @@ First, we'll add an input field and submit button to `index.html` to get the nam
         <input type='button' id='submitButton' value='Start graph'>
     </div>
 </body>
+</html>
 ``` 
 
 Here we've made changes to the CSS and added a new `<div>` element.
@@ -136,7 +138,7 @@ Now to get this button to do something when clicked, we'll turn back to `main.js
 
 This code should be placed within the `DOMContentLoaded` block of `main.js`.
 Here the submit button is selected, then given an action.
-Currently the only action performed is clearing the graph (useful for when a user tries several users in a row without reloading the page).
+Currently the only action performed is clearing the graph (useful for when a user tries several Twitter handles in a row without reloading the page).
 Before we can go further here, we need to write a few functions to use.
 
 # Functions for adding nodes
@@ -181,7 +183,7 @@ Since this function does not rely on the `cy` object at all, it will be located 
 function getTwitterPromise(targetUser) {
   // Use cached data
   var userPromise = $.ajax({
-    url: '(http://blog.js.cytoscape.org/public/demos/twitter-graph/cache/' + targetUser + '-user.json',
+    url: 'http://blog.js.cytoscape.org/public/demos/twitter-graph/cache/' + targetUser + '-user.json',
     type: 'GET',
     dataType: 'json'
   });
@@ -205,6 +207,7 @@ function getTwitterPromise(targetUser) {
 *If you're following along and running your own copy of the API, modify the request URL (likely to `localhost:3000/twitter/`), change from `GET` to `POST`, and add `data: { username: targetUser }` to make the request properly.* 
 
 For those unfamiliar with [jQuery](https://jquery.com/), it's a JavaScript library that can help us with asynchronously downloading JSON files (in this case, cached Twitter data).
+`$` is a quick way to use jQuery.
 Additionally, it'll be useful for adding an extension to the graph later.
 
 The `return` statement is undoubedtly the most interesting part of this statement; it will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) object.
@@ -217,11 +220,12 @@ In short, `Promise.all()` takes two Promises and will return one Promise which i
 This one Promise, when successfully fulfilled, will have its valued passed to whatever function is specified in `getTwitterPromise(username).then(myFunction)`.
 The value is already known, since we specified it as the `{ user: then[0], followers: then[1] }` object.
 
-Confused yet? Hopefully this will make more sense when you see it in action back in the `submitButton` function.
+If you're confused, I hope this will make more sense when you see it in action back in the `submitButton` function.
 
 ## addToGraph(targetUser, followers, level)
 
-Recall that `targetUser` is a user object and followers is an array that user's followers.
+Recall that `targetUser` is a user object and `followers` is an array that user's followers.
+Both are in formats provided by Twitter's API rather than the format expected by Cytoscape.js.
 Because of this, we'll need to convert from the object received from Twitter (or, for the purposes of this tutorial, the object created from cached data) to an object conforming to the [Cytoscape.js specification](http://js.cytoscape.org/#notation/elements-json).
 Before we can add the user (either `targetUser` or one of `followers`), it's necessary to check whether the element already exists—this could happen if Person C follows Person A and Person B; in this case, Person C may be added while adding Person A's followers and would not need to be added again for Person B.
 Cytoscape.js provides [`empty()`](http://js.cytoscape.org/#eles.empty) which, when combined with [`getElementById()`](http://js.cytoscape.org/#cy.getElementById), will efficiently check whether an element already exists.
@@ -234,7 +238,7 @@ Adding elements to the graph will occur in three steps:
   - Add a line between the newly added user and `targetUser`
 
 Now that an outline of `addToGraph()` has been defined, the code naturally falls into place.
-Because this function requires an initialized `cy` element, we'll place with within the `DOMContentLoaded` function, before our `submitButton` listener and after `var cy = cytoscape{ ... }`.
+Because this function requires an initialized `cy` element, we'll place it within the `DOMContentLoaded` function, before our `submitButton` listener and after `var cy = cytoscape{ ... }`.
 
 ```javascript
   function addToGraph(targetUser, followers, level) {
@@ -263,7 +267,7 @@ Because this function requires an initialized `cy` element, we'll place with wit
 ```
 
 Because `targetUser` and `followers` are Twitter objects rather than Cytoscape.js objects, `getElementById()` is using `id_str`.
-`id_str` is one of the several dozen names in the Twitter object and corresponds to the `id` name of nodes in the Cytoscape.js graph.
+`id_str` is one of the several dozen keys in the Twitter object and corresponds to the `id` name of nodes in the Cytoscape.js graph.
 [`getElementById()`](http://js.cytoscape.org/#cy.getElementById) will return a [collection](http://js.cytoscape.org/#collection) of all elements matching that ID (of which there will only be 0 or 1, since elements must have unique IDs).
 In the case that the collection has 0 elements, [`empty()`](http://js.cytoscape.org/#eles.empty) will return true and the element will be added.
 
@@ -272,7 +276,7 @@ Adding `targetUser` is straightforward, requiring only a call to `twitterUserObj
 It combines several values from the Twitter object with `level` to return a Cytoscape.js object to be added. 
 
 Adding users from `followers` is similar to adding `targetUser` but has slightly more complexity because of the array.
-First, `targetId` is defined as the `id_str` (which is also the `id` of the Cytoscape.js node) for efficiency because it is used repeatedly through the `forEach()` loop.
+First, `targetId` is defined as the `id_str` of `targetUser` (which is also the `id` of the Cytoscape.js node) for efficiency because it is used repeatedly through the `forEach()` loop.
 Next, [`cy.batch()`](http://js.cytoscape.org/#cy.batch) is called and the remaining code is wrapped within the function passed to `cy.batch()`.
 `cy.batch()` has a huge benefit to performance, since instead of modifying the appearance of the graph after each user is added, it will allow all calls to `cy.add()` to finish and then update the graph's appearance a single time.
 The `followers` array is stepped through with [`forEach()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach) to get individual followers.
@@ -315,7 +319,7 @@ Right now `twitterUserObjToCyEle` creates Cytoscape.js nodes with far more infor
 
 This function ties together `getTwitterPromise()` and `addToGraph()` to find top users (users with the highest followers) at a given level, query Twitter for a top user's followers, and add the resulting followers to the graph.
 
-Place the following at the very end the `DOMContentLoaded` listener. 
+Place the following at the very end of the `DOMContentLoaded` listener. 
 
 ```javascript
 function addFollowersByLevel(level, options) {
@@ -413,9 +417,9 @@ Promises have returned!
 This function takes a collection of Cytoscape.js nodes, sorted by followers, as an argument and will return an array of Promises which resolve to an object containing follower data for the most-followed users in each level.
 
 First, [`sortedFollowers.slice(-options.usersPerLevel)`](http://js.cytoscape.org/#eles.slice) is called so that this function only operates on the most popular users in a given level. Since `sortedFollowers` is in ascending order, a negative bound is used. 
-Then, [.map()](http://js.cytoscape.org/#eles.map) is used to run a function on each of these users.
+Then, [`.map()`](http://js.cytoscape.org/#eles.map) is used to run a function on each of these users.
 `.map()` provides the object as an argument to its function; in this case, we'll call the object `follower`.
-Becase `getTwitterPromise()` expects a username rather than a Cytoscape.js node, we first get `follower`'s username, then return a Promise for that user.
+Becase `getTwitterPromise()` expects a username rather than a Cytoscape.js node, we first get `follower`'s username, then return a Promise for `followerName`.
 
 ### The rest of addFollowersByLevel()
 
@@ -461,10 +465,10 @@ Next, we start a large `if` block (checking `quit` and `level` to make sure we d
 
 If the `.then()` statement is run, all Promises in `followerPromises` must have resolved successfully so we now have user and follower data to process.
 By using a loop, `twitterData` is assigned to the value returned by an individual Promise within `followerPromises` (recall that the value returned is an object; this was defined in `getTwitterPromise()`.
-Despite `followerPromises` being fulfilled successfully, there's still a possibility that an error occured (such as trying to get data for a private user) so we'll need to check whether the `error` key exists in `twitterData` (I chose to use this field in by Node.js server so that other Promises wouldn't be abandoned even if one didn't fill successfully due to a private user).
+Despite `followerPromises` being fulfilled successfully, there's still a possibility that an error occured (such as trying to get data for a private user) so we'll need to check whether the `error` key exists in `twitterData` (I chose to use this field in my Node.js server so that other Promises wouldn't be abandoned even if one didn't fill successfully due to a private user).
 
 If an error did occur, `error` is assigned to whichever part of the object had the error (`user` or `followers`) and information is logged.
-Additionally, if it was a rate-limiting error, graphing of additional levels is stopped.
+Additionally, if it was a rate-limiting error, graphing of additional levels is stopped by setting `quit` to `true`.
 
 Hopefully no error occured, and we can go ahead with adding the returned `twitterData` to the graph with `addToGraph()`.
 Because `twitterData` is an object with both `user` and `follower` properties, we need to separate them for `addToGraph()`.
@@ -560,7 +564,7 @@ Then, you'll have enough of the graph done to reload, run via the submit button,
 
 ![intermission]({{site.baseurl}}/public/demos/twitter-graph/screenshots/intermission.png)
 
-If you don't see anything, make sure you've a web server running (`npm install -g http-server` is a good start) in the `twitter-graph` directory. Unlike before, opening a file in the web browser (as in Ctrl-O => `index.html) will not work because many browsers block loading of files (such as JSON data) from other domains.
+If you don't see anything, make sure you've a web server running (`npm install -g http-server` is a good start) in the `twitter-graph` directory. Unlike before, opening a file in the web browser (as in Ctrl-O => `index.html`) will not work because many browsers block loading of files (such as JSON data) from other domains.
 
 The graph is quite boring though, so next we'll add some style and give the user layout choices.
 
@@ -631,6 +635,7 @@ Return to `index.html` and insert the following:
         <input type='button' id='forceButton' value='Force-directed'>
     </div>
 </body>
+</html>
 ```
 
 Now that we've added the buttons, it's time to give them a function, much like `submitButton`.
@@ -771,8 +776,3 @@ With a qTip box open:
 ![finished]({{site.baseurl}}/public/demos/twitter-graph/screenshots/qtip.png)
 
 Congratulations on finishing Tutorial 3!
-
-
-
-# TODO
-- Try other force-directed layout options
