@@ -29,7 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   var forceLayout = cy.makeLayout({
     name: 'cose',
-    animate: false
+    animate: false,
+    componentSpacing: 200,
+    refresh: 0,
+    boundingBox: {
+      x1: 0, y1: 0, w: 6000, h: 4000
+    }
   });
 
   function addToGraph(targetUser, followers, level) {

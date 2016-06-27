@@ -604,11 +604,18 @@ Next to `concentricLayout`, add the following code:
 ```javascript
   var forceLayout = cy.makeLayout({
     name: 'cose',
-    animate: false
+    animate: false,
+    componentSpacing: 200,
+    refresh: 0,
+    boundingBox: {
+      x1: 0, y1: 0, w: 6000, h: 4000
+    }
   });
 ```
 
-[`cose`](http://js.cytoscape.org/#layouts/cose) is a force-directed layout which is good for seeing clique-esque sections of the graph—clusters of users who all follow each other. The low rate limit for the Twitter API limits its usefulness here (we can't get complete lists of followers for all users) but there are still some interesting results from this layout.
+[`cose`](http://js.cytoscape.org/#layouts/cose) is a force-directed layout which is good for seeing clique-esque sections of the graph—clusters of users who all follow each other.
+The low rate limit for the Twitter API limits its usefulness here (we can't get complete lists of followers for all users) but there are still some interesting results from this layout.
+I've set a few additional options for cose to use more space and skip refreshes between iterations, which improves efficiency when not animating.
 
 ## Layout buttons
 
