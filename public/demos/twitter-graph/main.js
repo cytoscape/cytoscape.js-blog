@@ -11,8 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
           'label': 'data(username)',
           'width': 'mapData(followerCount, 0, 400, 50, 150)',
           'height': 'mapData(followerCount, 0, 400, 50, 150)',
-          'background-color': '#02779E',
-          'background-opacity': 'mapData(tweetCount, 0, 2000, 0.1, 1)'
+          'background-color': 'mapData(tweetCount, 0, 2000, #aaa, #02779E)'
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          events: 'no'
         }
       }
     ]
@@ -26,15 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
       return 1;
     },
     animate: false
-  });
-  var forceLayout = cy.makeLayout({
-    name: 'cose',
-    animate: false,
-    componentSpacing: 200,
-    refresh: 0,
-    boundingBox: {
-      x1: 0, y1: 0, w: 6000, h: 4000
-    }
   });
 
   function addToGraph(targetUser, followers, level) {
@@ -58,7 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
               id: 'follower-' + twitterFollower.id_str,
               source: twitterFollower.id_str,
               target: targetId
-            }
+            },
+            selectable: false
           });
         }
       });
@@ -68,11 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var concentricButton = document.getElementById('concentricButton');
   concentricButton.addEventListener('click', function() {
     concentricLayout.run();
-  });
-
-  var forceButton = document.getElementById('forceButton');
-  forceButton.addEventListener('click', function() {
-    forceLayout.run();
   });
 
   var submitButton = document.getElementById('submitButton');
@@ -107,17 +99,22 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Could not get data. Error message: ' + err);
       });
   });
+  // with the submit button hidden, we'll run the graph automatically
+  submitButton.click();
 
   cy.on('select', 'node', function(event) {
     var target = event.cyTarget;
-    target.qtip({
-      content: {
-        text: qtipText(target),
-        title: target.data('fullName')
-      },
-      style: {
-        classes: 'qtip-bootstrap'
-      }
+    target.style({
+      'border-width': 10,
+      'border-style': 'solid',
+      'border-color': 'black'
+    });
+  });
+
+  cy.on('unselect', 'node', function(event) {
+    var target = event.cyTarget;
+    target.style({
+      'border-width': 0
     });
   });
 
@@ -178,6 +175,26 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       // reached the final level, now let's lay things out
       options.layout.run();
+      // add qtip boxes
+      cy.nodes().forEach(function(ele) {
+        ele.qtip({
+          content: {
+            text: qtipText(ele),
+            title: ele.data('fullName')
+          },
+          style: {
+            classes: 'qtip-bootstrap'
+          },
+          position: {
+            my: 'bottom center',
+            at: 'top center',
+            target: ele
+          }
+        });
+      });
+      // and finally, clear the loading animation
+      var loading = document.getElementById('loading');
+      loading.classList.add('loaded');
     }
   }
 });
@@ -264,6 +281,11 @@ function twitterUserObjToCyEle(user, level) {
       description: user.description,
       profilePic: user.profile_image_url,
       level: level
+    },
+    position: {
+      // render offscreen
+      x: -1000000,
+      y: -1000000
     }
   };
 }

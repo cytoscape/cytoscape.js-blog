@@ -4928,7 +4928,6 @@ module.exports = elesfn;
 
 var is = _dereq_( '../is' );
 var util = _dereq_( '../util' );
-var Promise = _dereq_('../promise');
 
 var elesfn = ({
 
@@ -4956,7 +4955,28 @@ var elesfn = ({
         var ani = node.animation( {
           position: newPos,
           duration: options.animationDuration,
-          easing: options.animationEasing
+          easing: options.animationEasing,
+          step: !lastNode ? undefined : function(){
+            if( options.fit ){
+              cy.fit( options.eles, options.padding );
+            }
+          },
+          complete: !lastNode ? undefined : function(){
+            if( options.zoom != null ){
+              cy.zoom( options.zoom );
+            }
+
+            if( options.pan ){
+              cy.pan( options.pan );
+            }
+
+            if( options.fit ){
+              cy.fit( options.eles, options.padding );
+            }
+
+            layout.one( 'layoutstop', options.stop );
+            layout.trigger( { type: 'layoutstop', layout: layout } );
+          }
         } );
 
         layout.animations.push( ani );
@@ -4964,37 +4984,8 @@ var elesfn = ({
         ani.play();
       }
 
-      var onStep;
-      cy.on( 'step.*', ( onStep = function(){
-        if( options.fit ){
-          console.log('step')
-          cy.fit( options.eles, options.padding );
-        }
-      }) );
-
       layout.one( 'layoutready', options.ready );
       layout.trigger( { type: 'layoutready', layout: layout } );
-
-      Promise.all( layout.animations.map(function( ani ){
-        return ani.promise();
-      }) ).then(function(){
-        cy.off('step.*', onStep);
-
-        if( options.zoom != null ){
-          cy.zoom( options.zoom );
-        }
-
-        if( options.pan ){
-          cy.pan( options.pan );
-        }
-
-        if( options.fit ){
-          cy.fit( options.eles, options.padding );
-        }
-
-        layout.one( 'layoutstop', options.stop );
-        layout.trigger( { type: 'layoutstop', layout: layout } );
-      });
     } else {
       nodes.positions( fn );
 
@@ -5045,7 +5036,7 @@ elesfn.createLayout = elesfn.makeLayout;
 
 module.exports = elesfn;
 
-},{"../is":83,"../promise":86,"../util":100}],29:[function(_dereq_,module,exports){
+},{"../is":83,"../util":100}],29:[function(_dereq_,module,exports){
 'use strict';
 
 var is = _dereq_( '../is' );
@@ -6238,10 +6229,6 @@ var corefn = ({
 
           step( ele, ani, now, isCore );
 
-          if( is.fn( ani_p.step ) ){
-            ani_p.step.call( ele, now );
-          }
-
           if( ani_p.applying ){
             ani_p.applying = false;
           }
@@ -6297,8 +6284,6 @@ var corefn = ({
 
       // remove elements from list of currently animating if its queues are empty
       eles.unmerge( doneEles );
-
-      cy.trigger('step');
 
     } // handleElements
 
@@ -6417,8 +6402,6 @@ var corefn = ({
           }
 
           self.trigger('position');
-
-          if( self.id && self.id() === 'no' ){ console.log('position') }
         }
 
         var startPan = ani_p.startPan;
@@ -6469,6 +6452,10 @@ var corefn = ({
 
         } // if
 
+      }
+
+      if( is.fn( ani_p.step ) ){
+        ani_p.step.apply( self, [ now ] );
       }
 
       ani_p.progress = percent;
@@ -11995,8 +11982,6 @@ BRp.registerCalculationListeners = function(){
       rstyle.clean = false;
       _p.bbCache = null;
 
-      if( ele.id() === 'n0' ){ console.log('enqueue') }
-
       var evts = rstyle.dirtyEvents = rstyle.dirtyEvents || { length: 0 };
 
       if( !evts[ e.type ] ){
@@ -12064,9 +12049,7 @@ BRp.registerCalculationListeners = function(){
         fn( willDraw, elesToUpdate );
       } }
 
-      console.log('updateEleCalcs')
-
-      r.recalculateRenderedStyle( elesToUpdate, false );
+      r.recalculateRenderedStyle( elesToUpdate );
 
       for( var i = 0; i < elesToUpdate.length; i++ ){
         elesToUpdate[i]._private.rstyle.dirtyEvents = null;
@@ -12099,8 +12082,6 @@ BRp.recalculateRenderedStyle = function( eles, useCache ){
 
     // only update if dirty and in graph
     if( (useCache && rstyle.clean) || ele.removed() ){ continue; }
-
-    if( ele.id() === 'n0' ){ console.log('recalculateRenderedStyle') }
 
     if( _p.group === 'nodes' ){
       var pos = _p.position;
@@ -16511,7 +16492,6 @@ BRp.startRenderLoop = function(){
       r.averageRedrawTime = r.averageRedrawTime / 2 + duration / 2;
 
       r.requestedFrame = false;
-      console.log('render\n--');
     } else {
       beforeRenderCallbacks( false, requestTime );
     }

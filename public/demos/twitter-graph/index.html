@@ -6,6 +6,7 @@
     <meta charset='utf-8'></meta>
     <title>Tutorial 3: Twitter</title>
     <link type="text/css" rel="stylesheet" href="assets/jquery.qtip.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
     <script src='assets/jquery-2.2.4.js'></script>
     <script src='assets/jquery.qtip.min.js'></script>
     <script src='assets/cytoscape.js'></script>
@@ -24,6 +25,21 @@
         top: 0px;
         left: 0px;
     }
+    #loading {
+    position: absolute;
+    display: block;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    margin-top: -0.5em;
+    font-size: 2em;
+    color: #000;
+    }
+
+    #loading.loaded {
+    display: none;
+    }
     #layoutButtons {
         position: absolute;
         top: 5%;
@@ -37,18 +53,22 @@
         top: 5%;
         left: 2%;
         width: 10%;
+        display: none;
     }
 </style>
 
 <body>
     <div id='cy'></div>
+    <div id="loading">
+        <span class="fa fa-refresh fa-spin"></span>
+    </div>
     <div id='userSelection'>
+        <!--These buttons are hidden by default (display: none) since user input is not handled-->
         <input type='text' id='twitterHandle' placeholder="Twitter username">
         <input type='button' id='submitButton' value='Start graph'>
     </div>
     <div id='layoutButtons'>
-        <input type='button' id='concentricButton' value='Concentric'>
-        <input type='button' id='forceButton' value='Force-directed'>
+        <input type='button' id='concentricButton' value='Redo layout'>
     </div>
 </body>
 </html>
