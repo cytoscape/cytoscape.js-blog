@@ -782,4 +782,5 @@ With a qTip box open:
 
 ![finished]({{site.baseurl}}/public/demos/twitter-graph/screenshots/qtip.png)
 
+For comparison, [here's my finished graph](http://blog.js.cytoscape.org/public/demos/twitter-graph/index.html) and [the source on GitHub](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/twitter-graph).
 Congratulations on finishing Tutorial 3!
