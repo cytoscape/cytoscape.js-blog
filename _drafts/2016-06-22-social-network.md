@@ -67,14 +67,19 @@ document.addEventListener('DOMContentLoaded', function() {
 ```
 
 `mainUser` refers to the name of the Twitter user the graph will be built around.
-The value will be set later by getting the value of an input field.
+If you are running your own Twitter API server, the value may be set later by getting the value of an input field.
+In the more common case of using the cached data, only one user may be graphed (cytoscape) so there's no need for this input field.
 
 `var cy = window.cy = cytoscape({ ... })` is the standard Cytoscape.js initialization pattern, with a slight modification (`window.cy`) to make this instance of Cytoscape.js visible globally to help with debugging.
 
 # Adding the center user
 
+Because this tutorial is geared towards using cached data rather than downloading unique data, allowing user input of a Twitter username is unnecessary.
+With that in mind, we'll hide the user input field (it may be unhidden for those with their own Twitter API access and server running).
+
 ## The HTML side
 
+Although these HTML elements are hidden, adding them means that they can later be unhidden if one is running the [Twitter API server](https://github.com/cytoscape/cytoscape.js-tutorials/tree/master/twitterAPI_express) I wrote.
 First, we'll add an input field and submit button to `index.html` to get the name of a Twitter user.
 
 ```html
@@ -102,6 +107,7 @@ First, we'll add an input field and submit button to `index.html` to get the nam
         top: 5%;
         left: 2%;
         width: 10%;
+        display: none;
     }
 </style>
 <body>
@@ -115,10 +121,9 @@ First, we'll add an input field and submit button to `index.html` to get the nam
 ``` 
 
 Here we've made changes to the CSS and added a new `<div>` element.
-It should look like this: 
-![input buttons]({{site.baseurl}}/public/demos/twitter-graph/screenshots/input_button.png)
+Keep in mind that the `<div>` element is hidden so there should be no change in the graph's appearance.
 
-Now to get this button to do something when clicked, we'll turn back to `main.js`
+Returning to `main.js`, we'll give this button a function to handle events, then run this function manually because it's difficult to click an invisible button!
 
 ## The JS side
 
@@ -138,7 +143,9 @@ Now to get this button to do something when clicked, we'll turn back to `main.js
 
 This code should be placed within the `DOMContentLoaded` block of `main.js`.
 Here the submit button is selected, then given an action.
-Currently the only action performed is clearing the graph (useful for when a user tries several Twitter handles in a row without reloading the page).
+Note that although the submit button is not displayed (unless a user unhides it while running their own API server), it still exists and can therefore be given an action.
+Currently the only action performed is clearing the graph (useful for when a user tries several Twitter handles in a row without reloading the page), and setting `mainUser` to `cytoscape` if no other user is defined.
+By default, `mainUser` will always be set to `cytoscape` because the username input box is hidden.
 Before we can go further here, we need to write a few functions to use.
 
 # Functions for adding nodes
@@ -212,19 +219,19 @@ Additionally, it'll be useful for adding an extension to the graph later.
 
 The `return` statement is undoubedtly the most interesting part of this statement; it will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) object.
 Some work has already been done in this function; rather than returning an array of Promises (ex: `[userPromise, followersPromise]`), a single Promise is returned.
-[`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) is a method for coalescing many Promises into a single promise.
+[`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) is a method for coalescing many Promises into a single Promise.
 Here, we are using it to return a Promise which will resolve when both of jQuery's AJAX calls have resolved.
 [`.then(function(then) { ... })`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) is a method for Promises which is called when `Promise.all()` is fulfilled (also known as resolved) and like `Promise.all()`, returns a Promise.
-Since `Promise.all()` was given an array of two Promises, it will resolve to two values in `.then()`, which are stored in an object as `user` and `followers` properties.
+Since `Promise.all()` was given an array of two Promises, it will resolve to two values (`then[0]` and `then[1]`), which are stored in an object as `user` and `followers` properties.
 In short, `Promise.all()` takes two Promises and will return one Promise which is then given to `Promise.then()`, which also returns a Promise.
 This one Promise, when successfully fulfilled, will have its valued passed to whatever function is specified in `getTwitterPromise(username).then(myFunction)`.
-The value is already known, since we specified it as the `{ user: then[0], followers: then[1] }` object.
+The format of `then` passed to `myFunction()` is already known, since we specified it as the `{ user: then[0], followers: then[1] }` object.
 
 If you're confused, I hope this will make more sense when you see it in action back in the `submitButton` function.
 
 ## addToGraph(targetUser, followers, level)
 
-Recall that `targetUser` is a user object and `followers` is an array that user's followers.
+Recall that `targetUser` is a user object and `followers` is an array of that user's followers.
 Both are in formats provided by Twitter's API rather than the format expected by Cytoscape.js.
 Because of this, we'll need to convert from the object received from Twitter (or, for the purposes of this tutorial, the object created from cached data) to an object conforming to the [Cytoscape.js specification](http://js.cytoscape.org/#notation/elements-json).
 Before we can add the user (either `targetUser` or one of `followers`), it's necessary to check whether the element already exists—this could happen if Person C follows Person A and Person B; in this case, Person C may be added while adding Person A's followers and would not need to be added again for Person B.
@@ -235,7 +242,7 @@ Adding elements to the graph will occur in three steps:
 1. Add `targetUser` at the `level` specified
 2. For every user in `followers`:
   - Add that user at `level + 1`
-  - Add a line between the newly added user and `targetUser`
+  - Add an edge between the newly added user and `targetUser`
 
 Now that an outline of `addToGraph()` has been defined, the code naturally falls into place.
 Because this function requires an initialized `cy` element, we'll place it within the `DOMContentLoaded` function, before our `submitButton` listener and after `var cy = cytoscape{ ... }`.
@@ -258,7 +265,8 @@ Because this function requires an initialized `cy` element, we'll place it withi
               id: 'follower-' + twitterFollower.id_str,
               source: twitterFollower.id_str,
               target: targetId
-            }
+            },
+            selectable: false
           });
         }
       });
@@ -285,7 +293,8 @@ Also like before, `cy.add()` is called on the result of `twitterUserObjToCyEle()
 Helpfully, the same `twitterUserObjToCyEle()` works for both `targetUser` and users from `followers` because the objects returned from Twitter are very similar.
 This time, `twitterUserObjToCyEle()` is given `level + 1` because followers should be placed one level out from `targetUser`.
 Finally, an edge between this newly added follower and `targetUser` is added.
-To keep the IDs unique, I'm prepending `'follower-'` to each follower's `id_str`. 
+To keep the IDs unique, I'm prepending `'follower-'` to each follower's `id_str`.
+The `selectable` property is set to false because in this graph, only nodes are of interest (edges have no function besides representing follower connections).
 
 ## twitterUserObjToCyEle()
 
@@ -308,16 +317,21 @@ function twitterUserObjToCyEle(user, level) {
       description: user.description,
       profilePic: user.profile_image_url,
       level: level
-    }
+    },
+    position: {
+      x: -1000000,
+      y: -1000000
   };
 }
 ```
 
 Right now `twitterUserObjToCyEle` creates Cytoscape.js nodes with far more information than is necessary; we'll use it later on for modifying appearance and extending the graph.
+Specifying x and y coordinates for `position` ensures that nodes are added off-screen during graph initialization, giving things a more polished look.
+They will move into focus when a layout is run because layouts default to adjusting the viewport to show elements in the layout.
 
 ## addFollowersByLevel(level, options)
 
-This function ties together `getTwitterPromise()` and `addToGraph()` to find top users (users with the highest followers) at a given level, query Twitter for a top user's followers, and add the resulting followers to the graph.
+This function ties together `getTwitterPromise()` and `addToGraph()` to find top users (users with the highest followers) at a given level, query Twitter for a top user's followers (or use cached data), and add the resulting followers to the graph.
 
 Place the following at the very end of the `DOMContentLoaded` listener. 
 
@@ -395,8 +409,8 @@ Follower counts were added to the objects by `twitterUserObjToCyEle()` so they a
 ```
 
 This function uses `cy.nodes()` to get a [collection](http://js.cytoscape.org/#collection) and then filters it with [`.filter()`](http://js.cytoscape.org/#eles.filter).
-The `level` parameter passed to `addFollowersByLevel()` and referenced throghout this tutorial is finally put to use to ensure that only one level of users is selected (avoiding repeatedly getting high-follower-count users in lower levels).
-It's inside the large `if` block because sorting is only necessary if we'll be issueing requests for JSON data (when `level < options.maxLevel`).
+The `level` parameter passed to `addFollowersByLevel()` and referenced throughout this tutorial is finally put to use to ensure that only one level of users is selected (avoiding repeatedly getting high-follower-count users in lower levels).
+It's inside the large `if` block because sorting is only necessary if we'll be issuing requests for JSON data (when `level < options.maxLevel`).
 Lastly, this collection is sorted with the previously defined `followerCompare`, which will sort the list in ascending order by follower count.
 
 ### topFollowerPromises(sortedFollowers)
@@ -418,7 +432,7 @@ This function takes a collection of Cytoscape.js nodes, sorted by followers, as 
 
 First, [`sortedFollowers.slice(-options.usersPerLevel)`](http://js.cytoscape.org/#eles.slice) is called so that this function only operates on the most popular users in a given level. Since `sortedFollowers` is in ascending order, a negative bound is used. 
 Then, [`.map()`](http://js.cytoscape.org/#eles.map) is used to run a function on each of these users.
-`.map()` provides the object as an argument to its function; in this case, we'll call the object `follower`.
+`.map()` provides an array element as an argument to its function; in this case, we'll call the element `follower`.
 Becase `getTwitterPromise()` expects a username rather than a Cytoscape.js node, we first get `follower`'s username, then return a Promise for `followerName`.
 
 ### The rest of addFollowersByLevel()
@@ -473,7 +487,9 @@ Additionally, if it was a rate-limiting error, graphing of additional levels is 
 Hopefully no error occured, and we can go ahead with adding the returned `twitterData` to the graph with `addToGraph()`.
 Because `twitterData` is an object with both `user` and `follower` properties, we need to separate them for `addToGraph()`.
 
-Finally, `level` is incremented and `addFollowersByLevel()` is called again with the same `option` object (because options do not change). If this is the last run of `addFollowersByLevel` (when `level = options.maxLevel`), we'll skip adding elements to the graph and instead run a layout to organize all the newly added elements. Defining the `layout` property of `options` will by covered in the Style and Layout section.
+Finally, `level` is incremented and `addFollowersByLevel()` is called again with the same `option` object (because options do not change).
+If this is the last run of `addFollowersByLevel` (when `level = options.maxLevel`), we'll skip adding elements to the graph and instead run a layout to organize all the newly added elements.
+Defining the `layout` property of `options` will by covered in the **Style and Layout** section.
 
 ## A brief return to submitButton
 
@@ -522,11 +538,21 @@ The `options` object, containing properties that are constant between calls of `
 
 In case there's an error, we don't want to abort the graphing (it's better to display the graph in its current state than to throw an error and erase everything).
 To accomplish this, `addFollowersByLevel()` is wrapped in a [`try...catch`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch) block.
-Additionally, the entire Promise.then() function has a [`.catch()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch) statement at the end to collect and print any error produced by a Promise that was rejected.
+Additionally, the entire `Promise.then()` function has a [`.catch()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch) statement at the end to collect and print any error produced by a Promise that was rejected.
+
+A keen-eyed reader may notice that we just spent a huge amount of time defining an event handler for an event that will never happen—no button click should happen when the submit button is hidden.
+To make this event handler run, add the following immediately below `submitButton.addEventListener( ... );`:
+
+```javascript
+  submitButton.click();
+```
+
+This will run our submit button automatically.
 
 # Intermission
 
 JSON data is available [on GitHub](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/twitter-graph/cache).
+However, it should not be necessary because the JSON files will be downloaded from GitHub pages rather than being loaded from local disk.
 Make sure your folder layout looks like this:
 
 ```
@@ -534,47 +560,27 @@ twitter-graph/
     +-- assets/
         +-- cytoscape.js
         +-- jquery-2.2.4.js
-    +-- cache/
-        +-- BenjaminEnfield-followers.json
-        +-- BenjaminEnfield-user.json
-        +-- charlesherring-followers.json
-        +-- charlesherring-user.json
-        +-- cytoscape-followers.json
-        +-- cytoscape-user.json
-        +-- ElsevierConnect-followers.json
-        +-- ElsevierConnect-user.json
-        +-- iamfountainhead-followers.json
-        +-- iamfountainhead-user.json
-        +-- JeffreyHayzlett-followers.json
-        +-- JeffreyHayzlett-user.json
-        +-- kahaba-followers.json
-        +-- kahaba-user.json
-        +-- KanhemaPhoto-followers.json
-        +-- KanhemaPhoto-user.json
-        +-- officialbskip-followers.json
-        +-- officialbskip-user.json
-        +-- SimplyAfterDark-followers.json
-        +-- SimplyAfterDark-user.json
     +-- main.js
     +-- index.html
 ```
 
 If you're interested in running the graph to see what it looks like, comment out the call to `options.layout.run()` in `addFollowersByLevel()` and the `layout` property of `options` in the `submitButton` listener function since a layout function is not yet defined.
-Then, you'll have enough of the graph done to reload, run via the submit button, and see a graph that you can drag around!
+Then, you'll have enough of the graph done to reload and see a graph that you can drag around!
 
-![intermission]({{site.baseurl}}/public/demos/twitter-graph/screenshots/intermission.png)
+If you don't see anything, make sure you've a web server running (`npm install -g http-server` is a good start) in the `twitter-graph` directory.
+Unlike before, opening a file in the web browser (as in Ctrl-O => `index.html`) will not work because many browsers block loading of files (such as JSON data) from other domains.
 
-If you don't see anything, make sure you've a web server running (`npm install -g http-server` is a good start) in the `twitter-graph` directory. Unlike before, opening a file in the web browser (as in Ctrl-O => `index.html`) will not work because many browsers block loading of files (such as JSON data) from other domains.
-
-The graph is quite boring though, so next we'll add some style and give the user layout choices.
+The graph is quite boring though, so next we'll add some style options and run a layout.
 
 # Style and Layout
 
 Because style and layout options were already covered in [part 1]({% post_url 2016-05-24-getting-started %}) and [part 2]({% post_url 2016-06-08-glycolysis %}), I won't go into as much detail here.
 
-## Defining layouts
+## Defining a layout
 
-Unlike previous tutorials, we'll give users a choice between two layout options: concentric and force-directed. We'll default to `concentricLayout` (this option is set in the `options` object in the `submitButton` listener. To allow for switching between them, we'll create [layout objects](http://js.cytoscape.org/#layouts) with [`makeLayout()`](http://js.cytoscape.org/#cy.makeLayout).
+In this tutorial, we'll be using a concentric layout—good for representing the increasing degrees out from the initial username.
+Creating [layout objects](http://js.cytoscape.org/#layouts) with [`makeLayout()`](http://js.cytoscape.org/#cy.makeLayout) gives us the flexibility to use layouts besides `concentricLayout` (although concentric is the focus of this tutorial).
+Other layouts may be tested by defining them and setting `options.layout` (in the submitButton listener) equal to the user-defined layout rather than `concentricLayout`.
 
 ### Concentric layout
 
@@ -597,29 +603,9 @@ This creates a [concentric layout](http://js.cytoscape.org/#layouts/concentric) 
 In a concentric layout, the higher the value returned to `concentric`, the closer the node will be to the center of the graph. Because we have been using `level = 0` for the center of the graph, we'll subtract `level` from 10 to get a high value for central nodes and a low value for leaf nodes.
 `levelWidth` expects a function which will be used for determining how wide a range of `concentric` values will be mapped to a single concentric circle of the graph. In this case, we've made each level separated by a value of 1 so this function will return 1 every time (so that `level=0` gets its own circle, `level=1` has its own circle, `level=2` has its own circle, etc.).
 
-### Force directed layout
-
-Next to `concentricLayout`, add the following code:
-
-```javascript
-  var forceLayout = cy.makeLayout({
-    name: 'cose',
-    animate: false,
-    componentSpacing: 200,
-    refresh: 0,
-    boundingBox: {
-      x1: 0, y1: 0, w: 6000, h: 4000
-    }
-  });
-```
-
-[`cose`](http://js.cytoscape.org/#layouts/cose) is a force-directed layout which is good for seeing clique-esque sections of the graph—clusters of users who all follow each other.
-The low rate limit for the Twitter API limits its usefulness here (we can't get complete lists of followers for all users) but there are still some interesting results from this layout.
-I've set a few additional options for cose to use more space and skip refreshes between iterations, which improves efficiency when not animating.
-
 ## Layout buttons
 
-Before we can run these layouts manually, we'll need to add buttons to the webpage.
+In order to run a layout manually, we'll need to add a button to the webpage.
 Return to `index.html` and insert the following:
 
 ```html
@@ -638,16 +624,15 @@ Return to `index.html` and insert the following:
         <input type='button' id='submitButton' value='Start graph'>
     </div>
     <div id='layoutButtons'>
-        <input type='button' id='concentricButton' value='Concentric'>
-        <input type='button' id='forceButton' value='Force-directed'>
+        <input type='button' id='concentricButton' value='Redo layout'>
     </div>
 </body>
 </html>
 ```
 
-Now that we've added the buttons, it's time to give them a function, much like `submitButton`.
+Now that we've added the button, it's time to give it a function, much like our invisible `submitButton`.
 
-## Layout button functions
+## Layout button function
 
 Back in `main.js`, add the following to the `DOMContentLoaded` listener: 
 
@@ -656,22 +641,17 @@ Back in `main.js`, add the following to the `DOMContentLoaded` listener:
   concentricButton.addEventListener('click', function() {
     concentricLayout.run();
   });
-
-  var forceButton = document.getElementById('forceButton');
-  forceButton.addEventListener('click', function() {
-    forceLayout.run();
-  });
 ```
 
 After the complexities of Promises, isn't it nice to have something straightforward?
-[`layout.run()`](http://js.cytoscape.org/#layout.run) will run our previously-defined layout (either concentric or force-directed) when the corresponding button is clicked. Pretty simple!
+[`layout.run()`](http://js.cytoscape.org/#layout.run) will run our previously-defined layout when the corresponding button is clicked. Pretty simple!
 
-Now that layouts have been defined, you'll be able to uncomment the layout commands I talked about during Intermission (`options.layout.run()` and the `layout` property of `options`)—you have layouts to run!
+Now that a layout has been defined, you'll be able to uncomment the layout commands I talked about during Intermission (`options.layout.run()` and the `layout` property of `options`)—you have a layout to run!
 
 ## Style
 
 Adding a style to the graph will help convey information to users.
-In this graph, I've chosen to map node opacity to tweet count and node size to follower count.
+In this graph, I've chosen to map node color to tweet count and node size to follower count.
 Back in `var cy = ...`, we'll finally specify a `style` property!
 
 ```javascript
@@ -684,8 +664,7 @@ Back in `var cy = ...`, we'll finally specify a `style` property!
           'label': 'data(username)',
           'width': 'mapData(followerCount, 0, 400, 50, 150)',
           'height': 'mapData(followerCount, 0, 400, 50, 150)',
-          'background-color': '#02779E',
-          'background-opacity': 'mapData(tweetCount, 0, 2000, 0.1, 1)'
+          'background-color': 'mapData(tweetCount, 0, 2000, #aaa, #02779E)'
         }
       }
     ]
@@ -693,15 +672,86 @@ Back in `var cy = ...`, we'll finally specify a `style` property!
 ```
 
 Cytoscape.js provides [several other node properties](http://js.cytoscape.org/#style) that can be styled if you don't like these options.
-I'm using a special Cytoscape.js option, [`mapData()`](http://js.cytoscape.org/#style/mappers) for the values of `width`, `height`, and `background-opacity` which will change the style of individual nodes depending on their properties.
-These defaults give the nodes a light blue color (fitting, since we're dealing with Twitter) and provide minimums for size (50px) and opacity (0.1) so that nodes won't be invisible for low-tweet or low-follower users.
+I'm using a special Cytoscape.js option, [`mapData()`](http://js.cytoscape.org/#style/mappers) for the values of `width`, `height`, and `background-color` which will change the style of individual nodes depending on their properties.
+These defaults give the nodes a light blue color (fitting, since we're dealing with Twitter) and provide minimums for `width` and `height` (50px) so that nodes won't be invisible for low-tweet users.
 
-**The "core" of the graph is now complete. We've been able to download data asynchronously, add it to the graph, adjust the appearance of the graph, and switch between layouts. Congratulations!**
+Now that we've styled nodes, let's style edges too.
+They're much less complicated, since we don't want edges to do anything.
+This is accomplished by adding another selector and setting the [`events`] property to `no`
+
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+  var mainUser;
+  var cy = window.cy = cytoscape({
+    container: document.getElementById('cy'),
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(username)',
+          'width': 'mapData(followerCount, 0, 400, 50, 150)',
+          'height': 'mapData(followerCount, 0, 400, 50, 150)',
+          'background-color': 'mapData(tweetCount, 0, 2000, #aaa, #02779E)'
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          events: 'no'
+        }
+      }
+    ]
+  });
+```
+
+Additionally, it'd be nice to make it clear which node is selected. We can accomplish this by adding a black border around the selected node.
+Like in CSS, it's possible for an element to match several style rules.
+With this in mind, we can add a style rule that specifies a border for a selected node while leaving all other properties the same as ordinary nodes.
+Cytoscape.js provides a [`:selected`](http://js.cytoscape.org/#selectors/state) state that will limit the style to selected nodes only.
+Again, in the `style` object:
+
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+  var mainUser;
+  var cy = window.cy = cytoscape({
+    container: document.getElementById('cy'),
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(username)',
+          'width': 'mapData(followerCount, 0, 400, 50, 150)',
+          'height': 'mapData(followerCount, 0, 400, 50, 150)',
+          'background-color': 'mapData(tweetCount, 0, 2000, #aaa, #02779E)'
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          events: 'no'
+        }
+      },
+      {
+        selector: ':selected',
+        style: {
+          'border-width': 10,
+          'border-style': 'solid',
+          'border-color': 'black'
+        }
+      }
+    ]
+  });
+``` 
+
+On selection, we want to add a 10px black border to the selected node.
+The border is automatically removed when the node is no longer selected, since it will no longer have a `:selected` attribute.
+
+**The "core" of the graph is now complete. We've been able to download data asynchronously, add it to the graph, adjust the appearance of the graph, and run a concentric layout. Congratulations!**
 
 # Extensions
 
 With the core of the graph done, it's time to add some more features.
-Remember all those extra properties we added with `twitterUserObjToCyEle`?
+Remember all those extra properties we added with `twitterUserObjToCyEle()`?
 It's time to make use of them, using an extension called [qTip](https://github.com/cytoscape/cytoscape.js-qtip). 
 qTip will allow use to see Twitter user information whenever we select a node.
 
@@ -728,29 +778,37 @@ With the files downloaded, it's time to load the qTip extension into our graph. 
 Note that in addition to the `.js` files added, I also added the qTip stylesheet so that the tooltip appearance can be modified.
 
 Back in `main.js`, we'll need to add a function which displays a qTip box whenever a node is selected.
-Because the tooltip will be displayed in response to an event (a click), we'll use Cytoscape.js's [events](http://js.cytoscape.org/#core/events) functionality.
+The qTip extension will display a tooltip whenever a node is selected, so the only step necessary to set up qTip is calling `.qtip()` on each node as we add it.
+Because we want to modify all nodes with the qTip extension, we'll need to make sure that all nodes have been added to the graph before calling `.qtip()` on each one.
+With this in mind, we'll place the `.qtip()` call immediately after `options.layout.run()` in `addFollowersByLevel()`.
 
-In the `DOMContentLoaded` listener, add the following statement:
+In the `addFollowersByLevel()`, add the `.forEach()` statement following `options.layout.run()` in `addFollowersByLevel()`'s `else` statement:
 
 ```javascript
-  cy.on('select', 'node', function(event) {
-    var target = event.cyTarget;
-    target.qtip({
-      content: {
-        text: qtipText(target),
-        title: target.data('fullName')
-      },
-      style: {
-        classes: 'qtip-bootstrap'
-      }
-    });
-  });
+      options.layout.run();
+      cy.nodes().forEach(function(ele) {
+        ele.qtip({
+          content: {
+            text: qtipText(ele),
+            title: ele.data('fullName')
+          },
+          style: {
+            classes: 'qtip-bootstrap'
+          },
+          position: {
+            my: 'bottom center',
+            at: 'top center',
+            target: ele
+          }
+        });
+      });
 ```
 
-This uses the [`cy.on()`](http://js.cytoscape.org/#cy.on) listener to bind to node selection. [Part 2]({% post_url 2016-06-08-glycolysis %}) has a discussion of events for those interested. I'll be focusing on the `.qtip()` part for this tutorial.
+This uses [`forEach()`](http://js.cytoscape.org/#collection/iteration/eles.forEach) to call `qtip()` on each node of the graph.
 
 The qTip extension was loaded in `index.html`, so we're free to use `.qtip()` here.
-The object passed to the Cytoscape.js qTip extension is identical to [normal qTip](http://qtip2.com/guides#content) in terms of `content` and `style` but some of the values are different. For `text`, we'll be using a function `qtipText()` that builds an HTML string from the data of a Cytoscape.js node. For `title`, we can easily extract the name of a user from a selected node with `data('fullName')`. The `style` property is there to make things look nice.
+The object passed to the Cytoscape.js qTip extension is identical to [normal qTip](http://qtip2.com/guides#content) in terms of `content` and `style` but some of the values are different. For `text`, we'll be using a function `qtipText()` that builds an HTML string from the data of a Cytoscape.js node. For `title`, we can easily extract the name of a user from a selected node with `data('fullName')`.
+The `style` and `position` properties are there to make things look nice.
 
 ## qtipText(node)
 
@@ -764,13 +822,93 @@ function qtipText(node) {
   var image = '<img src="' + node.data('profilePic') + '" style="float:left;width:48px;height:48px;">';
   var description = '<i>' + node.data('description') + '</i>';
 
-  return image + twitterLink + '<br>' + location + '<br>' + following + '<p><br>' + description + '</p>';
+  return image + '&nbsp' + twitterLink + '<br> &nbsp' + location + '<br> &nbsp' + following + '<p><br>' + description + '</p>';
 }
 ```
 
 This function is here to build up an HTML string for qTip to display within the tooltip box. Each variable accesses one of the properties of the Cytoscape.js we saved in `twitterUserObjToCyEle` and surrounds it with some HTML tags to get a properly-formatted string to return.
 
-With this function complete, integration with qTip is complete! 
+With this function complete, integration with qTip is complete!
+However, I've also added a style rule to change the fonts of the qTip box; adding the following style to `index.html` will allow for a better font:
+
+```css
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+    }
+```
+
+# A loading spinner
+
+For the last bit of extra polish, we'll add a loading spinner to the graph so that there is something besides a blank white screen to look at while nodes are being created and added off-screen.
+This will be done using [Font Awesome](http://fontawesome.io/), which conveniently includes a loading spinner for us to use.
+
+In `index.html`, add a new CSS file to `<head>` to bring in Font Awesome:
+
+```html
+<head>
+    <meta charset='utf-8'></meta>
+    <title>Tutorial 3: Twitter</title>
+    <link type="text/css" rel="stylesheet" href="assets/jquery.qtip.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <script src='assets/jquery-2.2.4.js'></script>
+    <script src='assets/jquery.qtip.min.js'></script>
+    <script src='assets/cytoscape.js'></script>
+    <script src='assets/cytoscape-qtip.js'></script>
+    <script src='main.js'></script>
+</head>
+```
+
+Now we'll need to give the graph a special loading appearance and provide a way to clear this when the graph is done loading.
+Add the following CSS rules to the `<style>` section:
+
+```css
+    #loading {
+    position: absolute;
+    display: block;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    margin-top: -0.5em;
+    font-size: 2em;
+    color: #000;
+    }
+    #loading.loaded {
+    display: none;
+    }
+```
+
+This code (borrowed heavily from my Google Summer of Code mentor Max Franz's [Wine and Cheese demo](https://gist.github.com/maxkfranz/cde4db55e581d10405f5)) will put the spinner in the center of the graph and clear it when the `.loaded` class is added.
+
+In `index.html`, we'll create the spinner: 
+
+```html
+<body>
+    <div id='cy'></div>
+    <div id="loading">
+        <span class="fa fa-refresh fa-spin"></span>
+    </div>
+    <!--userSelection and layoutButtons omitted for brevity -->
+</body>
+```
+
+Then, in `main.js`, we'll hide the spinner as soon as the graph is done loading.
+All code that runs after populating the graph exists in the `else` statement of `addFollowersByLevel()`; clearing the loading spinner will be done there too.
+
+```javascript
+    else {
+      // reached the final level, now let's lay things out
+      options.layout.run();
+      cy.nodes().forEach(function(ele) {
+        // omitted for brevity
+      });
+      var loading = document.getElementById('loading');
+      loading.classList.add('loaded');
+    }
+```
+
+These two lines will select the loading element and add the `loaded` style which hides the spinner.
+Waiting for an event is unnecessary because this part of the code will only run once all `.add()` operations have finished.
 
 # Conclusion
 
@@ -782,5 +920,6 @@ With a qTip box open:
 
 ![finished]({{site.baseurl}}/public/demos/twitter-graph/screenshots/qtip.png)
 
-For comparison, [here's my finished graph](http://blog.js.cytoscape.org/public/demos/twitter-graph/index.html) and [the source on GitHub](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/twitter-graph).
+For comparison, [here's my finished graph]({{site.baseurl}}/public/demos/twitter-graph/index.html) and [the source on GitHub](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/twitter-graph).
+Remember that running this graph requires an HTTP server such as [http-server](https://www.npmjs.com/package/http-server) to be serving files in `twitter-graph/`.
 Congratulations on finishing Tutorial 3!

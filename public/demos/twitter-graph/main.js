@@ -19,6 +19,14 @@ document.addEventListener('DOMContentLoaded', function() {
         style: {
           events: 'no'
         }
+      },
+      {
+        selector: ':selected',
+        style: {
+          'border-width': 10,
+          'border-style': 'solid',
+          'border-color': 'black'
+        }
       }
     ]
   });
@@ -101,22 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   // with the submit button hidden, we'll run the graph automatically
   submitButton.click();
-
-  cy.on('select', 'node', function(event) {
-    var target = event.cyTarget;
-    target.style({
-      'border-width': 10,
-      'border-style': 'solid',
-      'border-color': 'black'
-    });
-  });
-
-  cy.on('unselect', 'node', function(event) {
-    var target = event.cyTarget;
-    target.style({
-      'border-width': 0
-    });
-  });
 
   /**
    * Get followers for the top three users (ranked by followers) at each level.
@@ -206,7 +198,7 @@ function qtipText(node) {
   var image = '<img src="' + node.data('profilePic') + '" style="float:left;width:48px;height:48px;">';
   var description = '<i>' + node.data('description') + '</i>';
 
-  return image + twitterLink + '<br>' + location + '<br>' + following + '<p><br>' + description + '</p>';
+  return image + '&nbsp' + twitterLink + '<br> &nbsp' + location + '<br> &nbsp' + following + '<p><br>' + description + '</p>';
 }
 
 function getTwitterPromise(targetUser) {
