@@ -103,6 +103,8 @@ document.addEventListener("DOMContentLoaded", function() {
     cy.nodes().unselect();
     target.select();
     panIn(target);
+    // open Wikipedia for node info
+    window.open(target.data('url'));
   });
 
   // Initialization: select first element to focus on.

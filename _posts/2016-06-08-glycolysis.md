@@ -12,6 +12,7 @@ The [first post]({% post_url 2016-05-24-getting-started %}) covers creating a 2-
 # Getting ready
 
 ## A container for the graph: `index.html`
+
 As before, Cytoscape.js requires an area to draw the graph. A simple `index.html` will get us started.
 CSS will again be inline with the HTML to keep things simple.
 A full-window graph is used to provide the glycolysis graph with as much space as possible for molecule structures. 
@@ -58,13 +59,14 @@ Because the file is lengthy and repetitive, I will only be including an excerpt 
 Each intermediate metabolite will be a node of the graph.
 The enzymes that convert each metabolite to the next intermediate will be the edges connecting nodes.
 
-Nodes have three `data` properties:
+Nodes have four `data` properties:
 
 - `id`: a unique ID given to the node; in this case, IDs are incrementing integers—good for representing an incremental process such as metabolism.
   Metabolite names are not used here (despite being unique) because they complicate comparison; there's no good way to tell that
   G6P is "greater than" (comes after) glucose without relying on analyzing edges. 
 - `molecule`: the name of the metabolite
 - `image`: a line-drawing image of the metabolite; displaying these images will be covered later
+- `url`: a link to Wikipedia for more information about the molecule
 
 Edges have four `data` properties:
 
@@ -78,14 +80,14 @@ Edges have four `data` properties:
 
 var GlyElements = {
   nodes: [
-    { data: { id: 0, molecule: 'Glucose', image: 'assets/glucose.svg' } },
-    { data: { id: 1, molecule: 'G6P', image: 'assets/g6p.svg' } },
-    { data: { id: 2, molecule: 'F6P', image: 'assets/f6p.svg' } },
-    { data: { id: 3, molecule: 'F1,6BP', image: 'assets/f16bp.svg' } },
+    { data: { id: 0, molecule: 'Glucose', image: 'assets/glucose.svg', url: 'https://en.wikipedia.org/wiki/Glucose'} },
+    { data: { id: 1, molecule: 'G6P', image: 'assets/g6p.svg', url: 'https://en.wikipedia.org/wiki/Glucose_6-phosphate' } },
+    { data: { id: 2, molecule: 'F6P', image: 'assets/f6p.svg', url: 'https://en.wikipedia.org/wiki/Fructose_6-phosphate' } },
+    { data: { id: 3, molecule: 'F1,6BP', image: 'assets/f16bp.svg', url: 'https://en.wikipedia.org/wiki/Fructose_1,6-bisphosphate' } },
     // GADP & DHAP is in equilibrium
-    { data: { id: 4, molecule: 'GADP', image: 'assets/gadp.svg' } },
-    { data: { id: 5, molecule: 'DHAP', image: 'assets/dhap.svg' } }, 
-    { data: { id: 6, molecule: '1,3BPG', image: 'assets/13bpg.svg' } }
+    { data: { id: 4, molecule: 'GADP', image: 'assets/gadp.svg', url: 'https://en.wikipedia.org/wiki/Glyceraldehyde_3-phosphate' } },
+    { data: { id: 5, molecule: 'DHAP', image: 'assets/dhap.svg', url: 'https://en.wikipedia.org/wiki/Dihydroxyacetone_phosphate' } }, 
+    { data: { id: 6, molecule: '1,3BPG', image: 'assets/13bpg.svg', 'https://en.wikipedia.org/wiki/1,3-Bisphosphoglyceric_acid' } }
     // Remaining data excluded for brevity
   ],
   edges: [
@@ -155,6 +157,7 @@ glycolysis/
 # Making the graph: `glycolysis.js`
 
 ## Waiting for `<div>`: Ensuring `cytoscape.js` has a container to use
+
 [Last time]({% post_url 2016-05-24-getting-started %}), it was possible to place `var cy = cytoscape({...})` after the `<div>` element to make sure that the graph had a container to use.
 Because of putting `<script src='glycolysis.js'></script>` in `<head>`, ordering will not work this time.
 Instead, using an event listener will make sure that no graph-related code is run before the [DOM has finished being laid out](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded).
@@ -167,6 +170,7 @@ document.addEventListener("DOMContentLoaded", function() { ... });
 All remaining code will go inside of the anonymous function (which will be executed once the DOM layout is finished).
 
 ## A basic graph
+
 Now that we are sure there is a `<div>` element to draw within, it's time to call `cytoscape()`.
 
 ```javascript
@@ -202,6 +206,7 @@ You may notice that `layout` has not been specified yet.
 It's much more complex here than in Tutorial 1 and so will be covered in its own section. 
 
 ## Adding images
+
 Return to the `style` property and add the following:
 
 ```javascript
@@ -463,6 +468,7 @@ Because some special treatment is required for DHAP (to avoid getting stuck in a
 Finally, the next element is selected and the animation is run, reusing the `panIn(target)` function previously defined.
 
 ## Writing `findSuccessor(selected)`
+
 As usual, the edge case of DHAP makes things more complicated.
 The successor is whichever node has the highest ID relative to the current node, excluding the current node.
 There is no guarantee that `selected` will be a node.
@@ -506,6 +512,7 @@ Once `max()` has finished, the `ele` property of `successor` is returned and wil
 
 
 ## Adding a "Next Step" button
+
 Now that all the animation mechanics are taken care of, it's important to add a way to use these animations!
 Adding an animation button will be done by modifying the DOM within `glycolysis.js`.
 But first, let's give the button a style: medium sized, in the top right.
@@ -552,6 +559,7 @@ The previously selected element is stored in `previous` and passed to `advanceBy
 # Improving the graph
 
 ## Looping back to the beginning
+
 Currently, the graph will reach pyruvate and the "Next Step" button will lose its effect (since pyruvate is the final metabolite and has no successor).
 One possibility is adding an edge back from pyruvate to glucose but this reduces accuracy of the graph—glucose cannot be produced from pyruvate.
 Instead, we'll modify `advanceByButton()` to recognize when it is at the last element and loop back to the beginning.
@@ -580,6 +588,7 @@ The ID of `previous` is compared with the ID of pyruvate and if equal, `nextSele
 These steps are easily accomplished with `cy.nodes('#0')`, another [selector which matches against element IDs](http://js.cytoscape.org/#selectors/group-class-amp-id).
 
 ## A better style
+
 The current appearance of the graph leaves something to be desired; edges should be more visible and labels would look better if the stood out more.
 [Plenty of style options](http://js.cytoscape.org/#style) are available so we'll make use of them in the graph declaration.
 You can play around with various properties but I've settled on these for producing a reasonably good-looking graph:
@@ -621,6 +630,7 @@ You can play around with various properties but I've settled on these for produc
 ```
 
 ## More animation options
+
 Right now, users can only animate the graph by clicking the "Next Step" button.
 They are able to select nodes by clicking and then running the animation from there, but it's possible to save them a step.
 We'll add an event listener that will pan whenever a node is clicked, saving the user from having to use the "Next Step" button.
@@ -635,6 +645,7 @@ Now all that's left is to write the function:
     cy.nodes().unselect();
     target.select();
     panIn(target);
+    window.open(target.data('url'));
   });
 ```
 
@@ -644,7 +655,29 @@ Instead, animation will skip forward or back to center on the tapped node.
 This node is selected and all other are unselected.
 Then, `panIn(target)` is called, just as it is in `advanceByButton(previous)`. 
 
+Finally, we'll open a link to the Wikipedia page about the selected molecule.
+This is easily done by opening a new window/ tab ([`window.open()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/open)) and passing the `url`, stored in each node's `data`.
+
+## Adding a CSS framework
+
+The final step is to make sure everything looks nice.
+A simple framework, such as [Skeleton](http://getskeleton.com) is a nice fit here.
+Download the .zip file, copy the two CSS files to the root of the folder, and the graph will now have a uniform style!
+
+```html
+<head>
+    <meta charset='utf-8'></meta>
+    <title>Tutorial 2: Glycolysis</title>
+    <link href='normalize.css' rel='stylesheet' type='text/css' />
+    <link href='skeleton.css' rel='stylesheet' type='text/css' />
+    <script src='cytoscape.js'></script>
+    <script src='gly_elements.js'></script>
+    <script src='glycolysis.js'></script>
+</head>
+```
+
 # Conclusion
+
 Now you should have a fully working glycolysis graph, looking similar to this: 
 
 ![finished graph]({{site.baseurl}}/public/demos/glycolysis/assets/finished_graph.png)
