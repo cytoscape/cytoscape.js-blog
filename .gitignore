@@ -41,5 +41,5 @@ validation-report.json
 node_modules
 bower_components
 
-# Include tutorial files
-!assets.zip
+# Include tutorial asset files
+!public/demos/**/*.zip
