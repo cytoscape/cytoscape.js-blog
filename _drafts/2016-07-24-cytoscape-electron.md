@@ -7,47 +7,38 @@ tags:
 ---
 
 # Table of contents
-Because this is a large document covering many sections, I've decided to include a table of contents for easy navigation.
 
-- [Introduction](#intro)
-- [Environment setup](#setup)
+1. [Introduction](#intro)
+2. [Environment setup](#setup)
   - [Node.js](#setup-node)
     - [package.json](#setup-node-package)
-- [Electron](#electron)
+3. [Electron](#electron)
   - [createWindow()](#electron-window)
-  - [Listening for `done-loading`](#electron-doneloading)
   - [The rest of `main.js`](#electron-rest)
-- [Loading screen](#loading)
-  - [`<head>`](#loading-head)
-  - [`<body>`](#loading-body)
-  - [`<script>`](#loading-js)
-  - [JavaScript for the loading screen](#loading-js)
-- [The Cytoscape.js window](#index)
+4. [The Cytoscape.js window](#index)
   - [`<head>`](#index-head)
   - [`<body>`](#index-body)
-- [CSS](#css)
-- [The Twitter API](#api)
+5. [CSS](#css)
+6. [The Twitter API](#api)
   - [Reading from disk](#api-read)
   - [Writing to disk](#api-write)
   - [API errors](#api-errors)
   - [Checking authentication](#api-getauth)
-  - [Erasing .env](#api-clearauth)
   - [User information from Twitter](#api-getuser)
   - [Follower information from Twitter](#api-getfollowers)
   - [module.exports](api-exports)
-- [Creating a graph with `renderer.js`](#renderer)
+7. [Creating a graph with `renderer.js`](#renderer)
   - [DOMContentLoaded](#renderer-loaded)
     - [Cytoscape initialization](#renderer-loaded-setup)
     - [Adding to the graph](#renderer-loaded-add)
     - [Layout](#renderer-loaded-layout)
     - [Submit button](#renderer-loaded-submit)
-    - [Clear authentication button](#renderer-loaded-clear)
     - [Adding followers by level](#renderer-loaded-bylevel)
   - [Getting Promises](#renderer-getpromise)
   - [twitterObjToCyEle](#renderer-obj)
   - [qTip](#renderer-qtip)
   - [Overriding defaults](#renderer-browser)
-- [Conclusion](#conclusion)
+8. [Conclusion](#conclusion)
 
 
 
@@ -102,7 +93,6 @@ Open your favorite editor and create a new `package.json` with the following con
     "bluebird": "^3.4.1",
     "cytoscape": "^2.7.6",
     "cytoscape-qtip": "^2.4.0",
-    "dotenv": "^2.0.0",
     "eslint": "^3.1.1",
     "jquery": "^2.2.4",
     "mkdirp": "^0.5.1",
@@ -123,7 +113,7 @@ For example, `cytoscape`, `cytoscape-qtip`, `jquery`, and `qtip2` all correspond
 A lot easier than hopping between websites to download all the files, unzip them, and make sure versions match!
 
 The numbers after each package are for [semantic versioning](http://semver.org/), a wonderful system that increments version numbers predictably in response to patchs, minor updates, and major updates.
-The carat (^) before each version indicates that each package can be updated to the most recent patch but no minor or major version upgrades.
+The carat (^) before each version indicates that each package can be updated to the most recent minor version but no major version upgrades.
 This is necessary because some package depend on specific versions of others; for example, `cytoscape-qtip` requires a specific `qtip` version, which in turn requires a specific `jquery` version.
 
 Once the file is done and in the root of `electron_twitter/`, run `npm install` and you should see npm taking care of downloading and installing each package.
@@ -138,48 +128,27 @@ Create a `main.js` file for Electron to use.
 
 ```javascript
 var electron = require('electron');
+// Module to control application life.
 var app = electron.app;
+// Module to create native browser window.
 var BrowserWindow = electron.BrowserWindow;
-var ipcMain = electron.ipcMain;
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
-let loadingWin;
 
 function createWindow() {
   // Create the browser window.
-  loadingWin = new BrowserWindow({ width: 800, height: 600 });
-  // and load the loading screen
-  loadingWin.loadURL(`file://${__dirname}/loading.html`);
-  loadingWin.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    loadingWin = null;
-  });
-}
+  win = new BrowserWindow({ width: 800, height: 600 });
 
-ipcMain.once('done-loading', (event, arg) => {
-  console.log(arg);
-  // can't create window until user has clicked submit button because Twit needs API key from .env
-  win = new BrowserWindow({ width: 800, height: 600, show: false });
+  // and load the graph screen
   win.loadURL(`file://${__dirname}/index.html`);
-  win.once('ready-to-show', () => {
-    win.show();
-    loadingWin.close();
-  });
-  // Emitted when the window is closed.
+
   win.on('closed', () => {
     win = null;
   });
-
-  // restart app if .env is erased
-  ipcMain.once('restart', () => {
-    app.relaunch({ args: process.argv.slice(1) });
-    app.exit(0);
-  });
-});
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -206,39 +175,18 @@ app.on('activate', () => {
 
 *Note: this is borrowed heavily from Electron's [quick start guide](http://electron.atom.io/docs/tutorial/quick-start/), which provides excellent boilerplate code for a simple app such as this one.*
 
-The first six statements are all initialization, first of the Electron specific componenets, then of the two windows we want to persist through the application's lifecycle.
-
 ## <a name="electron-window" />createWindow()
 
-`createWindow()` will create the loading window rather than the Cytoscape.js window.
-This allows a user to input an API key if desired; also, it gives us an opportunity to display a loading spinner while the graph window remains hidden and loading.
-[`loadURL()`](http://electron.atom.io/docs/api/web-contents/#webcontentsloadurlurl-options) loads the loading screen for us.
+`createWindow()` will create the Cytoscape.js window where the graph will exist.
+[`loadURL()`](http://electron.atom.io/docs/api/web-contents/#webcontentsloadurlurl-options) loads `index.html`, the main HTML page of our application.
 Now the purpose of Electron and Node.js should be more apparent—instead of a browser that will run JavaScript, we've written JavaScript that will run a browser!
-
-## <a name="electron-doneloading" />Listening to events: [`ipcMain.once()`](http://electron.atom.io/docs/api/ipc-main/#ipcmainoncechannel-listener)
-
-This listener is the biggest change between this code and Electron's Quick Start `main.js`. 
-When a button on the loading page is clicked (not yet covered), the page will emit an event, `done-loading`, which `main.js` acts on.
-Specifically, the event will indicate that the user is ready to move on the graph.
-At this point, the API key for Twitter will have either been input or skipped; either way, we can move forward and let Twit handle a missing or incorrect API key.
-
-Like before, we'll create a new [`BrowserWindow`](http://electron.atom.io/docs/api/browser-window/#new-browserwindowoptions), only this time hidden with `show: false`.
-The `.loadURL()` function is used again, this time to load the primary page, with Cytoscape.js.
-This way, we can display a loading spinner while the page loads (providing a smoother experience).
-The window will emit it's own event once loading is done, this time a [`ready-to-show`](http://electron.atom.io/docs/api/browser-window/#using-ready-to-show-event) event that allows us to display the graph without any worry of page-flickering while loading.
-We'll unhide the new window with [`win.show()`](http://electron.atom.io/docs/api/browser-window/#winshow) and close the loading window with [`loadingWin.close()`](http://electron.atom.io/docs/api/browser-window/#winclose).
-Next, we'll add a listener for `closed` events to this new window, just like we did for the loading window.
-All that we need to do is set `win = null` so that the window may be garbage collected.
-Lastly, another listener is required for the `Erase Auth` button we'll later add to `index.html`.
-`restart` is similar to `done-loading` in that it's a custom event rather than one related to the Electron lifecycle.
-Relaunching is straightforward to do; [`app.relaunch`](http://electron.atom.io/docs/api/app/#apprelaunchoptions) opens a new instance of the app with the same arguments as before and [`app.exit(0)`](http://electron.atom.io/docs/api/app/#appexitexitcode) immediately closes the current copy of the app.
 
 ## <a name="electron-rest" />The rest of main.js
 
 A few more lines are necessary to round out `main.js`.
-We've writen a function to create a loading window but not yet provided a way to execute that function.
+We've writen a function to create a graph window but not yet provided a way to execute that function.
 Just like event listeners for windows, Electron has an event listener for the app becoming ready, [`app.on('ready', createWindow)`](http://electron.atom.io/docs/all/#event-ready).
-Here, we'll pass `createWindow()` as the function to run when the app is done loading.
+Here, we'll pass `createWindow()` as the function to run when the app is ready.
 
 MacOS handles application lifecycles differently than Windows or Linux; applications will stay "loaded" until the application has been quit, even if all windows are closed.
 With that in mind, we only want the following code to execute on non-MacOS systems.
@@ -246,172 +194,10 @@ Node.js provides [`process.platform`](https://nodejs.org/api/process.html#proces
 If it's macOS (i.e. `darwin`), we'll do nothing; otherwise, closing all application windows and getting the [`window-all-closed`](http://electron.atom.io/docs/all/#event-window-all-closed) event means it's time to close the application with [`app.quit()`](http://electron.atom.io/docs/all/#appquit).
 
 [`activate`](http://electron.atom.io/docs/all/#event-activate-macos) is another MacOS-specific behavior; it indicates that the app has been activated (i.e. the application is open but a window may not be open).
-We're checking for the presence of `win` here despite `createWindow()` creating `loadingWin` because `loadingWin` is short-lived, being destroyed after the user moves on to the graph window.
-
-# <a name="loading" />Loading screen
-
-`main.js` needs a page to load; we'll write `loading.html` now.
-
-```html
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>Tutorial 4</title>
-  <link href="css/normalize.css" rel="stylesheet" type="text/css" />
-  <link href="css/skeleton.css" rel="stylesheet" type="text/css" />
-  <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-  <link href="css/graph_style.css" rel="stylesheet" type="text/css" />
-</head>
-
-<body>
-  <div id="loading" class="hidden">
-    <span class="fa fa-refresh fa-spin"></span>
-  </div>
-
-  <div id = "api_input" class="container">
-    <div class="row">
-      <div class="six columns">
-        <label for="consumer-key">Twitter consumer key</label>
-        <input class="u-full-width" placeholder="abc123" id="consumer-key" type="text">
-      </div>
-      <div class="six columns">
-        <label for="consumer-secret">Twitter consumer secret</label>
-        <input class="u-full-width" placeholder="xyz890" id="consumer-secret" type="text">
-      </div>
-    </div>
-    <div id="submission_buttons">
-      <input class="button-primary u-full-width" value="Submit" id="api_submit" type="button">
-      <input class="button u-full-width" value="Use example data" id="example_submit" type="button">
-    </div>
-  </div>
-</body>
-
-<script>
-  require('./javascripts/loading.js');
-
-</script>
-
-</html>
-```
-
-## <a name="loading-head" />\<head\>
-
-Readers who have looked at the [Glycolysis]({% post_url 2016-06-08-glycolysis %}) tutorial may recognzie two of the stylesheets mentioned, [skeleton](http://getskeleton.com/) and [normalize](https://necolas.github.io/normalize.css/).
-[Download the .zip (contains both Skeleton and Normalize](http://getskeleton.com/) and unzip to `css/`.
-Next, we'll borrow the loading spinner from [tutorial 3]({% post_url 2016-07-04-social-network %}), which means bringing in [Font Awesome](http://fontawesome.io/) again.
-[Download from Font Awesome](http://fontawesome.io/) and extract the `font/` folder to the project root and `font-awesome.min.css` to `css/`.
-By saving all our CSS files and fonts offline, we can be sure that the application will run without an internet connection (although only predownloaded and cached data will be available).
-If all this downloading is getting tedious, feel free to copy from [this project on GitHub](https://github.com/cytoscape/cytoscape.js-tutorials/tree/master/electron_twitter).
-Finally, there's our own style sheet, also in the `css/` folder; I'll go over its contents later on but I encourage you to skip down and take a look at the parts used in `loading.html`.
-
-## <a name="loading-body" />\<body\>
-
-We start out with a `<div>` element for our loading spinner with the corresponding `<span>` element.
-Unlike in Tutorial 3, the loading spinner starts out hidden (while the API key is being entered) and is unhidden when the graph starts loading and before the loading window is closed.
-
-Next, we'll add `<div id="api_input" class="container">`, indicating that we've started to use Skeleton.
-The `api_input` ID will help us hide these input fields if a `.env` file already exists while `class="container"` is for Skeleton.
-Skeleton provides a 12-column grid, so by setting boxes to 6 columns with `<div class="six columns">` we can ensure that input boxes are equally sized.
-The inclusion of `<div class="row">` will keep the input boxes normally on the same line, although will stack them if the window becomes too narrow.
-Each input field, one for `consumer-key` and one for `consumer-secret`, are made the full width (i.e. six columns) with `u-full-width`.
-
-With the input buttons done, we can close the `class="row"` div element and start a new element for the submission buttons.
-The new element is given its own ID, `"submission_buttons"`, which will be useful for selecting both buttons when handling click events.
-There are two submission buttons, one of which will use the information entered in the API input boxes and one of which will discard the input.
-This allows users without a Twitter API key to still use the application with pre-downloaded data while users with an API key can analyze users of their choosing.
-
-## <a name="loading-js" />That final `<script>` tag
-
-Back in `main.js`, we created a listener that would load the graph when an event was received from the loading screen.
-If the API button is clicked, the consumer key and consumer secret entered will be saved to disk.
-These events are dispatched when a user clicks the API submission buttons (either providing a key or going ahead with sample data).
-In both cases, the next step to take is to dispatch an event so that Electron can proceed with loading the graph window.
-Because this script deals with the webpage (whereas `main.js` relates to the Electron lifecycle), we'll name it `javascripts/loading.js`.
-
-```javascript
-var fs = require('fs');
-var path = require('path');
-var os = require('os');
-var ipcRenderer = require('electron').ipcRenderer;
-
-var apiButton = document.getElementById('api_submit');
-apiButton.addEventListener('click', function() {
-  var consumerKey = document.getElementById('consumer-key').value;
-  var consumerSecret = document.getElementById('consumer-secret').value;
-  if (consumerKey && consumerSecret) {
-    var data = 'TWITTER_CONSUMER_KEY=' + consumerKey +
-        '\nTWITTER_CONSUMER_SECRET=' + consumerSecret;
-    var tmpDir = path.join(os.tmpdir(), 'cytoscape-electron');
-    try {
-      fs.mkdirSync(tmpDir); // may throw error if tmpDir already exists
-    } catch (error) {
-      console.log('error creating directory (already exists?)');
-      console.log(error);
-    }
-    try {
-      fs.writeFileSync(path.join(tmpDir, '.env'), data);
-    } catch (error) {
-      console.log('error writing to .env');
-      console.log(error);
-    }
-  }
-});
-
-var submissionButtons = document.getElementById('submission_buttons');
-submissionButtons.addEventListener('click', function(event) {
-  // events will bubble up from either button click
-  if (event.target === document.getElementById('api_submit')) {
-    ipcRenderer.send('done-loading', 'done getting API keys');
-  } else if (event.target === document.getElementById('example_submit')) {
-    ipcRenderer.send('done-loading', 'user is skipping API key input');
-  }
-  document.getElementById('loading').className = ""; // unhide loading spinner
-
-  event.stopPropagation();
-});
-
-// skip loading screen if .env exists
-fs.stat(path.join(os.tmpdir(), 'cytoscape-electron/.env'), function(err, stats) {
-  if (err) {
-    console.log('.env not found');
-  } else if (stats && stats.isFile()) {
-    document.getElementById('api_input').className = 'hidden';
-    document.getElementById('example_submit').click();
-  }
-});
-```
-
-Three Node.js modules are necessary, plus `ipcRenderer` from Electron for dispatching events.
-
-Because of the special behavior required of `apiButton` (saving data to disk), it requires its own event listener.
-We'll take the values of `consumer-key` and `consumer-secret` and concatenate them into a single string, provided that both have been provided.
-Writing to disk is done with Node.js's [fs.writeFileSync()](https://nodejs.org/dist/latest-v6.x/docs/api/fs.html#fs_fs_writefilesync_file_data_options)—necessary because we don't want the graph to start loading until we've recorded our API keys!
-Additionally, we'll create a directory in the operating system's temporary directory to hold our files if a folder does not yet exist.
-
-Putting both buttons within the same `<div>` element will save us some time now.
-Because the action following recording the API key to disk is the same for both buttons—telling Electron we're done—we can use the same event handler for both.
-In JavaScript, events "bubble up" meaning that an element's event will be handled not only by that element's event handler (if one exists) but by each of its parents in the DOM hierarchy.
-In our case, a `'click'` event on either button will bubble up `submissionButtons`'s event listener, even though it may have already gone through `apiButton`'s event listener.
-
-While bubbling up, events keep their `target` property constant, which allows determine which button was clicked and the message content changed depending on event source.
-This doesn't matter because `main.js` doesn't care what message was received, only that event *was* received.
-
-To finish the listener, we'll unhide the loading spinner.
-Although this can be done with jQuery, removing a single class from an element is easy enough by setting that element's class name to an empty string.
-
-I added a final line, [`event.stopPropagation()`](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation) which will prevent any other event handlers from "seeing" the button click.
-This doesn't change any behavior because there are no other event listeners but fits nicely with the discussion of event bubbling.
-
-Of course, none of this is necessary if `.env` already exists.
-If it does, there's no need to show the input boxes so we'll add the `hidden` class and send a `click` event.
-Sending the `click` event allows us to reuse the event listeners to put up a loading spinner and tell Electron to load the graph window.
-
 
 # <a name="index" />index.html
 
-Once `loading.js` dispatches an event, `main.js` will take care of creating a new window containing `index.html` and unhiding it when loading is finished—so it's a great time to discuss `index.html`!
+`main.js` will take care of creating a new window containing `index.html`, while we'll cover now.
 
 ```html
 <!DOCTYPE html>
@@ -444,17 +230,13 @@ Once `loading.js` dispatches an event, `main.js` will take care of creating a ne
       </div>
 
       <div class="row">
-        <div class="four columns">
+        <div class="six columns">
           <input type="button" class="button-primary u-full-width" id="submitButton" value="Start graph" type="submit">
         </div>
-        <div class="four columns">
+        <div class="six columns">
           <input type="button" class="button u-full-width" id="layoutButton" value="Redo layout">
         </div>
-        <div class="four columns">
-          <input type="button" class="button u-full-width" id="clearAuth" value="Erase auth">
-        </div>
       </div>
-
     </div>
 
     <div id="loading" class="hidden">
@@ -470,8 +252,7 @@ Once `loading.js` dispatches an event, `main.js` will take care of creating a ne
 
 ## <a name="index-head" />\<head\>
 
-`<head>` is almost identical to the `<head>` of `loading.html`.
-The only change is the inclusion of qTip's stylesheet to help with styling qTip boxes.
+`<head>` is pretty standard, with our normal Font Awesome and Skeleton files as well as the qTip jQuery CSS file.
 Unlike previous tutorials, none of the JavaScript files for Cytoscape.js or qTip need to be included because they can be loaded with `require()` 
 This time, we'll load `renderer.js` in `<head>` because all DOM-sensitive code within `renderer.js` is loaded within an event listener which waits for `DOMContentLoaded`, as in previous tutorials.
 
@@ -485,7 +266,7 @@ The final element in our `full` flexbox is, as in every previous tutorial, the `
 
 # <a name="css" />graph_style.css
 
-Both `index.html` and `loading.html` rely on a number of CSS rules which I'll cover now.
+`index.html` relies on a number of CSS rules which I'll cover now.
 `graph_style.css`, like the rest of our `.css` files, will go in the `css/` directory.
 
 ```css
@@ -523,7 +304,7 @@ The `height` property deserves mentioning; by setting `height: 100vh` we'll use 
 - `#cy` is our normal Cytoscape.js container, although here we've also set `flex-grow: 1` which will grow the Cytoscape.js container to all remaining space after the input area is laid out.
 - `h1` will center any text with an `<h1>` tag; in this case, the text "Tutorial 4"
 - `#loading` will put any element with a `loading` id (i.e. the Font Awesome loading spinner) in the vertical and horizontal center of the page.
-- `.hidden` has expanded from its original purpose of hiding the loading spinner (although it's still used for this) to also be used for hiding input fields and buttons in `loading.html`.
+- `.hidden` is used for hiding the Font Awesome loading spinner when data has been downloaded for the graph.
 
 
 # <a name="api" />twitter_api.js
@@ -540,16 +321,12 @@ var mkdirp = require('mkdirp');
 var Promise = require('bluebird');
 
 var programTempDir = 'cytoscape-electron';
-var dotEnvPath = path.join(os.tmpdir(), programTempDir, '.env');
+var apiAuth;
 
 try {
-  var dotenvConfig = {
-    path: dotEnvPath,
-    silent: true
-  };
-  require('dotenv').config(dotenvConfig); // make sure .env is loaded for Twit
+  apiAuth = require('../api_key.json');
 } catch (error) {
-  console.log('.env not found');
+  console.log('api_key.json not found');
   console.log(error);
 }
 
@@ -569,20 +346,19 @@ We'll be using:
 Next, we set up a few variables: 
 
 - `programTempDir = 'cytoscape-electron'`: this is the directory where we'll save data downloaded from Twitter for Cytoscape.js to use. It will also hold our API authentication information
-- `dotEnvPath = path.join(os.tmpdir(), programTempDir, '.env')`: the location of `.env`, which stores our API authentication
+- `apiAuth = require('../api_key.json')`: if a JSON file named `api_key.json` is in the root of the program directory, we'll load the authentication information from it.
+  Otherwise, we'll use pre-downloaded information for the Cytoscape Twitter account. 
 - `userCount = 100`: we'll get 100 followers on each call to Twitter. This value may be increased up to 200
 - `preDownloadedDir = path.join(__dirname, '../predownload')`: if an API key isn't entered, we'll use pre-downloaded data that is distributed with the program in the `predownload` folder.
 - `T`: we'll later make this a Twit object if we're able to load the API key that Twit requires
 
-There's also the `try ... catch` block where we load `dotenv` with `require('dotenv')`.
-It's okay for loading `dotenv` to fail because a `.env` file will not exist if no key was entered on the loading screen.
 
 ```javascript
 try {
-  if (process.env.TWITTER_CONSUMER_KEY) {
+  if (apiAuth) {
     T = new Twit({
-      consumer_key: process.env.TWITTER_CONSUMER_KEY,
-      consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+      consumer_key: apiAuth.key,
+      consumer_secret: apiAuth.secret,
       app_only_auth: true,
       timeout_ms: 60 * 1000
     });
@@ -592,11 +368,9 @@ try {
   console.log('could not initialize Twit');
   console.log(error);
 }
-
-var TwitterAPI = function() {};
 ```
 
-Here's another `try ... catch` block, this time for initializing `T` if `TWITTER_CONSUMER_KEY` was successfully loaded from `.env`.
+Here's another `try ... catch` block, this time for initializing `T` if loading the authentication (with `require('../api_key.json')`) was successful.
 Below the block, we create a `TwitterAPI` variable but it's nothing more than an empty object right now.
 We'll add functions to `TwitterAPI.prototype` as we proceed, but first we need some helper functions.
 
@@ -730,13 +504,8 @@ TwitterAPI.prototype.getAuth = function() {
 };
 ```
 
-Of cource, we can only use [Twit's `getAuth()`](https://github.com/ttezel/twit#tgetauth) function if Twit was loaded successfully, which only happens if `.env` was loaded successfully.
+Of cource, we can only use [Twit's `getAuth()`](https://github.com/ttezel/twit#tgetauth) function if Twit was loaded successfully, which only happens if `api_key.json` was loaded successfully.
 Returning `return (T && T.getAuth())` allows us to short-circuit the check and immediately return `undefined` if T was never initialized with Twit (in which case authentication has obviously failed).
-
-## <a name="api-clearauth" />Resetting authentication: TwitterAPI.prototype.clearAuth()
-
-If authentication has failed, we need a way to remove `.env` so that new information can be entered.
-We'll provide `clearAuth()` for removing the `.env` file from `dotEnvPath`.
 
 ## <a name="api-getuser" />User information: TwitterAPI.prototype.getUser()
 
@@ -840,7 +609,7 @@ With that, the Twitter API is finished and we can move onwards to using it in `r
 *Note: this file is pretty complex. I recommend having it [all available in one place](https://github.com/cytoscape/cytoscape.js-tutorials/blob/master/electron_twitter/javascripts/renderer.js) for reference during this part.*
 
 `index.html` was fairly straightforward because almost all work in done in `renderer.js`, which is loaded with `require()` because of the Node.js environment.
-Similar to `loading.js`, `renderer.js` goes in `javascripts/` because it deals with an HTML page rather than Electron.
+`renderer.js` goes in `javascripts/` because it deals with an HTML page rather than Electron.
 `renderer.js` is far larger than previous JavaScript files, so I'll cover it in sections.
 
 ```javascript
@@ -973,19 +742,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   });
 
-  // erase .env if requested
-  var clearAuthButton = document.getElementById('clearAuth');
-  clearAuthButton.addEventListener('click', function() {
-    try {
-      twitter.clearAuth();
-      ipcRenderer.send('restart');
-    } catch (error) {
-      console.log('could not erase .env');
-      console.log(error);
-      ipcRenderer.send('restart');
-    }
-  });
-
   function addFollowersByLevel(level, options) {
     function followerCompare(a, b) {
       return a.data('followerCount') - b.data('followerCount');
@@ -1049,18 +805,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   }
-
-  // erase .env if requested
-  document.getElementById('clearAuth').addEventListener('click', function() {
-    try {
-      twitter.clearAuth();
-      ipcRenderer.send('restart');
-    } catch (error) {
-      console.log('could not erase .env');
-      console.log(error);
-      ipcRenderer.send('restart');
-    }
-  });
 });
 ```
 
@@ -1097,12 +841,6 @@ The net effect is eliminating the `catch(error) { console.log(error) }` statemen
 
 With a functional Twitter API now, there's the possibility of a user inputting a name besides `cytoscape` so we no longer need to run `submitButton.click()`.
 The submit button is unhidden in this tutorial and fully functional!
-
-### <a name="renderer-loaded-clear" />clearAuthButton.addEventListener()
-
-One significant change from Tutorial 3 is the inclusion of an additional button for deleting the `.env` file.
-We'll be using the `clearAuth()` function from `twitter_api.js` to take care of the details for us.
-Once the authentication is erased, we'll restart the app (by sending a message to Electron's `main.js` so that users can put in new API details (or use example data).
 
 ### <a name="renderer-loaded-bylevel" />addFollowersByLevel()
 
@@ -1212,12 +950,12 @@ Two things happen:
 
 # <a name="conclusion" />Conclusion
 
-By now, you've setup an environment with all the requried modules installed and `package.json`, `main.js`, `loading.js`, `renderer.js`, `twitter_api.js`, `index.html`, and `loading.html` all completed.
+By now, you've setup an environment with all the requried modules installed and `package.json`, `main.js`, `renderer.js`, `twitter_api.js`, and `index.html` all completed.
 Before we can run the graph, we'll need some sample data (unless you have an API key to use) so unzip [`predownload.zip`](http://blog.js.cytoscape.org/public/demos/electron-twitter/predownload.zip) into your `electron_twitter` directory alongside `package.json` and `main.js`.
-With this completed, run `npm start` in the root of `electron_twitter/` and you should soon see the loading screen.
+With this completed, run `npm start` in the root of `electron_twitter/` and you should soon see the main screen.
 
 Congratulations! 
 
 
 
-![The finished graph](http://blog.js.cytoscape.org/public/demos/electron-twitter/screenshots/finished.png)
+![The finished graph]({{ site.url }}/public/demos/electron-twitter/screenshots/finished.png)
