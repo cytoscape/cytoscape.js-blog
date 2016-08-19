@@ -159,8 +159,8 @@ A few functions come to mind:
   - Connecting `mainUser` and his or her followers
 - Go out a level and repeat, this time with the top three followers of `mainUser`
 
-A pattern emerges here; getting data about a user and her or his followers is done several times so we'll make that into a method.
-Similarly, adding followers and connecting to an existing user is also a good fit for a method.
+A pattern emerges here; getting data about a user and her or his followers is done several times so we'll make that into a function.
+Similarly, adding followers and connecting to an existing user is also a good fit for a function.
 
 When we are moving out a level and getting the top followers of `mainUser`, we need a way to make sure the followers we're sorting are recently added.
 In other words, there's no point in finding a several-million-follower user early on and continually ranking them first.
@@ -168,7 +168,7 @@ Instead, we want to focus on new users, such that after we've populated "level 2
 
 With this in mind, we can define interfaces for our new functions:
 
-- `getTwitterPromise(targetUser)` takes one argument and will return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) (to be covered in detail soon!)
+- `getUser(targetUser)` takes one argument and will return a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) (to be covered in detail soon!)
   - `targetUser`: the user (as an ID string) whose followers will be requested from Twitter 
 - `addToGraph(targetUser, followers, level)` takes three arguments and will modify `cy`
   - `targetUser`: this time, the user object provided by Twitter
@@ -182,12 +182,12 @@ With this in mind, we can define interfaces for our new functions:
     - `usersPerLevel`: integer; refers to number of users to get followers for at each level
     - `layout`: the layout to run after all elements have been added
 
-## getTwitterPromise(targetUser)
+## getUser(targetUser)
 
 Since this function does not rely on the `cy` object at all, it will be located outside of the `DOMContentLoaded` listener.
 
 ```javascript
-function getTwitterPromise(targetUser) {
+function getUser(targetUser) {
   // Use cached data
   var userPromise = $.ajax({
     url: 'http://blog.js.cytoscape.org/public/demos/twitter-graph/cache/' + targetUser + '-user.json',
@@ -219,12 +219,12 @@ Additionally, it'll be useful for adding an extension to the graph later.
 
 The `return` statement is undoubedtly the most interesting part of this statement; it will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) object.
 Some work has already been done in this function; rather than returning an array of Promises (ex: `[userPromise, followersPromise]`), a single Promise is returned.
-[`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) is a method for coalescing many Promises into a single Promise.
+[`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) is a function for coalescing many Promises into a single Promise.
 Here, we are using it to return a Promise which will resolve when both of jQuery's AJAX calls have resolved.
-[`.then(function(then) { ... })`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) is a method for Promises which is called when `Promise.all()` is fulfilled (also known as resolved) and like `Promise.all()`, returns a Promise.
+[`.then(function(then) { ... })`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) is a function for Promises which is called when `Promise.all()` is fulfilled (also known as resolved) and like `Promise.all()`, returns a Promise.
 Since `Promise.all()` was given an array of two Promises, it will resolve to two values (`then[0]` and `then[1]`), which are stored in an object as `user` and `followers` properties.
 In short, `Promise.all()` takes two Promises and will return one Promise which is then given to `Promise.then()`, which also returns a Promise.
-This one Promise, when successfully fulfilled, will have its valued passed to whatever function is specified in `getTwitterPromise(username).then(myFunction)`.
+This one Promise, when successfully fulfilled, will have its valued passed to whatever function is specified in `getUser(username).then(myFunction)`.
 The format of `then` passed to `myFunction()` is already known, since we specified it as the `{ user: then[0], followers: then[1] }` object.
 
 If you're confused, I hope this will make more sense when you see it in action back in the `submitButton` function.
@@ -331,7 +331,7 @@ They will move into focus when a layout is run because layouts default to adjust
 
 ## addFollowersByLevel(level, options)
 
-This function ties together `getTwitterPromise()` and `addToGraph()` to find top users (users with the highest followers) at a given level, query Twitter for a top user's followers (or use cached data), and add the resulting followers to the graph.
+This function ties together `getUser()` and `addToGraph()` to find top users (users with the highest followers) at a given level, query Twitter for a top user's followers (or use cached data), and add the resulting followers to the graph.
 
 Place the following at the very end of the `DOMContentLoaded` listener. 
 
@@ -346,7 +346,7 @@ function addFollowersByLevel(level, options) {
         .map(function(follower) {
           // remember that follower is a Cy element so need to access username
           var followerName = follower.data('username');
-          return getTwitterPromise(followerName);
+          return getUser(followerName);
         });
     }
 
@@ -423,7 +423,7 @@ Promises have returned!
         .map(function(follower) {
           // remember that follower is a Cy element so need to access username
           var followerName = follower.data('username');
-          return getTwitterPromise(followerName);
+          return getUser(followerName);
         });
     }
 ```
@@ -433,7 +433,7 @@ This function takes a collection of Cytoscape.js nodes, sorted by followers, as 
 First, [`sortedFollowers.slice(-options.usersPerLevel)`](http://js.cytoscape.org/#eles.slice) is called so that this function only operates on the most popular users in a given level. Since `sortedFollowers` is in ascending order, a negative bound is used. 
 Then, [`.map()`](http://js.cytoscape.org/#eles.map) is used to run a function on each of these users.
 `.map()` provides an array element as an argument to its function; in this case, we'll call the element `follower`.
-Becase `getTwitterPromise()` expects a username rather than a Cytoscape.js node, we first get `follower`'s username, then return a Promise for `followerName`.
+Becase `getUser()` expects a username rather than a Cytoscape.js node, we first get `follower`'s username, then return a Promise for `followerName`.
 
 ### The rest of addFollowersByLevel()
 
@@ -478,7 +478,7 @@ Next, we start a large `if` block (checking `quit` and `level` to make sure we d
 `var followerPromises = topFollowerPromises(topFollowers);` will assign an array of Promises to `followerPromises`, which is immediately resolved in the next line with `Promise.all(followerPromises).then( ... )`. If an error arises, it's handled by the `.catch()` statement later on, which prints the error and allows the program to move on.
 
 If the `.then()` statement is run, all Promises in `followerPromises` must have resolved successfully so we now have user and follower data to process.
-By using a loop, `twitterData` is assigned to the value returned by an individual Promise within `followerPromises` (recall that the value returned is an object; this was defined in `getTwitterPromise()`.
+By using a loop, `twitterData` is assigned to the value returned by an individual Promise within `followerPromises` (recall that the value returned is an object; this was defined in `getUser()`.
 Despite `followerPromises` being fulfilled successfully, there's still a possibility that an error occured (such as trying to get data for a private user) so we'll need to check whether the `error` key exists in `twitterData` (I chose to use this field in my Node.js server so that other Promises wouldn't be abandoned even if one didn't fill successfully due to a private user).
 
 If an error did occur, `error` is assigned to whichever part of the object had the error (`user` or `followers`) and information is logged.
@@ -493,7 +493,7 @@ Defining the `layout` property of `options` will by covered in the **Style and L
 
 ## A brief return to submitButton
 
-All methods necessary for adding elements to the graph have been defined, so we can finish writing a function for `submitButton`.
+All functions necessary for adding elements to the graph have been defined, so we can finish writing a function for `submitButton`.
 
 ```javascript
 submitButton.addEventListener('click', function() {
@@ -507,7 +507,7 @@ submitButton.addEventListener('click', function() {
     }
 
     // add first user to graph
-    getTwitterPromise(mainUser)
+    getUser(mainUser)
       .then(function(then) {
         addToGraph(then.user, then.followers, 0);
 

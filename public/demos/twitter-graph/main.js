@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // add first user to graph
-    getTwitterPromise(mainUser)
+    getUser(mainUser)
       .then(function(then) {
         addToGraph(then.user, then.followers, 0);
 
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .map(function(follower) {
           // remember that follower is a Cy element so need to access username
           var followerName = follower.data('username');
-          return getTwitterPromise(followerName);
+          return getUser(followerName);
         });
     }
 
@@ -201,7 +201,7 @@ function qtipText(node) {
   return image + '&nbsp' + twitterLink + '<br> &nbsp' + location + '<br> &nbsp' + following + '<p><br>' + description + '</p>';
 }
 
-function getTwitterPromise(targetUser) {
+function getUser(targetUser) {
   // use cached data
   var userPromise = $.ajax({
     url: 'cache/' + targetUser + '-user.json',
