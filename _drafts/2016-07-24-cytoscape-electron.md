@@ -258,11 +258,10 @@ This time, we'll load `renderer.js` in `<head>` because all DOM-sensitive code w
 
 ## <a name="index-body" />\<body\>
 
-All elements in `<body>` are within `<div id="full">`, which we'll use later for a [flexbox](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Using_CSS_flexible_boxes) powered layout.
-Using flexible boxes allows us to give Cytoscape.js 100% of the remaining space after our Skeleton-related elements are laid out.
+All elements in `<body>` are within `<div id="full">`, which we'll use later for adjusting the size of the graph.
 The [Skeleton](http://getskeleton.com/) framework is used again here to help with layout and appearance, so we'll again use the classes provided, such as `six columns`, `u-full-width`, `row`, and `container`.
 Like in Tutorial 3, the Font Awesome spinner is present, this time hidden by default (it will be unhidden when graphing activity starts after a button is clicked).
-The final element in our `full` flexbox is, as in every previous tutorial, the `cy` element which will hold our graph.
+The final element in our `full` container is, as in every previous tutorial, the `cy` element which will hold our graph.
 
 # <a name="css" />graph_style.css
 
@@ -271,13 +270,11 @@ The final element in our `full` flexbox is, as in every previous tutorial, the `
 
 ```css
 #full {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+    display: block;
+    height: 100%;
 }
 #cy {
-    height: 100%;
-    flex-grow: 1;
+    height: 23em;
 }
 h1 {
     text-align: center;
@@ -299,9 +296,9 @@ h1 {
 
 [Skeleton](http://getskeleton.com/) takes care of most of the CSS so we only need to write a few of our own rules:
 
-- `#full` is used in `index.html` for creating the flexbox that the rest of the graph (and buttons) are within.
-The `height` property deserves mentioning; by setting `height: 100vh` we'll use the full height of the window Electron created for us.
-- `#cy` is our normal Cytoscape.js container, although here we've also set `flex-grow: 1` which will grow the Cytoscape.js container to all remaining space after the input area is laid out.
+- `#full` is used in `index.html` for creating the box that the rest of the graph (and buttons) are within.
+The `height` property deserves mentioning; by setting `height: 100%` we'll use the full height of the window Electron created for us.
+- `#cy` is our normal Cytoscape.js container, although here we've also manually set a height (keeping in mind that 1em=15px in the default 15pt font so that the graph is given more than 0px height).
 - `h1` will center any text with an `<h1>` tag; in this case, the text "Tutorial 4"
 - `#loading` will put any element with a `loading` id (i.e. the Font Awesome loading spinner) in the vertical and horizontal center of the page.
 - `.hidden` is used for hiding the Font Awesome loading spinner when data has been downloaded for the graph.
