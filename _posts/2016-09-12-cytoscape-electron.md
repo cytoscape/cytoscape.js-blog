@@ -72,7 +72,7 @@ For the sake of ensuring compatibility with this tutorial, I recommend [the curr
 
 Once Node.js is installed, open a shell and `cd electron_twitter`.
 To make sure everything is set up properly, run `node -v` and `npm -v`.
-You should get `6.3.1` and `3.10.3`, respectively. 
+You should get `6.3.1` and `3.10.3`, respectively.
 
 Now that Node.js and npm are working, we can install the packages we'll use in this tutorial.
 While package managers such as [bower](https://bower.io/) could technically have been used in previous tutorials—Cytoscape.js is listed—it adds complexity to the tutorial.
@@ -82,7 +82,7 @@ In this case, using the packages installed by npm is easy as `var cytoscape = re
 
 `npm install` will automatically install all packages in a `package.json` file located in the root of `electron_twitter`.
 We'll take advantage of this to install all our packages at once.
-Open your favorite editor and create a new `package.json` with the following contents: 
+Open your favorite editor and create a new `package.json` with the following contents:
 
 ```javascript
 {
@@ -120,7 +120,7 @@ Once the file is done and in the root of `electron_twitter/`, run `npm install` 
 
 # <a name="electron" />Electron
 
-Now that the environment is set up, we can get to work! 
+Now that the environment is set up, we can get to work!
 First, we'll need a file for Electron to load at startup.
 In `package.json`, we indicated that `main.js` is the [main file](https://xkcd.com/703/) of our application.
 
@@ -280,7 +280,7 @@ And then, in `ui.html`:
 ## <a name="ui-head" />\<head\>
 
 `<head>` is pretty standard, with our normal Font Awesome and Skeleton files as well as the qTip jQuery CSS file.
-Unlike previous tutorials, none of the JavaScript files for Cytoscape.js or qTip need to be included because they can be loaded with `require()` 
+Unlike previous tutorials, none of the JavaScript files for Cytoscape.js or qTip need to be included because they can be loaded with `require()`
 This time, we'll load `renderer.js` in `<head>` because all DOM-sensitive code within `renderer.js` is loaded within an event listener which waits for `DOMContentLoaded`, as in previous tutorials.
 
 ## <a name="ui-body" />\<body\>
@@ -362,7 +362,7 @@ var preDownloadedDir = path.join(__dirname, '../predownload');
 var T;
 ```
 
-First, we load our modules with Node.js's [`require()`](https://nodejs.org/api/modules.html) function. 
+First, we load our modules with Node.js's [`require()`](https://nodejs.org/api/modules.html) function.
 We'll be using:
 
 - [`fs`](https://nodejs.org/dist/latest-v6.x/docs/api/fs.html), [`os`](https://nodejs.org/dist/latest-v6.x/docs/api/os.html), and [`path`](https://nodejs.org/dist/latest-v6.x/docs/api/path.html): all built-in Node.js modules
@@ -370,11 +370,11 @@ We'll be using:
 - [`mkdirp`](https://github.com/substack/node-mkdirp): a Node equivalent of `mkdir -p`; can create nested folders with a single call
 - [`bluebird`](http://bluebirdjs.com/docs/getting-started.html): implementation of JavaScript Promises, used for asynchronous interactions with Twitter's API
 
-Next, we set up a few variables: 
+Next, we set up a few variables:
 
 - `programTempDir = 'cytoscape-electron'`: this is the directory where we'll save data downloaded from Twitter for Cytoscape.js to use. It will also hold our API authentication information
 - `apiAuth = require('../api_key.json')`: if a JSON file named `api_key.json` is in the root of the program directory, we'll load the authentication information from it.
-  Otherwise, we'll use pre-downloaded information for the Cytoscape Twitter account. 
+  Otherwise, we'll use pre-downloaded information for the Cytoscape Twitter account.
 - `userCount = 100`: we'll get 100 followers on each call to Twitter. This value may be increased up to 200
 - `preDownloadedDir = path.join(__dirname, '../predownload')`: if an API key isn't entered, we'll use pre-downloaded data that is distributed with the program in the `predownload` folder.
 - `T`: we'll later make this a Twit object if we're able to load the API key that Twit requires
@@ -517,7 +517,7 @@ function makeErrorMessage(err) {
 }
 ```
 
-A `401` error indicates a private user, `429` is rate limiting, and other errors are rare enough that we'll treat them generically. 
+A `401` error indicates a private user, `429` is rate limiting, and other errors are rare enough that we'll treat them generically.
 
 ## <a name="api-getauth" />Checking authentication: TwitterAPI.prototype.getAuth()
 
@@ -574,7 +574,7 @@ Because we want a Promise to be returned from `getUser()`, we need to get a Prom
 Of course, if a cached file is found, `return readFile()` will already be a Promise and nothing in `.catch()` will be run.
 However, if `.catch()` is run due to an error from `readFile()`, we need `.catch()` to return its own Promise (effectively "replacing" the rejected Promise from `readFile()`).
 
-Helpfully, Twit can natively return Promises! 
+Helpfully, Twit can natively return Promises!
 This means `return T.get()` will return a Promise, which we can again chain with `.then()` just like any other Promise.
 Bluebird's [`.then()`](http://bluebirdjs.com/docs/api/then.html) conforms to the [Promises/A+ `.then()`](https://promisesaplus.com/#point-22), meaning that it accepts two functions as arguments: one to run on success, and one to run on failure.
 The net effect is the same as chaining `.then(successFunction).catch(errFunction)`, just more streamlined.
@@ -585,7 +585,7 @@ Because this is `getUser()`, we'll specify that the filename to use is `user.jso
 Lastly, we'll call [`return Promise.resolve(data)`](http://bluebirdjs.com/docs/api/promise.resolve.html), an easy way to wrap the data from Twit within a Promise (remember that `getUser()` must return a Promise).
 
 If an error occurs, the first function of `.then()` is skipped and instead the error is given to the second function.
-All we do here is call `Promise.reject(makeErrorMessage(err))` to return a Promise (keeping with the all-paths-lead-to-Promise trend) that [rejects](http://bluebirdjs.com/docs/api/promise.reject.html) with the error from `makeErrorMessage()`. 
+All we do here is call `Promise.reject(makeErrorMessage(err))` to return a Promise (keeping with the all-paths-lead-to-Promise trend) that [rejects](http://bluebirdjs.com/docs/api/promise.reject.html) with the error from `makeErrorMessage()`.
 And with that, `getUser()` is done!
 
 ## <a name="api-getfollowers" />Follower information: TwitterAPI.prototype.getFollowers()
@@ -970,7 +970,7 @@ jQuery(document).on('click', 'a[href^="http"]', function(event) {
 
 Now we finally use [`shell`](http://electron.atom.io/docs/api/shell/).
 This should be recognizable as an event listener, albeit one which uses jQuery and a selector to ensure that the event only handles clicks on link beginning with `http`.
-Two things happen: 
+Two things happen:
 
 - We prevent the default behavior of Electron opening the link with `event.preventDefault()`
 - We instead open the link with `shell.openExternal(this.href)`.
@@ -981,7 +981,7 @@ By now, you've setup an environment with all the requried modules installed and 
 Before we can run the graph, we'll need some sample data (unless you have an API key to use) so unzip [`predownload.zip`](http://blog.js.cytoscape.org/public/demos/electron-twitter/predownload.zip) into your `electron_twitter` directory alongside `package.json` and `main.js`.
 With this completed, run `npm start` in the root of `electron_twitter/` and you should soon see the main screen.
 
-Congratulations! 
+Congratulations!
 
 
 
