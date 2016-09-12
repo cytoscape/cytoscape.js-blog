@@ -8,18 +8,18 @@ tags:
 
 # Table of contents
 
-1. [Introduction](#intro)
-2. [Environment setup](#setup)
+- [Introduction](#intro)
+- [Environment setup](#setup)
   - [Node.js](#setup-node)
-    - [package.json](#setup-node-package)
-3. [Electron](#electron)
+  - [package.json](#setup-node-package)
+- [Electron](#electron)
   - [createWindow()](#electron-window)
   - [The rest of `main.js`](#electron-rest)
-4. [The Cytoscape.js window](#index)
+- [The Cytoscape.js window](#index)
   - [`<head>`](#ui-head)
   - [`<body>`](#ui-body)
-5. [CSS](#css)
-6. [The Twitter API](#api)
+- [CSS](#css)
+- [The Twitter API](#api)
   - [Reading from disk](#api-read)
   - [Writing to disk](#api-write)
   - [API errors](#api-errors)
@@ -27,7 +27,7 @@ tags:
   - [User information from Twitter](#api-getuser)
   - [Follower information from Twitter](#api-getfollowers)
   - [module.exports](api-exports)
-7. [Creating a graph with `renderer.js`](#renderer)
+- [Creating a graph with `renderer.js`](#renderer)
   - [DOMContentLoaded](#renderer-loaded)
     - [Cytoscape initialization](#renderer-loaded-setup)
     - [Adding to the graph](#renderer-loaded-add)
@@ -38,7 +38,7 @@ tags:
   - [twitterObjToCyEle](#renderer-obj)
   - [qTip](#renderer-qtip)
   - [Overriding defaults](#renderer-browser)
-8. [Conclusion](#conclusion)
+- [Conclusion](#conclusion)
 
 
 

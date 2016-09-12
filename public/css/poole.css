@@ -138,6 +138,10 @@ strong {
 /* Lists */
 ul, ol, dl {
   margin-top: 0;
+  list-style: disc;
+}
+
+ul + :not(ul) {
   margin-bottom: 1rem;
 }
 
