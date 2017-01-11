@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     ]
   });
-  var concentricLayout = cy.makeLayout({
+  var concentricOptions = {
     name: 'concentric',
     concentric: function(node) {
       return 10 - node.data('level');
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return 1;
     },
     animate: false
-  });
+  };
 
   function addToGraph(targetUser, followers, level) {
     // target user
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var concentricButton = document.getElementById('concentricButton');
   concentricButton.addEventListener('click', function() {
-    concentricLayout.run();
+    cy.layout(concentricOptions);
   });
 
   var submitButton = document.getElementById('submitButton');
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
           var options = {
             maxLevel: 4,
             usersPerLevel: 3,
-            layout: concentricLayout
+            layout: concentricOptions
           };
           addFollowersByLevel(1, options);
         } catch (error) {
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
    * @param {object} options Constant options for addFollowersByLevel
    * @param {number} options.maxLevel The deepest level to add followers to (Main user's followers are at level=1)
    * @param {number} options.usersPerLevel Number of users to add followers at each level
-   * @param {function} options.graphFunc Function passed to add JSON data to graph after Promise completes
+   * @param {object} options.layout Options for the concentric layout
    */
   function addFollowersByLevel(level, options) {
     function followerCompare(a, b) {
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     } else {
       // reached the final level, now let's lay things out
-      options.layout.run();
+      cy.layout(options.layout);
       // add qtip boxes
       cy.nodes().forEach(function(ele) {
         ele.qtip({

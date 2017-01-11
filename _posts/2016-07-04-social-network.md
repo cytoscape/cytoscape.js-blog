@@ -379,7 +379,7 @@ function addFollowersByLevel(level, options) {
         });
     } else {
       // reached the final level, now let's lay things out
-      options.layout.run();
+      cy.layout(options.layout);
     }
   }
 ```
@@ -467,7 +467,7 @@ Becase `getUser()` expects a username rather than a Cytoscape.js node, we first 
         });
     } else {
       // reached the final level, now let's lay things out
-      options.layout.run();
+      cy.layout(options.layout);
     }
 ```
 
@@ -547,7 +547,7 @@ To make this event handler run, add the following immediately below `submitButto
   submitButton.click();
 ```
 
-This will run our submit button automatically.
+This will "click" our submit button automatically.
 
 # Intermission
 
@@ -564,7 +564,7 @@ twitter-graph/
     +-- index.html
 ```
 
-If you're interested in running the graph to see what it looks like, comment out the call to `options.layout.run()` in `addFollowersByLevel()` and the `layout` property of `options` in the `submitButton` listener function since a layout function is not yet defined.
+If you're interested in running the graph to see what it looks like, comment out the call to `cy.layout(options.layout)` in `addFollowersByLevel()` and the `layout` property of `options` in the `submitButton` listener function since a layout function is not yet defined.
 Then, you'll have enough of the graph done to reload and see a graph that you can drag around!
 
 If you don't see anything, make sure you've a web server running (`npm install -g http-server` is a good start) in the `twitter-graph` directory.
@@ -579,15 +579,16 @@ Because style and layout options were already covered in [part 1]({% post_url 20
 ## Defining a layout
 
 In this tutorial, we'll be using a concentric layout—good for representing the increasing degrees out from the initial username.
-Creating [layout objects](http://js.cytoscape.org/#layouts) with [`makeLayout()`](http://js.cytoscape.org/#cy.makeLayout) gives us the flexibility to use layouts besides `concentricLayout` (although concentric is the focus of this tutorial).
-Other layouts may be tested by defining them and setting `options.layout` (in the submitButton listener) equal to the user-defined layout rather than `concentricLayout`.
+Creating layout objects gives us the flexibility to use layouts besides `concentricLayout` (although concentric is the focus of this tutorial).
+Note that I am **not** using [`makeLayout({ ... })`](http://js.cytoscape.org/#cy.makeLayout) here because we do not want Cytoscape to make a layout before we have finished retrieving data from the server.
+Other layouts may be tested by defining them and setting `options.layout.name` and associated options (in the submitButton listener) equal to the user-defined layout rather than `concentric`.
 
 ### Concentric layout
 
 Within the `DOMContentLoaded` listener, add the following code: 
 
 ```javascript
-  var concentricLayout = cy.makeLayout({
+  var concentricOptions = {
     name: 'concentric',
     concentric: function(node) {
       return 10 - node.data('level');
@@ -596,10 +597,10 @@ Within the `DOMContentLoaded` listener, add the following code:
       return 1;
     },
     animate: false
-  });
 ```
 
-This creates a [concentric layout](http://js.cytoscape.org/#layouts/concentric) without actually running the layout (since elements are not added to the graph until the user clicks the submit button, there's no reason to run a layout beforehand).
+These are the options for a [concentric layout](http://js.cytoscape.org/#layouts/concentric).
+See *Defining a layout* for an explanation of why `makeLayout()` is not used here.
 In a concentric layout, the higher the value returned to `concentric`, the closer the node will be to the center of the graph. Because we have been using `level = 0` for the center of the graph, we'll subtract `level` from 10 to get a high value for central nodes and a low value for leaf nodes.
 `levelWidth` expects a function which will be used for determining how wide a range of `concentric` values will be mapped to a single concentric circle of the graph. In this case, we've made each level separated by a value of 1 so this function will return 1 every time (so that `level=0` gets its own circle, `level=1` has its own circle, `level=2` has its own circle, etc.).
 
@@ -639,14 +640,14 @@ Back in `main.js`, add the following to the `DOMContentLoaded` listener:
 ```javascript
   var concentricButton = document.getElementById('concentricButton');
   concentricButton.addEventListener('click', function() {
-    concentricLayout.run();
+    cy.layout(concentricOptions);
   });
 ```
 
 After the complexities of Promises, isn't it nice to have something straightforward?
-[`layout.run()`](http://js.cytoscape.org/#layout.run) will run our previously-defined layout when the corresponding button is clicked. Pretty simple!
+[`cy.layout()`](http://js.cytoscape.org/#cy.layout) will run our previously-defined layout when the corresponding button is clicked. Pretty simple!
 
-Now that a layout has been defined, you'll be able to uncomment the layout commands I talked about during Intermission (`options.layout.run()` and the `layout` property of `options`)—you have a layout to run!
+Now that a layout has been defined, you'll be able to uncomment the layout commands I talked about during Intermission (`cy.layout(options.layout);` and the `layout` property of `options`)—you have a layout to run!
 
 ## Style
 
@@ -780,12 +781,12 @@ Note that in addition to the `.js` files added, I also added the qTip stylesheet
 Back in `main.js`, we'll need to add a function which displays a qTip box whenever a node is selected.
 The qTip extension will display a tooltip whenever a node is selected, so the only step necessary to set up qTip is calling `.qtip()` on each node as we add it.
 Because we want to modify all nodes with the qTip extension, we'll need to make sure that all nodes have been added to the graph before calling `.qtip()` on each one.
-With this in mind, we'll place the `.qtip()` call immediately after `options.layout.run()` in `addFollowersByLevel()`.
+With this in mind, we'll place the `.qtip()` call immediately after `cy.layout(options.layout);` in `addFollowersByLevel()`.
 
-In the `addFollowersByLevel()`, add the `.forEach()` statement following `options.layout.run()` in `addFollowersByLevel()`'s `else` statement:
+In the `addFollowersByLevel()`, add the `.forEach()` statement following `cy.layout(options.layout);` in `addFollowersByLevel()`'s `else` statement:
 
 ```javascript
-      options.layout.run();
+      cy.layout(options.layout);
       cy.nodes().forEach(function(ele) {
         ele.qtip({
           content: {
@@ -898,7 +899,7 @@ All code that runs after populating the graph exists in the `else` statement of 
 ```javascript
     else {
       // reached the final level, now let's lay things out
-      options.layout.run();
+      cy.layout(options.layout);
       cy.nodes().forEach(function(ele) {
         // omitted for brevity
       });

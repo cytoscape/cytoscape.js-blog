@@ -2,7 +2,7 @@
 
 /*!
 
-Cytoscape.js 2.7.3 (MIT licensed)
+Cytoscape.js 2.7.13 (MIT licensed)
 
 Copyright (c) The Cytoscape Consortium
 
@@ -689,7 +689,7 @@ var elesfn = ({
     var V = this.nodes();
     var A = {};
     var _C = {};
-    var max;
+    var max = 0;
     var C = {
       set: function( key, val ){
         _C[ key ] = val;
@@ -827,6 +827,9 @@ var elesfn = ({
       },
 
       betweennessNormalized: function( node ){
+        if ( max == 0 )
+          return 0;
+
         if( is.string( node ) ){
           var node = cy.filter( node ).id();
         } else {
@@ -1042,6 +1045,8 @@ var elesfn = ({
 
     return {
       closeness: function( node ){
+        if( maxCloseness == 0 ){ return 0; }
+
         if( is.string( node ) ){
           // from is a selector string
           var node = (cy.filter( node )[0]).id();
@@ -1161,6 +1166,9 @@ var elesfn = ({
 
       return {
         degree: function( node ){
+          if( maxDegree == 0 )
+            return 0;
+
           if( is.string( node ) ){
             // from is a selector string
             var node = (cy.filter( node )[0]).id();
@@ -1195,6 +1203,9 @@ var elesfn = ({
 
       return {
         indegree: function( node ){
+          if ( maxIndegree == 0 )
+            return 0;
+
           if( is.string( node ) ){
             // from is a selector string
             var node = (cy.filter( node )[0]).id();
@@ -1206,6 +1217,9 @@ var elesfn = ({
           return indegrees[ node ] / maxIndegree;
         },
         outdegree: function( node ){
+          if ( maxOutdegree == 0 )
+            return 0;
+
           if( is.string( node ) ){
             // from is a selector string
             var node = (cy.filter( node )[0]).id();
@@ -2112,7 +2126,7 @@ var util = _dereq_( '../util' );
 
 var elesfn = ({
   classes: function( classes ){
-    classes = classes.match( /\S+/g ) || [];
+    classes = ( classes || '' ).match( /\S+/g ) || [];
     var self = this;
     var changed = [];
     var classesMap = {};
@@ -2143,15 +2157,20 @@ var elesfn = ({
       }
 
       // check if ele has classes outside of those passed
-      if( !changedEle ){ for( var eleCls in eleClasses ){
-        var eleHasClass = eleClasses[ eleCls ];
-        var specdClass = classesMap[ eleCls ]; // i.e. this class is passed to the function
+      if( !changedEle ){
+        var classes = Object.keys( eleClasses );
 
-        if( eleHasClass && !specdClass ){
-          changedEle = true;
-          break;
+        for( var i = 0; i < classes.length; i++ ){
+          var eleCls = classes[i];
+          var eleHasClass = eleClasses[ eleCls ];
+          var specdClass = classesMap[ eleCls ]; // i.e. this class is passed to the function
+
+          if( eleHasClass && !specdClass ){
+            changedEle = true;
+            break;
+          }
         }
-      } }
+      }
 
       if( changedEle ){
         _p.classes = util.copy( classesMap );
@@ -2883,30 +2902,15 @@ fn = elesfn = ({
         // cache cycle (i.e. before fired events)
         useCache: false
       } );
-      var padding = {
-        top: parent.pstyle( 'padding-top' ).pfValue,
-        bottom: parent.pstyle( 'padding-bottom' ).pfValue,
-        left: parent.pstyle( 'padding-left' ).pfValue,
-        right: parent.pstyle( 'padding-right' ).pfValue
-      };
       var pos = _p.position;
-      var didUpdate = false;
 
-      if( parent.pstyle( 'width' ).value === 'auto' ){
-        _p.autoWidth = bb.w;
-        pos.x = (bb.x1 + bb.x2 - padding.left + padding.right) / 2;
-        didUpdate = true;
-      }
+      _p.autoWidth = bb.w;
+      pos.x = (bb.x1 + bb.x2) / 2;
 
-      if( parent.pstyle( 'height' ).value === 'auto' ){
-        _p.autoHeight = bb.h;
-        pos.y = (bb.y1 + bb.y2 - padding.top + padding.bottom) / 2;
-        didUpdate = true;
-      }
+      _p.autoHeight = bb.h;
+      pos.y = (bb.y1 + bb.y2) / 2;
 
-      if( didUpdate ){
-        updated.push( parent );
-      }
+      updated.push( parent );
     }
 
     // go up, level by level
@@ -3008,16 +3012,20 @@ var updateBoundsFromLabel = function( bounds, ele, prefix, options ){
     var shadowY = ele.pstyle( 'text-shadow-offset-y' ).pfValue;
     var shadowOpacity = ele.pstyle( 'text-shadow-opacity' ).value;
     var outlineWidth = ele.pstyle( 'text-outline-width' ).pfValue;
+    var borderWidth = ele.pstyle( 'text-border-width' ).pfValue;
+    var halfBorderWidth = borderWidth / 2;
 
     var lh = labelHeight;
     var lw = labelWidth;
+    var lw_2 = lw / 2;
+    var lh_2 = lh / 2;
     var lx1, lx2, ly1, ly2;
 
     if( isEdge ){
-      lx1 = labelX - lw / 2;
-      lx2 = labelX + lw / 2;
-      ly1 = labelY - lh / 2;
-      ly2 = labelY + lh / 2;
+      lx1 = labelX - lw_2;
+      lx2 = labelX + lw_2;
+      ly1 = labelY - lh_2;
+      ly2 = labelY + lh_2;
     } else {
       switch( halign.value ){
         case 'left':
@@ -3026,8 +3034,8 @@ var updateBoundsFromLabel = function( bounds, ele, prefix, options ){
           break;
 
         case 'center':
-          lx1 = labelX - lw / 2;
-          lx2 = labelX + lw / 2;
+          lx1 = labelX - lw_2;
+          lx2 = labelX + lw_2;
           break;
 
         case 'right':
@@ -3043,8 +3051,8 @@ var updateBoundsFromLabel = function( bounds, ele, prefix, options ){
           break;
 
         case 'center':
-          ly1 = labelY - lh / 2;
-          ly2 = labelY + lh / 2;
+          ly1 = labelY - lh_2;
+          ly2 = labelY + lh_2;
           break;
 
         case 'bottom':
@@ -3083,10 +3091,10 @@ var updateBoundsFromLabel = function( bounds, ele, prefix, options ){
       ly2 = Math.max( px1y1.y, px1y2.y, px2y1.y, px2y2.y );
     }
 
-    lx1 += marginX - outlineWidth;
-    lx2 += marginX + outlineWidth;
-    ly1 += marginY - outlineWidth;
-    ly2 += marginY + outlineWidth;
+    lx1 += marginX - Math.max( outlineWidth, halfBorderWidth );
+    lx2 += marginX + Math.max( outlineWidth, halfBorderWidth );
+    ly1 += marginY - Math.max( outlineWidth, halfBorderWidth );
+    ly2 += marginY + Math.max( outlineWidth, halfBorderWidth );
 
     updateBounds( bounds, lx1, ly1, lx2, ly2 );
 
@@ -3372,6 +3380,18 @@ var defBbOpts = {
 
 var defBbOptsKey = getKey( defBbOpts );
 
+elesfn.recalculateRenderedStyle = function( useCache ){
+  var cy = this.cy();
+  var renderer = cy.renderer();
+  var styleEnabled = cy.styleEnabled();
+
+  if( renderer && styleEnabled ){
+    renderer.recalculateRenderedStyle( this, useCache );
+  }
+
+  return this;
+};
+
 elesfn.boundingBox = function( options ){
   // the main usecase is ele.boundingBox() for a single element with no/def options
   // specified s.t. the cache is used, so check for this case to make it faster by
@@ -3404,18 +3424,17 @@ elesfn.boundingBox = function( options ){
 
   var eles = this;
   var cy = eles.cy();
-  var renderer = eles.cy().renderer();
   var styleEnabled = cy.styleEnabled();
 
   if( styleEnabled ){
-    renderer.recalculateRenderedStyle( eles, opts.useCache );
+    this.recalculateRenderedStyle( opts.useCache );
   }
 
   for( var i = 0; i < eles.length; i++ ){
     var ele = eles[i];
 
     if( styleEnabled && ele.isEdge() && ele.pstyle('curve-style').strValue === 'bezier' ){
-      renderer.recalculateRenderedStyle( ele.parallelEdges(), opts.useCache ); // n.b. ele.parallelEdges() single is cached
+      ele.parallelEdges().recalculateRenderedStyle( opts.useCache ); // n.b. ele.parallelEdges() single is cached
     }
 
     updateBoundsFromBox( bounds, cachedBoundingBoxImpl( ele, opts ) );
@@ -3446,11 +3465,13 @@ var defineDimFns = function( opts ){
 
     if( ele ){
       if( styleEnabled ){
+        if( ele.isParent() ){
+          return _p[ opts.autoName ] || 0;
+        }
+
         var d = ele.pstyle( opts.name );
 
         switch( d.strValue ){
-          case 'auto':
-            return _p[ opts.autoName ] || 0;
           case 'label':
             return _p.rstyle[ opts.labelName ] || 0;
           default:
@@ -3471,8 +3492,8 @@ var defineDimFns = function( opts ){
     if( ele ){
       if( styleEnabled ){
         var dim = ele[ opts.name ]();
-        var border = ele.pstyle( 'border-width' ).pfValue;
-        var padding = ele.pstyle( opts.paddings[0] ).pfValue + ele.pstyle( opts.paddings[1] ).pfValue;
+        var border = ele.pstyle( 'border-width' ).pfValue; // n.b. 1/2 each side
+        var padding = 2 * ele.pstyle( 'padding' ).pfValue;
 
         return dim + border + padding;
       } else {
@@ -3501,13 +3522,11 @@ var defineDimFns = function( opts ){
 };
 
 defineDimFns( {
-  name: 'width',
-  paddings: [ 'padding-left', 'padding-right' ]
+  name: 'width'
 } );
 
 defineDimFns( {
-  name: 'height',
-  paddings: [ 'padding-top', 'padding-bottom' ]
+  name: 'height'
 } );
 
 // aliases
@@ -3723,7 +3742,7 @@ var elesfn = ({
   absoluteComplement: function(){
     var cy = this._private.cy;
 
-    return cy.elements().not( this );
+    return cy.mutableElements().not( this );
   },
 
   intersect: function( other ){
@@ -3832,7 +3851,7 @@ var elesfn = ({
 
     if( is.string( toAdd ) ){
       var selector = toAdd;
-      toAdd = cy.elements( selector );
+      toAdd = cy.mutableElements().filter( selector );
     }
 
     var elements = [];
@@ -3863,7 +3882,7 @@ var elesfn = ({
 
     if( toAdd && is.string( toAdd ) ){
       var selector = toAdd;
-      toAdd = cy.elements( selector );
+      toAdd = cy.mutableElements().filter( selector );
     }
 
     for( var i = 0; i < toAdd.length; i++ ){
@@ -3877,6 +3896,11 @@ var elesfn = ({
         this[ index ] = toAddEle;
         _p.ids[ id ] = toAddEle;
         _p.indexes[ id ] = index;
+      } else { // replace
+        var index = _p.indexes[ id ];
+
+        this[ index ] = toAddEle;
+        _p.ids[ id ] = toAddEle;
       }
     }
 
@@ -3929,7 +3953,7 @@ var elesfn = ({
 
     if( toRemove && is.string( toRemove ) ){
       var selector = toRemove;
-      toRemove = cy.elements( selector );
+      toRemove = cy.mutableElements().filter( selector );
     }
 
     for( var i = 0; i < toRemove.length; i++ ){
@@ -4211,7 +4235,7 @@ elesfn.poolIndex = function(){
   var id = this._private.data.id;
 
   return eles._private.indexes[ id ];
-},
+};
 
 elesfn.json = function( obj ){
   var ele = this.element();
@@ -4281,13 +4305,9 @@ elesfn.json = function( obj ){
       classes: null
     };
 
-    var classes = [];
-    for( var cls in p.classes ){
-      if( p.classes[ cls ] ){
-        classes.push( cls );
-      }
-    }
-    json.classes = classes.join( ' ' );
+    json.classes = Object.keys( p.classes ).filter(function( cls ){
+      return p.classes[cls];
+    }).join(' ');
 
     return json;
   }
@@ -4355,13 +4375,13 @@ elesfn.restore = function( notifyRenderer ){
   elements = nodes.concat( edges );
 
   var i;
-  var removeFromElements = function(i){
+  var removeFromElements = function(){
     elements.splice( i, 1 );
     i--;
   };
 
   // now, restore each element
-  for( i = 0, l = elements.length; i < l; i++ ){
+  for( i = 0; i < elements.length; i++ ){
     var ele = elements[ i ];
 
     var _private = ele._private;
@@ -4381,13 +4401,13 @@ elesfn.restore = function( notifyRenderer ){
       util.error( 'Can not create element with invalid string ID `' + data.id + '`' );
 
       // can't create element if it has empty string as id or non-string id
-      removeFromElements(i);
+      removeFromElements();
       continue;
     } else if( cy.hasElementWithId( data.id ) ){
       util.error( 'Can not create second element with ID `' + data.id + '`' );
 
       // can't create element if one already has that id
-      removeFromElements(i);
+      removeFromElements();
       continue;
     }
 
@@ -4434,7 +4454,7 @@ elesfn.restore = function( notifyRenderer ){
         }
       }
 
-      if( badSourceOrTarget ){ removeFromElements(i); continue; } // can't create this
+      if( badSourceOrTarget ){ removeFromElements(); continue; } // can't create this
 
       var src = cy.getElementById( data.source );
       var tgt = cy.getElementById( data.target );
@@ -4725,11 +4745,15 @@ elesfn.move = function( struct ){
       this.remove();
 
       for( var i = 0; i < jsons.length; i++ ){
-        var json = jsons[ i ];
+        var json = jsons[i];
+        var ele = this[i];
 
         if( json.group === 'edges' ){
           if( srcExists ){ json.data.source = srcId; }
+
           if( tgtExists ){ json.data.target = tgtId; }
+
+          json.scratch = ele._private.scratch;
         }
       }
 
@@ -4743,19 +4767,22 @@ elesfn.move = function( struct ){
     if( parentExists ){
       var jsons = this.jsons();
       var descs = this.descendants();
-      var descsEtc = descs.union( descs.union( this ).connectedEdges() );
+      var descsEtcJsons = descs.union( descs.union( this ).connectedEdges() ).jsons();
 
       this.remove(); // NB: also removes descendants and their connected edges
 
-      for( var i = 0; i < this.length; i++ ){
-        var json = jsons[ i ];
+      for( var i = 0; i < jsons.length; i++ ){
+        var json = jsons[i];
+        var ele = this[i];
 
         if( json.group === 'nodes' ){
           json.data.parent = parentId === null ? undefined : parentId;
+
+          json.scratch = ele._private.scratch;
         }
       }
 
-      return cy.add( jsons ).union( descsEtc.restore() );
+      return cy.add( jsons.concat( descsEtcJsons ) );
     }
   }
 
@@ -4928,6 +4955,7 @@ module.exports = elesfn;
 
 var is = _dereq_( '../is' );
 var util = _dereq_( '../util' );
+var Promise = _dereq_('../promise');
 
 var elesfn = ({
 
@@ -4943,7 +4971,6 @@ var elesfn = ({
     if( options.animate ){
       for( var i = 0; i < nodes.length; i++ ){
         var node = nodes[ i ];
-        var lastNode = i === nodes.length - 1;
 
         var newPos = fn.call( node, i, node );
         var pos = node.position();
@@ -4955,28 +4982,7 @@ var elesfn = ({
         var ani = node.animation( {
           position: newPos,
           duration: options.animationDuration,
-          easing: options.animationEasing,
-          step: !lastNode ? undefined : function(){
-            if( options.fit ){
-              cy.fit( options.eles, options.padding );
-            }
-          },
-          complete: !lastNode ? undefined : function(){
-            if( options.zoom != null ){
-              cy.zoom( options.zoom );
-            }
-
-            if( options.pan ){
-              cy.pan( options.pan );
-            }
-
-            if( options.fit ){
-              cy.fit( options.eles, options.padding );
-            }
-
-            layout.one( 'layoutstop', options.stop );
-            layout.trigger( { type: 'layoutstop', layout: layout } );
-          }
+          easing: options.animationEasing
         } );
 
         layout.animations.push( ani );
@@ -4984,8 +4990,40 @@ var elesfn = ({
         ani.play();
       }
 
+      var onStep;
+      cy.on( 'step.*', ( onStep = function(){
+        if( options.fit ){
+          cy.fit( options.eles, options.padding );
+        }
+      }) );
+
+      layout.one('layoutstop', function(){
+        cy.off('step.*', onStep);
+      });
+
       layout.one( 'layoutready', options.ready );
       layout.trigger( { type: 'layoutready', layout: layout } );
+
+      Promise.all( layout.animations.map(function( ani ){
+        return ani.promise();
+      }) ).then(function(){
+        cy.off('step.*', onStep);
+
+        if( options.zoom != null ){
+          cy.zoom( options.zoom );
+        }
+
+        if( options.pan ){
+          cy.pan( options.pan );
+        }
+
+        if( options.fit ){
+          cy.fit( options.eles, options.padding );
+        }
+
+        layout.one( 'layoutstop', options.stop );
+        layout.trigger( { type: 'layoutstop', layout: layout } );
+      });
     } else {
       nodes.positions( fn );
 
@@ -5036,7 +5074,7 @@ elesfn.createLayout = elesfn.makeLayout;
 
 module.exports = elesfn;
 
-},{"../is":83,"../util":100}],29:[function(_dereq_,module,exports){
+},{"../is":83,"../promise":86,"../util":100}],29:[function(_dereq_,module,exports){
 'use strict';
 
 var is = _dereq_( '../is' );
@@ -5057,19 +5095,34 @@ var elesfn = ({
       return this; // chaining and exit early when batching
     }
 
+    var hasCompounds = cy.hasCompoundNodes();
     var style = cy.style();
+    var updatedEles = this;
+
     notifyRenderer = notifyRenderer || notifyRenderer === undefined ? true : false;
 
-    style.apply( this );
+    if( hasCompounds ){ // then add everything up and down for compound selector checks
+      updatedEles = this.spawnSelf().merge( this.descendants() ).merge( this.parents() );
+    }
 
-    var updatedCompounds = this.updateCompoundBounds();
-    var toNotify = updatedCompounds.length > 0 ? this.add( updatedCompounds ) : this;
+    style.apply( updatedEles );
+
+    if( hasCompounds ){
+      var updatedCompounds = updatedEles.updateCompoundBounds();
+
+      // disable for performance for now
+      // (as updatedCompounds would be a subset of updatedEles ayway b/c of selectors check)
+      // if( updatedCompounds.length > 0 ){
+      //   updatedEles.merge( updatedCompounds );
+      // }
+    }
 
     if( notifyRenderer ){
-      toNotify.rtrigger( 'style' ); // let renderer know we changed style
+      updatedEles.rtrigger( 'style' ); // let renderer know we changed style
     } else {
-      toNotify.trigger( 'style' ); // just fire the event
+      updatedEles.trigger( 'style' ); // just fire the event
     }
+
     return this; // chaining
   },
 
@@ -5225,11 +5278,14 @@ var elesfn = ({
       if(
         ele.pstyle( 'visibility' ).value !== 'visible'
         || ele.pstyle( 'display' ).value !== 'element'
+        || ele.pstyle('width').pfValue === 0
       ){
         return false;
       }
 
       if( ele._private.group === 'nodes' ){
+        if( ele.pstyle('height').pfValue === 0 ){ return false; }
+
         if( !hasCompoundNodes ){ return true; }
 
         var parents = ele._private.data.parent ? ele.parents() : null;
@@ -5306,20 +5362,6 @@ var elesfn = ({
       } else {
         return ele.effectiveOpacity() === 0;
       }
-    }
-  },
-
-  isFullAutoParent: function(){
-    var cy = this.cy();
-    if( !cy.styleEnabled() ){ return false; }
-
-    var ele = this[0];
-
-    if( ele ){
-      var autoW = ele.pstyle( 'width' ).value === 'auto';
-      var autoH = ele.pstyle( 'height' ).value === 'auto';
-
-      return ele.isParent() && autoW && autoH;
     }
   },
 
@@ -6058,7 +6100,7 @@ var corefn = {
 
   remove: function( collection ){
     if( is.elementOrCollection( collection ) ){
-      collection = collection;
+      // already have right ref
     } else if( is.string( collection ) ){
       var selector = collection;
       collection = this.$( selector );
@@ -6073,7 +6115,7 @@ var corefn = {
     cy.notifications( false );
 
     // remove old elements
-    var oldEles = cy.elements();
+    var oldEles = cy.mutableElements();
     if( oldEles.length > 0 ){
       oldEles.remove();
     }
@@ -6090,7 +6132,7 @@ var corefn = {
 
       cy.notify( {
         type: 'load',
-        eles: cy.elements()
+        eles: cy.mutableElements()
       } );
 
       cy.one( 'load', onload );
@@ -6101,7 +6143,7 @@ var corefn = {
     } );
 
     var layoutOpts = util.extend( {}, cy._private.options.layout );
-    layoutOpts.eles = cy.$();
+    layoutOpts.eles = cy.elements();
 
     cy.layout( layoutOpts );
 
@@ -6229,6 +6271,10 @@ var corefn = ({
 
           step( ele, ani, now, isCore );
 
+          if( is.fn( ani_p.step ) ){
+            ani_p.step.call( ele, now );
+          }
+
           if( ani_p.applying ){
             ani_p.applying = false;
           }
@@ -6284,6 +6330,8 @@ var corefn = ({
 
       // remove elements from list of currently animating if its queues are empty
       eles.unmerge( doneEles );
+
+      cy.trigger('step');
 
     } // handleElements
 
@@ -6452,10 +6500,6 @@ var corefn = ({
 
         } // if
 
-      }
-
-      if( is.fn( ani_p.step ) ){
-        ani_p.step.apply( self, [ now ] );
       }
 
       ani_p.progress = percent;
@@ -6941,16 +6985,7 @@ util.extend( corefn, {
 
     cy.stopAnimationLoop();
 
-    cy.notify( { type: 'destroy' } ); // destroy the renderer
-
-    var domEle = cy.container();
-    if( domEle ){
-      domEle._cyreg = null;
-
-      while( domEle.childNodes.length > 0 ){
-        domEle.removeChild( domEle.childNodes[0] );
-      }
-    }
+    cy.destroyRenderer();
 
     return cy;
   },
@@ -7002,6 +7037,7 @@ util.extend( corefn, {
   json: function( obj ){
     var cy = this;
     var _p = cy._private;
+    var eles = cy.mutableElements();
 
     if( is.plainObject( obj ) ){ // set
 
@@ -7046,7 +7082,7 @@ util.extend( corefn, {
         }
 
         // elements not specified in json should be removed
-        cy.elements().stdFilter( function( ele ){
+        eles.stdFilter( function( ele ){
           return !idInJson[ ele.id() ];
         } ).remove();
       }
@@ -7087,7 +7123,7 @@ util.extend( corefn, {
       var json = {};
 
       json.elements = {};
-      cy.elements().each( function( i, ele ){
+      eles.forEach( function( ele ){
         var group = ele.group();
 
         if( !json.elements[ group ] ){
@@ -7242,6 +7278,10 @@ var corefn = ({
 
     var renderer = this.renderer();
 
+    // exit if destroy() called on core or renderer in between frames #1499
+    // TODO first check this.isDestroyed() in >=3.1 #1440
+    if( !renderer ){ return; }
+
     renderer.notify( params );
   },
 
@@ -7315,7 +7355,10 @@ var corefn = ({
     var cy = this;
 
     return this.batch( function(){
-      for( var id in map ){
+      var ids = Object.keys( map );
+
+      for( var i = 0; i < ids.length; i++ ){
+        var id = ids[i];
         var data = map[ id ];
         var ele = cy.getElementById( id );
 
@@ -7379,6 +7422,23 @@ var corefn = ({
     } );
 
     cy._private.renderer = new RendererProto( rOpts );
+  },
+
+  destroyRenderer: function(){
+    var cy = this;
+
+    cy.notify( { type: 'destroy' } ); // destroy the renderer
+
+    var domEle = cy.container();
+    if( domEle ){
+      domEle._cyreg = null;
+
+      while( domEle.childNodes.length > 0 ){
+        domEle.removeChild( domEle.childNodes[0] );
+      }
+    }
+
+    cy._private.renderer = null; // to be extra safe, remove the ref
   },
 
   onRender: function( fn ){
@@ -7452,9 +7512,13 @@ var corefn = ({
 
     if( selector ){
       return eles.filter( selector );
+    } else {
+      return eles.spawnSelf();
     }
+  },
 
-    return eles;
+  mutableElements: function(){
+    return this._private.elements;
   }
 
 });
@@ -7751,7 +7815,7 @@ var corefn = ({
       bb.h = bb.y2 - bb.y1;
 
     } else if( !is.elementOrCollection( elements ) ){
-      elements = this.elements();
+      elements = this.mutableElements();
     }
 
     bb = bb || elements.boundingBox();
@@ -7952,9 +8016,9 @@ var corefn = ({
 
     if( is.string( elements ) ){
       var selector = elements;
-      elements = this.elements( selector );
+      elements = this.mutableElements().filter( selector );
     } else if( !is.elementOrCollection( elements ) ){
-      elements = this.elements();
+      elements = this.mutableElements();
     }
 
     var bb = elements.boundingBox();
@@ -8131,15 +8195,19 @@ var define = {
       } else if( p.allowSetting && is.plainObject( name ) ){ // extend
         var obj = name;
         var k, v;
+        var keys = Object.keys( obj );
 
-        for( k in obj ){
+        for( var i = 0; i < keys.length; i++ ){
+          k = keys[ i ];
           v = obj[ k ];
 
           var valid = !p.immutableKeys[ k ];
           if( valid ){
-            for( var i = 0, l = all.length; i < l; i++ ){
-              if( p.canSet( all[ i ] ) ){
-                all[ i ]._private[ p.field ][ k ] = v;
+            for( var j = 0; j < all.length; j++ ){
+              var ele = all[j];
+
+              if( p.canSet( ele ) ){
+                ele._private[ p.field ][ k ] = v;
               }
             }
           }
@@ -8216,8 +8284,10 @@ var define = {
 
         for( var i_a = 0, l_a = all.length; i_a < l_a; i_a++ ){
           var _privateFields = all[ i_a ]._private[ p.field ];
+          var keys = Object.keys( _privateFields );
 
-          for( var key in _privateFields ){
+          for( var i = 0; i < keys.length; i++ ){
+            var key = keys[i];
             var validKeyToDelete = !p.immutableKeys[ key ];
 
             if( validKeyToDelete ){
@@ -8285,7 +8355,11 @@ var define = {
         events = map;
       }
 
-      for( var evts in events ){
+      var keys = Object.keys( events );
+
+      for( var k = 0; k < keys.length; k++ ){
+        var evts = keys[k];
+
         callback = events[ evts ];
         if( callback === false ){
           callback = define.event.falseCallback;
@@ -8391,7 +8465,11 @@ var define = {
         events = map;
       }
 
-      for( var evts in events ){
+      var keys = Object.keys( events );
+
+      for( var k = 0; k < keys.length; k++ ){
+        var evts = keys[k];
+
         callback = events[ evts ];
 
         if( callback === false ){
@@ -8721,11 +8799,7 @@ var define = {
         break;
       }
 
-      var propertiesEmpty = true;
-      if( properties ){ for( var i in properties ){ // jshint ignore:line
-        propertiesEmpty = false;
-        break;
-      } }
+      var propertiesEmpty = Object.keys( properties ).length === 0;
 
       if( propertiesEmpty ){
         return new Animation( all[0], properties ); // nothing to animate
@@ -8991,11 +9065,23 @@ function setExtension( type, name, registrant ){
 
   var ext = registrant;
 
+  var overrideErr = function( field ){
+    util.error( 'Can not register `' + name + '` for `' + type + '` since `' + field + '` already exists in the prototype and can not be overridden' );
+  };
+
   if( type === 'core' ){
-    Core.prototype[ name ] = registrant;
+    if( Core.prototype[ name ] ){
+      return overrideErr( name );
+    } else {
+      Core.prototype[ name ] = registrant;
+    }
 
   } else if( type === 'collection' ){
-    Collection.prototype[ name ] = registrant;
+    if( Collection.prototype[ name ] ){
+      return overrideErr( name );
+    } else {
+      Collection.prototype[ name ] = registrant;
+    }
 
   } else if( type === 'layout' ){
     // fill in missing layout functions in the prototype
@@ -9031,22 +9117,28 @@ function setExtension( type, name, registrant ){
       layoutProto.start = function(){ this.run(); return this; };
     }
 
-    if( !layoutProto.stop ){
-      layoutProto.stop = function(){
-        var opts = this.options;
+    var regStop = registrant.prototype.stop;
+    layoutProto.stop = function(){
+      var opts = this.options;
 
-        if( opts && opts.animate ){
-          var anis = this.animations;
+      if( opts && opts.animate ){
+        var anis = this.animations;
+
+        if( anis ){
           for( var i = 0; i < anis.length; i++ ){
             anis[ i ].stop();
           }
         }
+      }
 
+      if( regStop ){
+        regStop.call( this );
+      } else {
         this.trigger( 'layoutstop' );
+      }
 
-        return this;
-      };
-    }
+      return this;
+    };
 
     if( !layoutProto.destroy ){
       layoutProto.destroy = function(){
@@ -9084,8 +9176,7 @@ function setExtension( type, name, registrant ){
       var existsInR = rProto[ pName ] != null;
 
       if( existsInR ){
-        util.error( 'Can not register renderer `' + name + '` since it overrides `' + pName + '` in its prototype' );
-        return;
+        return overrideErr( pName );
       }
 
       proto[ pName ] = pVal; // take impl from base
@@ -9482,7 +9573,7 @@ BreadthFirstLayout.prototype.run = function(){
     }
 
     var eleDepth = ele._private.scratch.breadthfirst.depth;
-    var neighbors = ele.neighborhood().nodes().not( ':parent' );
+    var neighbors = ele.neighborhood().nodes().not( ':parent' ).intersection(nodes);
     var percent = 0;
     var samples = 0;
 
@@ -9978,6 +10069,9 @@ var defaults = {
   // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
   boundingBox: undefined,
 
+  // Randomize the initial positions of the nodes (true) or use existing positions (false)
+  randomize: false,
+
   // Extra spacing between components in non-compound graphs
   componentSpacing: 100,
 
@@ -10060,9 +10154,9 @@ CoseLayout.prototype.run = function(){
   }
 
   // If required, randomize node positions
-  // if (true === options.randomize) {
-  randomizePositions( layoutInfo, cy );
-  // }
+  if (options.randomize) {
+    randomizePositions( layoutInfo, cy );
+  }
 
   var startTime = Date.now();
   var refreshRequested = false;
@@ -10783,7 +10877,7 @@ CoseLayout.prototype.run = function(){
       }
 
       if( options.animate ){
-        broadcast( layoutInfo.layoutNodes ); // jshint ignore:line
+        broadcast( layoutInfo.layoutNodes ); // eslint-disable-line no-undef
       }
 
     } while( loopRet && i + 1 < options.numIter );
@@ -10899,10 +10993,10 @@ var createLayoutInfo = function( cy, layout, options ){
     tempNode.minX       = tempNode.positionX - tempNode.width  / 2;
     tempNode.maxY       = tempNode.positionY + tempNode.height / 2;
     tempNode.minY       = tempNode.positionY - tempNode.height / 2;
-    tempNode.padLeft    = parseFloat( n.style( 'padding-left' ) );
-    tempNode.padRight   = parseFloat( n.style( 'padding-right' ) );
-    tempNode.padTop     = parseFloat( n.style( 'padding-top' ) );
-    tempNode.padBottom  = parseFloat( n.style( 'padding-bottom' ) );
+    tempNode.padLeft    = parseFloat( n.style( 'padding' ) );
+    tempNode.padRight   = parseFloat( n.style( 'padding' ) );
+    tempNode.padTop     = parseFloat( n.style( 'padding' ) );
+    tempNode.padBottom  = parseFloat( n.style( 'padding' ) );
 
     // forces
     tempNode.nodeRepulsion = is.fn( options.nodeRepulsion ) ? options.nodeRepulsion.call( n, n ) : options.nodeRepulsion;
@@ -11108,7 +11202,7 @@ var findLCA_aux = function( node1, node2, graphIx, layoutInfo ){
  *         Only used for debbuging
  */
 var printLayoutInfo = function( layoutInfo ){
-  /* jshint ignore:start */
+  /* eslint-disable */
 
   if( !DEBUG ){
     return;
@@ -11165,7 +11259,7 @@ var printLayoutInfo = function( layoutInfo ){
   console.debug( s );
 
   return;
-  /* jshint ignore:end */
+  /* eslint-enable */
 };
 
 
@@ -11472,7 +11566,7 @@ GridLayout.prototype.run = function(){
     var getPos = function( i, element ){
       var x, y;
 
-      if( element.locked() || element.isFullAutoParent() ){
+      if( element.locked() || element.isParent() ){
         return false;
       }
 
@@ -12049,7 +12143,7 @@ BRp.registerCalculationListeners = function(){
         fn( willDraw, elesToUpdate );
       } }
 
-      r.recalculateRenderedStyle( elesToUpdate );
+      r.recalculateRenderedStyle( elesToUpdate, false );
 
       for( var i = 0; i < elesToUpdate.length; i++ ){
         elesToUpdate[i]._private.rstyle.dirtyEvents = null;
@@ -12072,6 +12166,9 @@ BRp.recalculateRenderedStyle = function( eles, useCache ){
   var edges = [];
   var nodes = [];
 
+  // the renderer can't be used for calcs when destroyed, e.g. ele.boundingBox()
+  if( this.destroyed ){ return; }
+
   // use cache by default for perf
   if( useCache === undefined ){ useCache = true; }
 
@@ -12084,26 +12181,31 @@ BRp.recalculateRenderedStyle = function( eles, useCache ){
     if( (useCache && rstyle.clean) || ele.removed() ){ continue; }
 
     if( _p.group === 'nodes' ){
-      var pos = _p.position;
-
       nodes.push( ele );
-
-      rstyle.nodeX = pos.x;
-      rstyle.nodeY = pos.y;
-      rstyle.nodeW = ele.pstyle( 'width' ).pfValue;
-      rstyle.nodeH = ele.pstyle( 'height' ).pfValue;
     } else { // edges
-
       edges.push( ele );
-
-    } // if edges
+    }
 
     rstyle.clean = true;
     // rstyle.dirtyEvents = null;
   }
 
+  // update node data from projections
+  for( var i = 0; i < nodes.length; i++ ){
+    var ele = nodes[i];
+    var _p = ele._private;
+    var rstyle = _p.rstyle;
+    var pos = _p.position;
+
+    this.recalculateNodeLabelProjection( ele );
+
+    rstyle.nodeX = pos.x;
+    rstyle.nodeY = pos.y;
+    rstyle.nodeW = ele.pstyle( 'width' ).pfValue;
+    rstyle.nodeH = ele.pstyle( 'height' ).pfValue;
+  }
+
   this.recalculateEdgeProjections( edges );
-  this.recalculateLabelProjections( nodes, edges );
 
   // update edge data from projections
   for( var i = 0; i < edges.length; i++ ){
@@ -12112,6 +12214,8 @@ BRp.recalculateRenderedStyle = function( eles, useCache ){
     var rstyle = _p.rstyle;
     var rs = _p.rscratch;
 
+    this.recalculateEdgeLabelProjections( ele );
+
     // update rstyle positions
     rstyle.srcX = rs.arrowStartX;
     rstyle.srcY = rs.arrowStartY;
@@ -12119,6 +12223,9 @@ BRp.recalculateRenderedStyle = function( eles, useCache ){
     rstyle.tgtY = rs.arrowEndY;
     rstyle.midX = rs.midX;
     rstyle.midY = rs.midY;
+    rstyle.labelAngle = rs.labelAngle;
+    rstyle.sourceLabelAngle = rs.sourceLabelAngle;
+    rstyle.targetLabelAngle = rs.targetLabelAngle;
   }
 };
 
@@ -12225,6 +12332,7 @@ BRp.findNearestElements = function( x, y, visibleElementsOnly, isTouch ){
         shape.checkPoint( x, y, 0, width, height, pos.x, pos.y )
       ){
         addEle( node, 0 );
+        return true;
       }
 
     }
@@ -12276,6 +12384,7 @@ BRp.findNearestElements = function( x, y, visibleElementsOnly, isTouch ){
           widthSq > ( sqDist = math.sqdistToFiniteLine( x, y, pts[ i ], pts[ i + 1], pts[ i + 2], pts[ i + 3] ) )
         ){
           addEle( edge, sqDist );
+          return true;
         }
       }
 
@@ -12288,6 +12397,7 @@ BRp.findNearestElements = function( x, y, visibleElementsOnly, isTouch ){
           (widthSq > (sqDist = math.sqdistToQuadraticBezier( x, y, pts[ i ], pts[ i + 1], pts[ i + 2], pts[ i + 3], pts[ i + 4], pts[ i + 5] )) )
         ){
           addEle( edge, sqDist );
+          return true;
         }
       }
     }
@@ -12344,21 +12454,26 @@ BRp.findNearestElements = function( x, y, visibleElementsOnly, isTouch ){
       prefixDash = '';
     }
 
-    if( ele.pstyle( 'text-events' ).strValue === 'no' ){ return; }
+    var text = ele.pstyle( prefixDash + 'label' ).value;
+    var eventsEnabled = ele.pstyle( 'text-events' ).strValue === 'yes';
 
-    var rotation = ele.pstyle( prefixDash + 'text-rotation' );
+    if( !eventsEnabled || !text ){ return; }
 
-    // adjust bb w/ angle
-    if( rotation.strValue === 'autorotate' || !!rotation.pfValue ){
+    var rstyle = _p.rstyle;
+    var bw = ele.pstyle('text-border-width').pfValue;
+    var lw = preprop( rstyle, 'labelWidth', prefix ) + bw/2 + 2*th;
+    var lh = preprop( rstyle, 'labelHeight', prefix ) + bw/2 + 2*th;
+    var lx = preprop( rstyle, 'labelX', prefix );
+    var ly = preprop( rstyle, 'labelY', prefix );
 
-      var rstyle = _p.rstyle;
-      var bw = ele.pstyle('text-border-width').pfValue;
-      var lw = preprop( rstyle, 'labelWidth', prefix ) + bw/2 + 2*th;
-      var lh = preprop( rstyle, 'labelHeight', prefix ) + bw/2 + 2*th;
-      var lx = preprop( rstyle, 'labelX', prefix );
-      var ly = preprop( rstyle, 'labelY', prefix );
+    var theta = preprop( _p.rscratch, 'labelAngle', prefix );
 
-      var theta = preprop( _p.rscratch, 'labelAngle', prefix );
+    var lx1 = lx - lw / 2;
+    var lx2 = lx + lw / 2;
+    var ly1 = ly - lh / 2;
+    var ly2 = ly + lh / 2;
+
+    if( theta ){
       var cos = Math.cos( theta );
       var sin = Math.sin( theta );
 
@@ -12371,11 +12486,6 @@ BRp.findNearestElements = function( x, y, visibleElementsOnly, isTouch ){
           y: x * sin + y * cos + ly
         };
       };
-
-      var lx1 = lx - lw / 2;
-      var lx2 = lx + lw / 2;
-      var ly1 = ly - lh / 2;
-      var ly2 = ly + lh / 2;
 
       var px1y1 = rotate( lx1, ly1 );
       var px1y2 = rotate( lx1, ly2 );
@@ -12391,25 +12501,21 @@ BRp.findNearestElements = function( x, y, visibleElementsOnly, isTouch ){
 
       if( math.pointInsidePolygonPoints( x, y, points ) ){
         addEle( ele );
+        return true;
       }
-
-    } else {
-      var bb = ele.boundingBox( {
-        includeLabels: true,
-        includeNodes: false,
-        includeEdges: false
-      } );
-
-      // adjust bb w/ threshold
-      bb.x1 -= th;
-      bb.y1 -= th;
-      bb.x2 += th;
-      bb.y2 += th;
-      bb.w = bb.x2 - bb.x1;
-      bb.h = bb.y2 - bb.y1;
+    } else { // do a cheaper bb check
+      var bb = {
+        w: lw,
+        h: lh,
+        x1: lx1,
+        x2: lx2,
+        y1: ly1,
+        y2: ly2
+      };
 
       if( math.inBoundingBox( bb, x, y ) ){
         addEle( ele );
+        return true;
       }
     }
 
@@ -12419,16 +12525,10 @@ BRp.findNearestElements = function( x, y, visibleElementsOnly, isTouch ){
     var ele = eles[ i ];
 
     if( ele.isNode() ){
-      checkNode( ele );
-
-      checkLabel( ele );
+      checkNode( ele ) || checkLabel( ele );
 
     } else { // then edge
-      checkEdge( ele );
-
-      checkLabel( ele );
-      checkLabel( ele, 'source' );
-      checkLabel( ele, 'target' );
+      checkEdge( ele ) || checkLabel( ele ) || checkLabel( ele, 'source' ) || checkLabel( ele, 'target' );
     }
   }
 
@@ -12543,14 +12643,14 @@ BRp.updateCachedGrabbedEles = function(){
   eles.drag = [];
   eles.nondrag = [];
 
-  var grabTarget;
+  var grabTargets = [];
 
   for( var i = 0; i < eles.length; i++ ){
     var ele = eles[i];
     var rs = ele._private.rscratch;
 
-    if( rs.isGrabTarget && !ele.isParent() ){
-      grabTarget = ele;
+    if( ele.grabbed() && !ele.isParent() ){
+      grabTargets.push( ele );
     } else if( rs.inDragLayer ){
       eles.drag.push( ele );
     } else {
@@ -12558,19 +12658,19 @@ BRp.updateCachedGrabbedEles = function(){
     }
   }
 
-  // put the grab target node last so it's on top of its neighbourhood
-  if( grabTarget ){
-    eles.drag.push( grabTarget );
+  // put the grab target nodes last so it's on top of its neighbourhood
+  for( var i = 0; i < grabTargets.length; i++ ){
+    var ele = grabTargets[i];
+
+    eles.drag.push( ele );
   }
 };
 
 BRp.getCachedZSortedEles = function( forceRecalc ){
-  var cyEles = this.cy.elements();
-  var eles = [];
-
   if( forceRecalc || !this.cachedZSortedEles ){
     //console.time('cachezorder')
 
+    var cyEles = this.cy.mutableElements();
     var eles = [];
 
     eles.nodes = [];
@@ -12627,6 +12727,11 @@ BRp.projectLines = function( edge ){
   var rs = _p.rscratch;
   var et = rs.edgeType;
 
+  // clear the cached points state
+  _p.rstyle.bezierPts = null;
+  _p.rstyle.linePts = null;
+  _p.rstyle.haystackPts = null;
+
   if( et === 'multibezier' ||  et === 'bezier' ||  et === 'self' ||  et === 'compound' ){
     var bpts = _p.rstyle.bezierPts = []; // jshint ignore:line
 
@@ -12665,10 +12770,7 @@ BRp.recalculateNodeLabelProjection = function( node ){
   var _p = node._private;
   var nodeWidth = node.width();
   var nodeHeight = node.height();
-  var paddingLeft = node.pstyle('padding-left').pfValue;
-  var paddingRight = node.pstyle('padding-right').pfValue;
-  var paddingTop = node.pstyle('padding-top').pfValue;
-  var paddingBottom = node.pstyle('padding-bottom').pfValue;
+  var padding = node.pstyle('padding').pfValue;
   var nodePos = _p.position;
   var textHalign = node.pstyle( 'text-halign' ).strValue;
   var textValign = node.pstyle( 'text-valign' ).strValue;
@@ -12677,11 +12779,11 @@ BRp.recalculateNodeLabelProjection = function( node ){
 
   switch( textHalign ){
     case 'left':
-      textX = nodePos.x - nodeWidth / 2 - paddingLeft;
+      textX = nodePos.x - nodeWidth / 2 - padding;
       break;
 
     case 'right':
-      textX = nodePos.x + nodeWidth / 2 + paddingRight;
+      textX = nodePos.x + nodeWidth / 2 + padding;
       break;
 
     default: // e.g. center
@@ -12690,11 +12792,11 @@ BRp.recalculateNodeLabelProjection = function( node ){
 
   switch( textValign ){
     case 'top':
-      textY = nodePos.y - nodeHeight / 2 - paddingTop;
+      textY = nodePos.y - nodeHeight / 2 - padding;
       break;
 
     case 'bottom':
-      textY = nodePos.y + nodeHeight / 2 + paddingBottom;
+      textY = nodePos.y + nodeHeight / 2 + padding;
       break;
 
     default: // e.g. middle
@@ -12963,6 +13065,7 @@ BRp.getLabelText = function( ele, prefix ){
   };
 
   if( textTransform == 'none' ){
+    // passthrough
   } else if( textTransform == 'uppercase' ){
     text = text.toUpperCase();
   } else if( textTransform == 'lowercase' ){
@@ -13042,16 +13145,17 @@ BRp.calculateLabelDimensions = function( ele, text, extraKey ){
     return cache[ cacheKey ];
   }
 
+  var sizeMult = 1; // increase the scale to increase accuracy w.r.t. zoomed text
   var fStyle = ele.pstyle( 'font-style' ).strValue;
-  var size = ele.pstyle( 'font-size' ).pfValue + 'px';
+  var size = ( sizeMult * ele.pstyle( 'font-size' ).pfValue ) + 'px';
   var family = ele.pstyle( 'font-family' ).strValue;
   var weight = ele.pstyle( 'font-weight' ).strValue;
 
   var div = this.labelCalcDiv;
 
   if( !div ){
-    div = this.labelCalcDiv = document.createElement( 'div' );
-    document.body.appendChild( div );
+    div = this.labelCalcDiv = document.createElement( 'div' ); // eslint-disable-line no-undef
+    document.body.appendChild( div ); // eslint-disable-line no-undef
   }
 
   var ds = div.style;
@@ -13082,21 +13186,11 @@ BRp.calculateLabelDimensions = function( ele, text, extraKey ){
   div.textContent = text;
 
   cache[ cacheKey ] = {
-    width: div.clientWidth,
-    height: div.clientHeight
+    width: Math.ceil( div.clientWidth / sizeMult ),
+    height: Math.ceil( div.clientHeight / sizeMult )
   };
 
   return cache[ cacheKey ];
-};
-
-BRp.recalculateLabelProjections = function( nodes, edges ){
-  for( var i = 0; i < nodes.length; i++ ){
-    this.recalculateNodeLabelProjection( nodes[ i ] );
-  }
-
-  for( var i = 0; i < edges.length; i++ ){
-    this.recalculateEdgeLabelProjections( edges[ i ] );
-  }
 };
 
 BRp.recalculateEdgeProjections = function( edges ){
@@ -13176,16 +13270,15 @@ BRp.findEdgeControlPoints = function( edges ){
     src = pairEdges[0]._private.source;
     tgt = pairEdges[0]._private.target;
 
-    src_p = src._private;
-    tgt_p = tgt._private;
-
-    // make sure src/tgt distinction is consistent
-    // (src/tgt in this case are just for ctrlpts and don't actually have to be true src/tgt)
-    if( src_p.data.id > tgt_p.data.id ){
+    // make sure src/tgt distinction is consistent for bundled edges
+    if( !pairEdges.hasUnbundled && src.id() > tgt.id() ){
       var temp = src;
       src = tgt;
       tgt = temp;
     }
+
+    src_p = src._private;
+    tgt_p = tgt._private;
 
     srcPos = src_p.position;
     tgtPos = tgt_p.position;
@@ -13259,9 +13352,9 @@ BRp.findEdgeControlPoints = function( edges ){
       };
 
 
-      // if src intersection is inside tgt or tgt intersection is inside src, then no ctrl pts to draw
+      // if node shapes overlap, then no ctrl pts to draw
       if(
-        tgtShape.checkPoint( srcOutside[0], srcOutside[1], 0, tgtW, tgtH, tgtPos.x, tgtPos.y )  ||
+        tgtShape.checkPoint( srcOutside[0], srcOutside[1], 0, tgtW, tgtH, tgtPos.x, tgtPos.y )  &&
         srcShape.checkPoint( tgtOutside[0], tgtOutside[1], 0, srcW, srcH, srcPos.x, srcPos.y )
       ){
         vectorNormInverse = {};
@@ -13293,12 +13386,6 @@ BRp.findEdgeControlPoints = function( edges ){
       var ctrlptDist = ctrlptDists ? ctrlptDists.pfValue[0] : undefined;
       var ctrlptWeight = ctrlptWs.value[0];
       var edgeIsUnbundled = curveStyle === 'unbundled-bezier' || curveStyle === 'segments';
-
-      var swappedDirection = edge_p.source !== src;
-
-      if( swappedDirection && edgeIsUnbundled ){
-        ctrlptDist *= -1;
-      }
 
       var srcX1 = rs.lastSrcCtlPtX;
       var srcX2 = srcPos.x;
@@ -13436,14 +13523,7 @@ BRp.findEdgeControlPoints = function( edges ){
           var w = segmentWs[ s ];
           var d = segmentDs[ s ];
 
-          // d = swappedDirection ? -d : d;
-          //
-          // d = Math.abs(d);
-
-          // var w1 = !swappedDirection ? (1 - w) : w;
-          // var w2 = !swappedDirection ? w : (1 - w);
-
-          var w1 = (1 - w);
+          var w1 = 1 - w;
           var w2 = w;
 
           var midptPts = edgeDistances === 'node-position' ? posPts : midptSrcPts;
@@ -13494,8 +13574,8 @@ BRp.findEdgeControlPoints = function( edges ){
 
           var distanceFromMidpoint = manctrlptDist !== undefined ? manctrlptDist : normctrlptDist;
 
-          var w1 = !swappedDirection || edgeIsUnbundled ? (1 - ctrlptWeight) : ctrlptWeight;
-          var w2 = !swappedDirection || edgeIsUnbundled ? ctrlptWeight : (1 - ctrlptWeight);
+          var w1 = 1 - ctrlptWeight;
+          var w2 = ctrlptWeight;
 
           var midptPts = edgeDistances === 'node-position' ? posPts : midptSrcPts;
 
@@ -13929,6 +14009,7 @@ BRp.findEndpoints = function( edge ){
   var multi = et !== 'bezier';
   var lines = et === 'straight' || et === 'segments';
   var segments = et === 'segments';
+  var hasEndpts = bezier || multi || lines;
 
   var p1, p2;
 
@@ -13992,7 +14073,7 @@ BRp.findEndpoints = function( edge ){
   rs.arrowStartX = arrowStart[0];
   rs.arrowStartY = arrowStart[1];
 
-  if( lines ){
+  if( hasEndpts ){
     if( !is.number( rs.startX ) || !is.number( rs.startY ) || !is.number( rs.endX ) || !is.number( rs.endY ) ){
       rs.badLine = true;
     } else {
@@ -14022,22 +14103,35 @@ module.exports = BRp;
 
 var BRp = {};
 
-BRp.getCachedImage = function( url, onLoad ){
+BRp.getCachedImage = function( url, crossOrigin, onLoad ){
   var r = this;
   var imageCache = r.imageCache = r.imageCache || {};
+  var cache = imageCache[ url ];
 
-  if( imageCache[ url ] && imageCache[ url ].image ){
-    return imageCache[ url ].image;
+  if( cache ){
+    if( !cache.image.complete ){
+      cache.image.addEventListener('load', onLoad);
+    }
+
+    return cache.image;
+  } else {
+    cache = imageCache[ url ] = imageCache[ url ] || {};
+
+    var image = cache.image = new Image(); // eslint-disable-line no-undef
+    image.addEventListener('load', onLoad);
+
+    // #1582 safari doesn't load data uris with crossOrigin properly
+    // https://bugs.webkit.org/show_bug.cgi?id=123978
+    var dataUriPrefix = 'data:';
+    var isDataUri = url.substring( 0, dataUriPrefix.length ).toLowerCase() === dataUriPrefix;
+    if( !isDataUri ){
+      image.crossOrigin = crossOrigin; // prevent tainted canvas
+    }
+
+    image.src = url;
+
+    return image;
   }
-
-  var cache = imageCache[ url ] = imageCache[ url ] || {};
-
-  var image = cache.image = new Image();
-  image.addEventListener('load', onLoad);
-  image.crossOrigin = 'Anonymous'; // prevent tainted canvas
-  image.src = url;
-
-  return image;
 };
 
 module.exports = BRp;
@@ -14129,6 +14223,9 @@ BRp.notify = function( params ){
   var types;
   var r = this;
 
+  // the renderer can't be notified after it's destroyed
+  if( this.destroyed ){ return; }
+
   if( is.array( params.type ) ){
     types = params.type;
 
@@ -14184,6 +14281,10 @@ BRp.destroy = function(){
     ( tgt.off || tgt.removeEventListener ).apply( tgt, b.args );
   }
 
+  r.bindings = [];
+  r.beforeRenderCallbacks = [];
+  r.onUpdateEleCalcsFns = [];
+
   if( r.removeObserver ){
     r.removeObserver.disconnect();
   }
@@ -14194,7 +14295,7 @@ BRp.destroy = function(){
 
   if( r.labelCalcDiv ){
     try {
-      document.body.removeChild( r.labelCalcDiv );
+      document.body.removeChild( r.labelCalcDiv ); // eslint-disable-line no-undef
     } catch( e ){
       // ie10 issue #1014
     }
@@ -14242,7 +14343,7 @@ BRp.binder = function( tgt ){
       args: args
     });
 
-    ( tgt.on || tgt.addEventListener ).apply( tgt, args );
+    ( tgt.addEventListener || tgt.on ).apply( tgt, args );
 
     return this;
   };
@@ -14480,7 +14581,7 @@ BRp.load = function(){
 
   // watch for when the cy container is removed from the dom
   if( haveMutationsApi ){
-    r.removeObserver = new MutationObserver( function( mutns ){
+    r.removeObserver = new MutationObserver( function( mutns ){ // eslint-disable-line no-undef
       for( var i = 0; i < mutns.length; i++ ){
         var mutn = mutns[ i ];
         var rNodes = mutn.removedNodes;
@@ -14516,13 +14617,13 @@ BRp.load = function(){
   }, 100 );
 
   if( haveMutationsApi ){
-    r.styleObserver = new MutationObserver( onResize );
+    r.styleObserver = new MutationObserver( onResize ); // eslint-disable-line no-undef
 
     r.styleObserver.observe( r.container, { attributes: true } );
   }
 
   // auto resize
-  r.registerBinding( window, 'resize', onResize );
+  r.registerBinding( window, 'resize', onResize ); // eslint-disable-line no-undef
 
   var invalCtnrBBOnScroll = function( domEle ){
     r.registerBinding( domEle, 'scroll', function( e ){
@@ -14699,7 +14800,7 @@ BRp.load = function(){
 
   }, false );
 
-  r.registerBinding( window, 'mousemove', function mousemoveHandler( e ){
+  r.registerBinding( window, 'mousemove', function mousemoveHandler( e ){ // eslint-disable-line no-undef
     var preventDefault = false;
     var capture = r.hoverData.capture;
 
@@ -14994,7 +15095,7 @@ BRp.load = function(){
     }
   }, false );
 
-  r.registerBinding( window, 'mouseup', function mouseupHandler( e ){
+  r.registerBinding( window, 'mouseup', function mouseupHandler( e ){ // eslint-disable-line no-undef
     var capture = r.hoverData.capture;
     if( !capture ){ return; }
     r.hoverData.capture = false;
@@ -15204,7 +15305,16 @@ BRp.load = function(){
         r.redraw();
       }, 150 );
 
-      var diff = e.deltaY / -250 || e.wheelDeltaY / 1000 || e.wheelDelta / 1000;
+      var diff;
+
+      if( e.deltaY != null ){
+        diff = e.deltaY / -250;
+      } else if( e.wheelDeltaY != null ){
+        diff = e.wheelDeltaY / 1000;
+      } else {
+        diff = e.wheelDelta / 1000;
+      }
+
       diff = diff * r.wheelSensitivity;
 
       var needsWheelFix = e.deltaMode === 1;
@@ -15229,7 +15339,7 @@ BRp.load = function(){
   // r.registerBinding(r.container, 'DOMMouseScroll', wheelHandler, true);
   // r.registerBinding(r.container, 'MozMousePixelScroll', wheelHandler, true); // older firefox
 
-  r.registerBinding( window, 'scroll', function scrollHandler( e ){
+  r.registerBinding( window, 'scroll', function scrollHandler( e ){ // eslint-disable-line no-undef
     r.scrollingPage = true;
 
     clearTimeout( r.scrollingPageTimeout );
@@ -15364,9 +15474,9 @@ BRp.load = function(){
     }
 
     if( e.touches[2] ){
-
+      // ignore
     } else if( e.touches[1] ){
-
+      // ignore
     } else if( e.touches[0] ){
       var nears = r.findNearestElements( now[0], now[1], true, true );
       var near = nears[0];
@@ -15456,7 +15566,7 @@ BRp.load = function(){
   }, false );
 
   var touchmoveHandler;
-  r.registerBinding(window, 'touchmove', touchmoveHandler = function(e) {
+  r.registerBinding(window, 'touchmove', touchmoveHandler = function(e) { // eslint-disable-line no-undef
     var select = r.selection;
     var capture = r.touchData.capture;
     var cy = r.cy;
@@ -15848,7 +15958,7 @@ BRp.load = function(){
   }, false );
 
   var touchcancelHandler;
-  r.registerBinding( window, 'touchcancel', touchcancelHandler = function( e ){
+  r.registerBinding( window, 'touchcancel', touchcancelHandler = function( e ){ // eslint-disable-line no-undef
     var start = r.touchData.start;
 
     r.touchData.capture = false;
@@ -15859,7 +15969,7 @@ BRp.load = function(){
   } );
 
   var touchendHandler;
-  r.registerBinding( window, 'touchend', touchendHandler = function( e ){
+  r.registerBinding( window, 'touchend', touchendHandler = function( e ){ // eslint-disable-line no-undef
     var start = r.touchData.start;
 
     var capture = r.touchData.capture;
@@ -15965,8 +16075,9 @@ BRp.load = function(){
       r.data.bgActivePosistion = undefined;
       r.redrawHint( 'select', true );
     } else if( e.touches[1] ){
-
+      // ignore
     } else if( e.touches[0] ){
+      // ignore
 
     // Last touch released
     } else if( !e.touches[0] ){
@@ -16175,15 +16286,45 @@ var math = _dereq_( '../../../math' );
 
 var BRp = {};
 
-BRp.registerNodeShapes = function(){
-  var nodeShapes = this.nodeShapes = {};
-  var renderer = this;
+BRp.generatePolygon = function( name, points ){
+  return ( this.nodeShapes[ name ] = {
+    renderer: this,
 
-  nodeShapes[ 'ellipse' ] = {
+    name: name,
+
+    points: points,
+
+    draw: function( context, centerX, centerY, width, height ){
+      this.renderer.nodeShapeImpl( 'polygon', context, centerX, centerY, width, height, this.points );
+    },
+
+    intersectLine: function( nodeX, nodeY, width, height, x, y, padding ){
+      return math.polygonIntersectLine(
+          x, y,
+          this.points,
+          nodeX,
+          nodeY,
+          width / 2, height / 2,
+          padding )
+        ;
+    },
+
+    checkPoint: function( x, y, padding, width, height, centerX, centerY ){
+      return math.pointInsidePolygon( x, y, this.points,
+        centerX, centerY, width, height, [0, -1], padding )
+      ;
+    }
+  } );
+};
+
+BRp.generateEllipse = function(){
+  return ( this.nodeShapes['ellipse'] = {
+    renderer: this,
+
     name: 'ellipse',
 
     draw: function( context, centerX, centerY, width, height ){
-      renderer.nodeShapeImpl( this.name )( context, centerX, centerY, width, height );
+      this.renderer.nodeShapeImpl( this.name, context, centerX, centerY, width, height );
     },
 
     intersectLine: function( nodeX, nodeY, width, height, x, y, padding ){
@@ -16205,49 +16346,19 @@ BRp.registerNodeShapes = function(){
 
       return x * x + y * y <= 1;
     }
-  };
+  } );
+};
 
-  function generatePolygon( name, points ){
-    return ( nodeShapes[ name ] = {
-      name: name,
+BRp.generateRoundRectangle = function(){
+  return ( this.nodeShapes['roundrectangle'] = {
+    renderer: this,
 
-      points: points,
-
-      draw: function( context, centerX, centerY, width, height ){
-        renderer.nodeShapeImpl( 'polygon' )( context, centerX, centerY, width, height, this.points );
-      },
-
-      intersectLine: function( nodeX, nodeY, width, height, x, y, padding ){
-        return math.polygonIntersectLine(
-            x, y,
-            this.points,
-            nodeX,
-            nodeY,
-            width / 2, height / 2,
-            padding )
-          ;
-      },
-
-      checkPoint: function( x, y, padding, width, height, centerX, centerY ){
-        return math.pointInsidePolygon( x, y, nodeShapes[ name ].points,
-          centerX, centerY, width, height, [0, -1], padding )
-        ;
-      }
-    } );
-  }
-
-  generatePolygon( 'triangle', math.generateUnitNgonPointsFitToSquare( 3, 0 ) );
-
-  generatePolygon( 'square', math.generateUnitNgonPointsFitToSquare( 4, 0 ) );
-  nodeShapes[ 'rectangle' ] = nodeShapes[ 'square' ];
-
-  nodeShapes[ 'roundrectangle' ] = {
     name: 'roundrectangle',
 
     points: math.generateUnitNgonPointsFitToSquare( 4, 0 ),
 
     draw: function( context, centerX, centerY, width, height ){
-      renderer.nodeShapeImpl( this.name )( context, centerX, centerY, width, height );
+      this.renderer.nodeShapeImpl( this.name, context, centerX, centerY, width, height );
     },
 
     intersectLine: function( nodeX, nodeY, width, height, x, y, padding ){
@@ -16327,22 +16438,36 @@ BRp.registerNodeShapes = function(){
 
       return false;
     }
-  };
+  } );
+};
 
-  generatePolygon( 'diamond', [
+BRp.registerNodeShapes = function(){
+  var nodeShapes = this.nodeShapes = {};
+  var renderer = this;
+
+  this.generateEllipse();
+
+  this.generatePolygon( 'triangle', math.generateUnitNgonPointsFitToSquare( 3, 0 ) );
+
+  this.generatePolygon( 'rectangle', math.generateUnitNgonPointsFitToSquare( 4, 0 ) );
+  nodeShapes[ 'square' ] = nodeShapes[ 'rectangle' ];
+
+  this.generateRoundRectangle();
+
+  this.generatePolygon( 'diamond', [
     0, 1,
     1, 0,
     0, -1,
     -1, 0
   ] );
 
-  generatePolygon( 'pentagon', math.generateUnitNgonPointsFitToSquare( 5, 0 ) );
+  this.generatePolygon( 'pentagon', math.generateUnitNgonPointsFitToSquare( 5, 0 ) );
 
-  generatePolygon( 'hexagon', math.generateUnitNgonPointsFitToSquare( 6, 0 ) );
+  this.generatePolygon( 'hexagon', math.generateUnitNgonPointsFitToSquare( 6, 0 ) );
 
-  generatePolygon( 'heptagon', math.generateUnitNgonPointsFitToSquare( 7, 0 ) );
+  this.generatePolygon( 'heptagon', math.generateUnitNgonPointsFitToSquare( 7, 0 ) );
 
-  generatePolygon( 'octagon', math.generateUnitNgonPointsFitToSquare( 8, 0 ) );
+  this.generatePolygon( 'octagon', math.generateUnitNgonPointsFitToSquare( 8, 0 ) );
 
   var star5Points = new Array( 20 );
   {
@@ -16369,16 +16494,16 @@ BRp.registerNodeShapes = function(){
 
   star5Points = math.fitPolygonToSquare( star5Points );
 
-  generatePolygon( 'star', star5Points );
+  this.generatePolygon( 'star', star5Points );
 
-  generatePolygon( 'vee', [
+  this.generatePolygon( 'vee', [
     -1, -1,
     0, -0.333,
     1, -1,
     0, 1
   ] );
 
-  generatePolygon( 'rhomboid', [
+  this.generatePolygon( 'rhomboid', [
     -1, -1,
     0.333, -1,
     1, 1,
@@ -16393,12 +16518,12 @@ BRp.registerNodeShapes = function(){
     var name = 'polygon-' + key;
     var shape;
 
-    if( (shape = nodeShapes[ name ]) ){ // got cached shape
+    if( (shape = this[ name ]) ){ // got cached shape
       return shape;
     }
 
     // create and cache new shape
-    return generatePolygon( name, points );
+    return renderer.generatePolygon( name, points );
   };
 
 };
@@ -16430,6 +16555,9 @@ BRp.redraw = function( options ){
 };
 
 BRp.beforeRender = function( fn, priority ){
+  // the renderer can't add tick callbacks when destroyed
+  if( this.destroyed ){ return; }
+
   priority = priority || 0;
 
   var cbs = this.beforeRenderCallbacks;
@@ -16438,6 +16566,14 @@ BRp.beforeRender = function( fn, priority ){
 
   // higher priority callbacks executed first
   cbs.sort(function( a, b ){ return b.priority - a.priority; });
+};
+
+var beforeRenderCallbacks = function( r, willDraw, startTime ){
+  var cbs = r.beforeRenderCallbacks;
+
+  for( var i = 0; i < cbs.length; i++ ){
+    cbs[i].fn( willDraw, startTime );
+  }
 };
 
 BRp.startRenderLoop = function(){
@@ -16449,19 +16585,11 @@ BRp.startRenderLoop = function(){
     r.renderLoopStarted = true;
   }
 
-  var beforeRenderCallbacks = function( willDraw, startTime ){
-    var cbs = r.beforeRenderCallbacks;
-
-    for( var i = 0; i < cbs.length; i++ ){
-      cbs[i].fn( willDraw, startTime );
-    }
-  };
-
   var renderFn = function( requestTime ){
     if( r.destroyed ){ return; }
 
     if( r.requestedFrame && !r.skipFrame ){
-      beforeRenderCallbacks( true, requestTime );
+      beforeRenderCallbacks( r, true, requestTime );
 
       var startTime = util.performanceNow();
 
@@ -16493,7 +16621,7 @@ BRp.startRenderLoop = function(){
 
       r.requestedFrame = false;
     } else {
-      beforeRenderCallbacks( false, requestTime );
+      beforeRenderCallbacks( r, false, requestTime );
     }
 
     r.skipFrame = false;
@@ -16541,22 +16669,30 @@ CRp.arrowShapeImpl = function( name ){
     },
 
     'triangle-tee': function( context, trianglePoints, teePoints ){
-      var triPts = trianglePoints;
-      for( var i = 0; i < triPts.length; i++ ){
-        var pt = triPts[ i ];
+      if( context.beginPath ){ context.beginPath(); }
 
-        context.lineTo( pt.x, pt.y );
-      }
+        var triPts = trianglePoints;
+        for( var i = 0; i < triPts.length; i++ ){
+          var pt = triPts[ i ];
 
-      var teePts = teePoints;
-      var firstTeePt = teePoints[0];
-      context.moveTo( firstTeePt.x, firstTeePt.y );
+          context.lineTo( pt.x, pt.y );
+        }
 
-      for( var i = 0; i < teePts.length; i++ ){
-        var pt = teePts[ i ];
+      if( context.closePath ){ context.closePath(); }
 
-        context.lineTo( pt.x, pt.y );
-      }
+      if( context.beginPath ){ context.beginPath(); }
+
+        var teePts = teePoints;
+        var firstTeePt = teePoints[0];
+        context.moveTo( firstTeePt.x, firstTeePt.y );
+
+        for( var i = 0; i < teePts.length; i++ ){
+          var pt = teePts[ i ];
+
+          context.lineTo( pt.x, pt.y );
+        }
+
+      if( context.closePath ){ context.closePath(); }
     },
 
     'circle': function( context, rx, ry, r ){
@@ -16577,14 +16713,11 @@ CRp.drawEdge = function( context, edge, shiftToOriginWithBb, drawLabel, drawOver
   var usePaths = this.usePaths();
 
   // if bezier ctrl pts can not be calculated, then die
-  if( rs.badBezier || rs.badLine || isNaN( rs.allpts[0] ) ){ // iNaN in case edge is impossible and browser bugs (e.g. safari)
+  if( rs.badLine || isNaN(rs.allpts[0]) ){ // isNaN in case edge is impossible and browser bugs (e.g. safari)
     return;
   }
 
-  // Edge line width
-  if( edge.pstyle( 'width' ).pfValue <= 0 ){
-    return;
-  }
+  if( !edge.visible() ){ return; }
 
   var bb;
   if( shiftToOriginWithBb ){
@@ -16618,6 +16751,8 @@ CRp.drawEdge = function( context, edge, shiftToOriginWithBb, drawLabel, drawOver
 
     context.lineCap = 'butt';
   }
+
+  context.lineJoin = 'round';
 
   var edgeWidth = edge.pstyle( 'width' ).pfValue + (drawOverlayInstead ? 2 * overlayPadding : 0);
   var lineStyle = drawOverlayInstead ? 'solid' : edge.pstyle( 'line-style' ).value;
@@ -16670,7 +16805,7 @@ CRp.drawEdgePath = function( edge, context, pts, type, width ){
       path = context = rs.pathCache;
       pathCacheHit = true;
     } else {
-      path = context = new Path2D();
+      path = context = new Path2D(); // eslint-disable-line no-undef
       rs.pathCacheKey = pathCacheKey;
       rs.pathCache = path;
     }
@@ -16692,7 +16827,7 @@ CRp.drawEdgePath = function( edge, context, pts, type, width ){
     }
   }
 
-  if( !pathCacheHit ){
+  if( !pathCacheHit && !rs.badLine ){
     if( context.beginPath ){ context.beginPath(); }
     context.moveTo( pts[0], pts[1] );
 
@@ -16701,20 +16836,16 @@ CRp.drawEdgePath = function( edge, context, pts, type, width ){
       case 'self':
       case 'compound':
       case 'multibezier':
-        if( !rs.badBezier ){
-          for( var i = 2; i + 3 < pts.length; i += 4 ){
-            context.quadraticCurveTo( pts[ i ], pts[ i + 1], pts[ i + 2], pts[ i + 3] );
-          }
+        for( var i = 2; i + 3 < pts.length; i += 4 ){
+          context.quadraticCurveTo( pts[ i ], pts[ i + 1], pts[ i + 2], pts[ i + 3] );
         }
         break;
 
       case 'straight':
       case 'segments':
       case 'haystack':
-        if( !rs.badLine ){
-          for( var i = 2; i + 1 < pts.length; i += 2 ){
-            context.lineTo( pts[ i ], pts[ i + 1] );
-          }
+        for( var i = 2; i + 1 < pts.length; i += 2 ){
+          context.lineTo( pts[ i ], pts[ i + 1] );
         }
         break;
     }
@@ -16819,7 +16950,7 @@ CRp.drawArrowShape = function( edge, arrowType, context, fill, edgeWidth, shape,
       path = context = rs.arrowPathCache[ arrowType ];
       pathCacheHit = true;
     } else {
-      path = context = new Path2D();
+      path = context = new Path2D(); // eslint-disable-line no-undef
       rs.arrowPathCacheKey[ arrowType ] = pathCacheKey;
       rs.arrowPathCache[ arrowType ] = path;
     }
@@ -16881,6 +17012,8 @@ CRp.drawCachedElement = function( context, ele, pxRatio, extent ){
   var r = this;
   var bb = ele.boundingBox();
 
+  if( bb.w === 0 || bb.h === 0 ){ return; }
+
   if( !extent || math.boundingBoxesIntersect( bb, extent ) ){
     var cache = r.data.eleTxrCache.getElement( ele, bb, pxRatio );
 
@@ -16934,6 +17067,8 @@ CRp.drawLayeredElements = function( context, eles, pxRatio, extent ){
       var layer = layers[i];
       var bb = layer.bb;
 
+      if( bb.w === 0 || bb.h === 0 ){ continue; }
+
       context.drawImage( layer.canvas, bb.x1, bb.y1, bb.w, bb.h );
     }
   } else { // fall back on plain caching if no layers
@@ -16983,12 +17118,12 @@ CRp.drawInscribedImage = function( context, img, node ){
 
   // workaround for broken browsers like ie
   if( null == imgW || null == imgH ){
-    document.body.appendChild( img );
+    document.body.appendChild( img ); // eslint-disable-line no-undef
 
     imgW = img.cachedW = img.width || img.offsetWidth;
     imgH = img.cachedH = img.height || img.offsetHeight;
 
-    document.body.removeChild( img );
+    document.body.removeChild( img ); // eslint-disable-line no-undef
   }
 
   var w = imgW;
@@ -17154,18 +17289,7 @@ CRp.drawElementText = function( context, ele, force ){
         context.textAlign = 'center';
     }
 
-    switch( textValign ){
-      case 'top':
-        context.textBaseline = 'bottom';
-        break;
-
-      case 'bottom':
-        context.textBaseline = 'top';
-        break;
-
-      default: // e.g. center
-        context.textBaseline = 'middle';
-    }
+    context.textBaseline = 'bottom';
   } else {
     var label = ele.pstyle( 'label' );
     var srcLabel = ele.pstyle( 'source-label' );
@@ -17180,7 +17304,7 @@ CRp.drawElementText = function( context, ele, force ){
     }
 
     context.textAlign = 'center';
-    context.textBaseline = 'middle';
+    context.textBaseline = 'bottom';
   }
 
 
@@ -17331,17 +17455,15 @@ CRp.drawText = function( context, ele, prefix ){
       textY = 0;
     }
 
-    if( isNode ){
-      var pLeft = ele.pstyle( 'padding-left' ).pfValue;
-      var pRight = ele.pstyle( 'padding-right' ).pfValue;
-      var pTop = ele.pstyle( 'padding-top' ).pfValue;
-      var pBottom = ele.pstyle( 'padding-bottom' ).pfValue;
-
-      textX += pLeft / 2;
-      textX -= pRight / 2;
-
-      textY += pTop / 2;
-      textY -= pBottom / 2;
+    switch( valign ){
+      case 'top':
+        break;
+      case 'center':
+        textY += textH / 2;
+        break;
+      case 'bottom':
+        textY += textH;
+        break;
     }
 
     var backgroundOpacity = ele.pstyle( 'text-background-opacity' ).value;
@@ -17349,29 +17471,20 @@ CRp.drawText = function( context, ele, prefix ){
     var textBorderWidth = ele.pstyle( 'text-border-width' ).pfValue;
 
     if( backgroundOpacity > 0 || ( textBorderWidth > 0 && borderOpacity > 0 ) ){
-      var bgWidth = textW;
-      var bgHeight = textH;
       var bgX = textX;
 
-      if( halign ){
-        if( halign == 'center' ){
-          bgX = bgX - bgWidth / 2;
-        } else if( halign == 'left' ){
-          bgX = bgX - bgWidth;
-        }
+      switch( halign ){
+        case 'left':
+          bgX -= textW;
+          break;
+        case 'center':
+          bgX -= textW / 2;
+          break;
+        case 'right':
+          break;
       }
 
-      var bgY = textY;
-
-      if( isNode ){
-        if( valign == 'top' ){
-          bgY = bgY - bgHeight;
-        } else if( valign == 'center' ){
-          bgY = bgY - bgHeight / 2;
-        }
-      } else {
-        bgY = bgY - bgHeight / 2;
-      }
+      var bgY = textY - textH;
 
       if( backgroundOpacity > 0 ){
         var textFill = context.fillStyle;
@@ -17380,9 +17493,9 @@ CRp.drawText = function( context, ele, prefix ){
         context.fillStyle = 'rgba(' + textBackgroundColor[ 0 ] + ',' + textBackgroundColor[ 1 ] + ',' + textBackgroundColor[ 2 ] + ',' + backgroundOpacity * parentOpacity + ')';
         var styleShape = ele.pstyle( 'text-background-shape' ).strValue;
         if( styleShape == 'roundrectangle' ){
-          roundRect( context, bgX, bgY, bgWidth, bgHeight, 2 );
+          roundRect( context, bgX, bgY, textW, textH, 2 );
         } else {
-          context.fillRect( bgX, bgY, bgWidth, bgHeight );
+          context.fillRect( bgX, bgY, textW, textH );
         }
         context.fillStyle = textFill;
       }
@@ -17414,12 +17527,12 @@ CRp.drawText = function( context, ele, prefix ){
           }
         }
 
-        context.strokeRect( bgX, bgY, bgWidth, bgHeight );
+        context.strokeRect( bgX, bgY, textW, textH );
 
         if( textBorderStyle === 'double' ){
           var whiteWidth = textBorderWidth / 2;
 
-          context.strokeRect( bgX + whiteWidth, bgY + whiteWidth, bgWidth - whiteWidth * 2, bgHeight - whiteWidth * 2 );
+          context.strokeRect( bgX + whiteWidth, bgY + whiteWidth, textW - whiteWidth * 2, textH - whiteWidth * 2 );
         }
 
         if( context.setLineDash ){ // for very outofdate browsers
@@ -17445,14 +17558,10 @@ CRp.drawText = function( context, ele, prefix ){
         case 'top':
           textY -= ( lines.length - 1 ) * lineHeight;
           break;
-
-        case 'bottom':
-          // nothing required
-          break;
-
-        default:
         case 'center':
-          textY -= ( lines.length - 1 ) * lineHeight / 2;
+        case 'bottom':
+          textY -= ( lines.length - 1 ) * lineHeight;
+          break;
       }
 
       for( var l = 0; l < lines.length; l++ ){
@@ -17502,15 +17611,18 @@ CRp.drawNode = function( context, node, shiftToOriginWithBb, drawLabel ){
     return; // can't draw node with undefined position
   }
 
+  if( !node.visible() ){ return; }
+
+  var parentOpacity = node.effectiveOpacity();
+
   var usePaths = this.usePaths();
   var path;
   var pathCacheHit = false;
 
-  var parentOpacity = node.effectiveOpacity();
-  if( parentOpacity === 0 ){ return; }
+  var padding = node.pstyle('padding').pfValue;
 
-  nodeWidth = node.width() + node.pstyle( 'padding-left' ).pfValue + node.pstyle( 'padding-right' ).pfValue;
-  nodeHeight = node.height() + node.pstyle( 'padding-top' ).pfValue + node.pstyle( 'padding-bottom' ).pfValue;
+  nodeWidth = node.width() + 2 * padding;
+  nodeHeight = node.height() + 2 * padding;
 
   context.lineWidth = node.pstyle( 'border-width' ).pfValue;
 
@@ -17533,8 +17645,10 @@ CRp.drawNode = function( context, node, shiftToOriginWithBb, drawLabel ){
 
   if( url !== undefined ){
 
+    var bgImgCrossOrigin = node.pstyle( 'background-image-crossorigin' );
+
     // get image, and if not loaded then ask to redraw when later loaded
-    image = this.getCachedImage( url, function(){
+    image = this.getCachedImage( url, bgImgCrossOrigin, function(){
       node.trigger('background');
 
       r.redrawHint( 'eles', true );
@@ -17595,10 +17709,11 @@ CRp.drawNode = function( context, node, shiftToOriginWithBb, drawLabel ){
   //
   // draw shape
 
-  var styleShape = node.pstyle( 'shape' ).strValue;
+  var styleShape = node.pstyle('shape').strValue;
+  var shapePts = node.pstyle('shape-polygon-points').pfValue;
 
   if( usePaths ){
-    var pathCacheKey = styleShape + '$' + nodeWidth + '$' + nodeHeight;
+    var pathCacheKey = styleShape + '$' + nodeWidth + '$' + nodeHeight + ( styleShape === 'polygon' ? '$' + shapePts.join('$') : '' );
 
     context.translate( pos.x, pos.y );
 
@@ -17606,7 +17721,7 @@ CRp.drawNode = function( context, node, shiftToOriginWithBb, drawLabel ){
       path = rs.pathCache;
       pathCacheHit = true;
     } else {
-      path = new Path2D();
+      path = new Path2D(); // eslint-disable-line no-undef
       rs.pathCacheKey = pathCacheKey;
       rs.pathCache = path;
     }
@@ -17863,7 +17978,7 @@ CRp.getPixelRatio = function(){
     context.oBackingStorePixelRatio ||
     context.backingStorePixelRatio || 1;
 
-  return (window.devicePixelRatio || 1) / backingStore;
+  return (window.devicePixelRatio || 1) / backingStore; // eslint-disable-line no-undef
 };
 
 CRp.paintCache = function( context ){
@@ -18193,7 +18308,7 @@ CRp.render = function( options ){
     if( !r.textureCache ){
       r.textureCache = {};
 
-      bb = r.textureCache.bb = cy.elements().boundingBox();
+      bb = r.textureCache.bb = cy.mutableElements().boundingBox();
 
       r.textureCache.texture = r.data.bufferCanvases[ r.TEXTURE_BUFFER ];
 
@@ -18482,7 +18597,7 @@ CRp.drawPolygonPath = function(
 
 // Round rectangle drawing
 CRp.drawRoundRectanglePath = function(
-  context, x, y, width, height, radius ){
+  context, x, y, width, height ){
 
   var halfWidth = width / 2;
   var halfHeight = height / 2;
@@ -18637,6 +18752,8 @@ ETCp.getElement = function( ele, bb, pxRatio, lvl, reason ){
   var r = this.renderer;
   var rs = ele._private.rscratch;
   var zoom = r.cy.zoom();
+
+  if( bb.w === 0 || bb.h === 0 ){ return null; }
 
   if( lvl == null ){
     lvl = Math.ceil( math.log2( zoom * pxRatio ) );
@@ -18893,7 +19010,7 @@ ETCp.addTexture = function( txrH, minW ){
   txr.invalidatedWidth = 0;
   txr.fullnessChecks = 0;
 
-  txr.canvas = document.createElement('canvas');
+  txr.canvas = document.createElement('canvas'); // eslint-disable-line no-undef
   txr.canvas.width = txr.width;
   txr.canvas.height = txr.height;
 
@@ -19048,7 +19165,7 @@ var is = _dereq_( '../../../is' );
 var CRp = {};
 
 CRp.createBuffer = function( w, h ){
-  var buffer = document.createElement( 'canvas' );
+  var buffer = document.createElement( 'canvas' ); // eslint-disable-line no-undef
   buffer.width = w;
   buffer.height = h;
 
@@ -19057,7 +19174,7 @@ CRp.createBuffer = function( w, h ){
 
 CRp.bufferCanvasImage = function( options ){
   var cy = this.cy;
-  var eles = cy.elements();
+  var eles = cy.mutableElements();
   var bb = eles.boundingBox();
   var width = options.full ? Math.ceil( bb.w ) : this.container.clientWidth;
   var height = options.full ? Math.ceil( bb.h ) : this.container.clientHeight;
@@ -19094,7 +19211,7 @@ CRp.bufferCanvasImage = function( options ){
     scale *= pxRatio;
   }
 
-  var buffCanvas = document.createElement( 'canvas' );
+  var buffCanvas = document.createElement( 'canvas' ); // eslint-disable-line no-undef
 
   buffCanvas.width = width;
   buffCanvas.height = height;
@@ -19126,7 +19243,7 @@ CRp.bufferCanvasImage = function( options ){
       this.drawElements( buffCxt, zsortedEles );
     } else { // draw the current view
       var pan = cy.pan();
-      
+
       var translation = {
         x: pan.x * scale,
         y: pan.y * scale
@@ -19195,7 +19312,7 @@ function CanvasRenderer( options ){
     bufferContexts: new Array( CRp.CANVAS_LAYERS ),
   };
 
-  r.data.canvasContainer = document.createElement( 'div' );
+  r.data.canvasContainer = document.createElement( 'div' ); // eslint-disable-line no-undef
   var containerStyle = r.data.canvasContainer.style;
   r.data.canvasContainer.setAttribute( 'style', '-webkit-tap-highlight-color: rgba(0,0,0,0);' );
   containerStyle.position = 'relative';
@@ -19207,7 +19324,7 @@ function CanvasRenderer( options ){
   container.setAttribute( 'style', ( container.getAttribute( 'style' ) || '' ) + '-webkit-tap-highlight-color: rgba(0,0,0,0);' );
 
   for( var i = 0; i < CRp.CANVAS_LAYERS; i++ ){
-    var canvas = r.data.canvases[ i ] = document.createElement( 'canvas' );
+    var canvas = r.data.canvases[ i ] = document.createElement( 'canvas' );  // eslint-disable-line no-undef
     r.data.contexts[ i ] = canvas.getContext( '2d' );
     canvas.setAttribute( 'style', '-webkit-user-select: none; -moz-user-select: -moz-none; user-select: none; -webkit-tap-highlight-color: rgba(0,0,0,0); outline-style: none;' + ( is.ms() ? ' -ms-touch-action: none; touch-action: none; ' : '' ) );
     canvas.style.position = 'absolute';
@@ -19224,7 +19341,7 @@ function CanvasRenderer( options ){
   r.data.canvases[ CRp.DRAG ].setAttribute( 'data-id', 'layer' + CRp.DRAG + '-drag' );
 
   for( var i = 0; i < CRp.BUFFER_COUNT; i++ ){
-    r.data.bufferCanvases[ i ] = document.createElement( 'canvas' );
+    r.data.bufferCanvases[ i ] = document.createElement( 'canvas' );  // eslint-disable-line no-undef
     r.data.bufferContexts[ i ] = r.data.bufferCanvases[ i ].getContext( '2d' );
     r.data.bufferCanvases[ i ].style.position = 'absolute';
     r.data.bufferCanvases[ i ].setAttribute( 'data-id', 'buffer' + i );
@@ -19338,9 +19455,6 @@ var useEleTxrCaching = true; // whether to use individual ele texture caching un
 var LayeredTextureCache = function( renderer, eleTxrCache ){
   var self = this;
 
-  // TODO disable once not debugging
-  window.cache = this;
-
   var r = self.renderer = renderer;
 
   self.layersByLevel = {}; // e.g. 2 => [ layer1, layer2, ..., layerN ]
@@ -19383,7 +19497,7 @@ LTCp.makeLayer = function( bb, lvl ){
   var w = Math.ceil( bb.w * scale );
   var h = Math.ceil( bb.h * scale );
 
-  var canvas = document.createElement('canvas');
+  var canvas = document.createElement('canvas'); // eslint-disable-line no-undef
 
   canvas.width = w;
   canvas.height = h;
@@ -19561,7 +19675,7 @@ LTCp.getLayers = function( eles, pxRatio, lvl ){
     if(
       !layer
       || layer.eles.length >= maxElesPerLayer
-      || ( defNumLayers > 1 && !math.boundingBoxInBoundingBox( layer.bb, ele.boundingBox() ) )
+      || !math.boundingBoxInBoundingBox( layer.bb, ele.boundingBox() )
     ){
       // log('make new layer for ele %s', ele.id());
 
@@ -19621,6 +19735,9 @@ LTCp.drawEleInLayer = function( layer, ele, lvl, pxRatio ){
   var r = this.renderer;
   var context = layer.context;
   var bb = ele.boundingBox();
+
+  if( bb.w === 0 || bb.h === 0 ){ return; }
+
   var eleCache = self.eleTxrCache;
   var reason = useHighQualityEleTxrReqs ? eleCache.reasons.highQuality : undefined;
 
@@ -20000,24 +20117,15 @@ module.exports = LayeredTextureCache;
 
 var CRp = {};
 
-var impl;
-
-CRp.nodeShapeImpl = function( name ){
-  var self = this;
-
-  return ( impl || (impl = {
-    'ellipse': function( context, centerX, centerY, width, height ){
-      self.drawEllipsePath( context, centerX, centerY, width, height );
-    },
-
-    'polygon': function( context, centerX, centerY, width, height, points ){
-      self.drawPolygonPath( context, centerX, centerY, width, height, points );
-    },
-
-    'roundrectangle': function( context, centerX, centerY, width, height ){
-      self.drawRoundRectanglePath( context, centerX, centerY, width, height, 10 );
-    }
-  }) )[ name ];
+CRp.nodeShapeImpl = function( name, context, centerX, centerY, width, height, points ){
+  switch( name ){
+    case 'ellipse':
+      return this.drawEllipsePath( context, centerX, centerY, width, height );
+    case 'polygon':
+      return this.drawPolygonPath( context, centerX, centerY, width, height, points );
+    case 'roundrectangle':
+      return this.drawRoundRectanglePath( context, centerX, centerY, width, height );
+  }
 };
 
 module.exports = CRp;
@@ -20480,385 +20588,369 @@ PSF LICENSE AGREEMENT FOR PYTHON 2.7.2
 */
 
 'use strict';
-/* jshint ignore:start */
-
 // Generated by CoffeeScript 1.8.0
-(function(){
-  var Heap, defaultCmp, floor, heapify, heappop, heappush, heappushpop, heapreplace, insort, min, nlargest, nsmallest, updateItem, _siftdown, _siftup;
 
-  floor = Math.floor, min = Math.min;
+var Heap, defaultCmp, floor, heapify, heappop, heappush, heappushpop, heapreplace, insort, min, nlargest, nsmallest, updateItem, _siftdown, _siftup;
 
-
-  /*
-  Default comparison function to be used
-   */
-
-  defaultCmp = function( x, y ){
-    if( x < y ){
-      return -1;
-    }
-    if( x > y ){
-      return 1;
-    }
-    return 0;
-  };
+floor = Math.floor, min = Math.min;
 
 
-  /*
-  Insert item x in list a, and keep it sorted assuming a is sorted.
+/*
+Default comparison function to be used
+ */
 
-  If x is already in a, insert it to the right of the rightmost x.
-
-  Optional args lo (default 0) and hi (default a.length) bound the slice
-  of a to be searched.
-   */
-
-  insort = function( a, x, lo, hi, cmp ){
-    var mid;
-    if( lo == null ){
-      lo = 0;
-    }
-    if( cmp == null ){
-      cmp = defaultCmp;
-    }
-    if( lo < 0 ){
-      throw new Error( 'lo must be non-negative' );
-    }
-    if( hi == null ){
-      hi = a.length;
-    }
-    while( lo < hi ){
-      mid = floor( (lo + hi) / 2 );
-      if( cmp( x, a[ mid ] ) < 0 ){
-        hi = mid;
-      } else {
-        lo = mid + 1;
-      }
-    }
-    return ([].splice.apply( a, [ lo, lo - lo ].concat( x ) ), x);
-  };
+defaultCmp = function( x, y ){
+  if( x < y ){
+    return -1;
+  }
+  if( x > y ){
+    return 1;
+  }
+  return 0;
+};
 
 
-  /*
-  Push item onto heap, maintaining the heap invariant.
-   */
+/*
+Insert item x in list a, and keep it sorted assuming a is sorted.
 
-  heappush = function( array, item, cmp ){
-    if( cmp == null ){
-      cmp = defaultCmp;
-    }
-    array.push( item );
-    return _siftdown( array, 0, array.length - 1, cmp );
-  };
+If x is already in a, insert it to the right of the rightmost x.
 
+Optional args lo (default 0) and hi (default a.length) bound the slice
+of a to be searched.
+ */
 
-  /*
-  Pop the smallest item off the heap, maintaining the heap invariant.
-   */
-
-  heappop = function( array, cmp ){
-    var lastelt, returnitem;
-    if( cmp == null ){
-      cmp = defaultCmp;
-    }
-    lastelt = array.pop();
-    if( array.length ){
-      returnitem = array[0];
-      array[0] = lastelt;
-      _siftup( array, 0, cmp );
+insort = function( a, x, lo, hi, cmp ){
+  var mid;
+  if( lo == null ){
+    lo = 0;
+  }
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  if( lo < 0 ){
+    throw new Error( 'lo must be non-negative' );
+  }
+  if( hi == null ){
+    hi = a.length;
+  }
+  while( lo < hi ){
+    mid = floor( (lo + hi) / 2 );
+    if( cmp( x, a[ mid ] ) < 0 ){
+      hi = mid;
     } else {
-      returnitem = lastelt;
+      lo = mid + 1;
     }
-    return returnitem;
-  };
+  }
+  return ([].splice.apply( a, [ lo, lo - lo ].concat( x ) ), x);
+};
 
 
-  /*
-  Pop and return the current smallest value, and add the new item.
+/*
+Push item onto heap, maintaining the heap invariant.
+ */
 
-  This is more efficient than heappop() followed by heappush(), and can be
-  more appropriate when using a fixed size heap. Note that the value
-  returned may be larger than item! That constrains reasonable use of
-  this routine unless written as part of a conditional replacement:
-      if item > array[0]
-        item = heapreplace(array, item)
-   */
+heappush = function( array, item, cmp ){
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  array.push( item );
+  return _siftdown( array, 0, array.length - 1, cmp );
+};
 
-  heapreplace = function( array, item, cmp ){
-    var returnitem;
-    if( cmp == null ){
-      cmp = defaultCmp;
-    }
+
+/*
+Pop the smallest item off the heap, maintaining the heap invariant.
+ */
+
+heappop = function( array, cmp ){
+  var lastelt, returnitem;
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  lastelt = array.pop();
+  if( array.length ){
     returnitem = array[0];
-    array[0] = item;
+    array[0] = lastelt;
     _siftup( array, 0, cmp );
-    return returnitem;
-  };
+  } else {
+    returnitem = lastelt;
+  }
+  return returnitem;
+};
 
 
-  /*
-  Fast version of a heappush followed by a heappop.
-   */
+/*
+Pop and return the current smallest value, and add the new item.
 
-  heappushpop = function( array, item, cmp ){
-    var _ref;
-    if( cmp == null ){
-      cmp = defaultCmp;
-    }
-    if( array.length && cmp( array[0], item ) < 0 ){
-      _ref = [ array[0], item ], item = _ref[0], array[0] = _ref[1];
-      _siftup( array, 0, cmp );
-    }
-    return item;
-  };
+This is more efficient than heappop() followed by heappush(), and can be
+more appropriate when using a fixed size heap. Note that the value
+returned may be larger than item! That constrains reasonable use of
+this routine unless written as part of a conditional replacement:
+    if item > array[0]
+      item = heapreplace(array, item)
+ */
 
-
-  /*
-  Transform list into a heap, in-place, in O(array.length) time.
-   */
-
-  heapify = function( array, cmp ){
-    var i, _i, _j, _len, _ref, _ref1, _results, _results1;
-    if( cmp == null ){
-      cmp = defaultCmp;
-    }
-    _ref1 = (function(){
-      _results1 = [];
-      for( var _j = 0, _ref = floor( array.length / 2 ); 0 <= _ref ? _j < _ref : _j > _ref; 0 <= _ref ? _j++ : _j-- ){ _results1.push( _j ); }
-      return _results1;
-    }).apply( this ).reverse();
-    _results = [];
-    for( _i = 0, _len = _ref1.length; _i < _len; _i++ ){
-      i = _ref1[ _i ];
-      _results.push( _siftup( array, i, cmp ) );
-    }
-    return _results;
-  };
+heapreplace = function( array, item, cmp ){
+  var returnitem;
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  returnitem = array[0];
+  array[0] = item;
+  _siftup( array, 0, cmp );
+  return returnitem;
+};
 
 
-  /*
-  Update the position of the given item in the heap.
-  This function should be called every time the item is being modified.
-   */
+/*
+Fast version of a heappush followed by a heappop.
+ */
 
-  updateItem = function( array, item, cmp ){
-    var pos;
-    if( cmp == null ){
-      cmp = defaultCmp;
-    }
-    pos = array.indexOf( item );
-    if( pos === -1 ){
-      return;
-    }
-    _siftdown( array, 0, pos, cmp );
-    return _siftup( array, pos, cmp );
-  };
+heappushpop = function( array, item, cmp ){
+  var _ref;
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  if( array.length && cmp( array[0], item ) < 0 ){
+    _ref = [ array[0], item ], item = _ref[0], array[0] = _ref[1];
+    _siftup( array, 0, cmp );
+  }
+  return item;
+};
 
 
-  /*
-  Find the n largest elements in a dataset.
-   */
+/*
+Transform list into a heap, in-place, in O(array.length) time.
+ */
 
-  nlargest = function( array, n, cmp ){
-    var elem, result, _i, _len, _ref;
-    if( cmp == null ){
-      cmp = defaultCmp;
-    }
-    result = array.slice( 0, n );
+heapify = function( array, cmp ){
+  var i, _i, _j, _len, _ref, _ref1, _results, _results1;
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  _ref1 = (function(){
+    _results1 = [];
+    for( var _j = 0, _ref = floor( array.length / 2 ); 0 <= _ref ? _j < _ref : _j > _ref; 0 <= _ref ? _j++ : _j-- ){ _results1.push( _j ); }
+    return _results1;
+  }).apply( this ).reverse();
+  _results = [];
+  for( _i = 0, _len = _ref1.length; _i < _len; _i++ ){
+    i = _ref1[ _i ];
+    _results.push( _siftup( array, i, cmp ) );
+  }
+  return _results;
+};
+
+
+/*
+Update the position of the given item in the heap.
+This function should be called every time the item is being modified.
+ */
+
+updateItem = function( array, item, cmp ){
+  var pos;
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  pos = array.indexOf( item );
+  if( pos === -1 ){
+    return;
+  }
+  _siftdown( array, 0, pos, cmp );
+  return _siftup( array, pos, cmp );
+};
+
+
+/*
+Find the n largest elements in a dataset.
+ */
+
+nlargest = function( array, n, cmp ){
+  var elem, result, _i, _len, _ref;
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  result = array.slice( 0, n );
+  if( !result.length ){
+    return result;
+  }
+  heapify( result, cmp );
+  _ref = array.slice( n );
+  for( _i = 0, _len = _ref.length; _i < _len; _i++ ){
+    elem = _ref[ _i ];
+    heappushpop( result, elem, cmp );
+  }
+  return result.sort( cmp ).reverse();
+};
+
+
+/*
+Find the n smallest elements in a dataset.
+ */
+
+nsmallest = function( array, n, cmp ){
+  var elem, i, los, result, _i, _j, _len, _ref, _ref1, _results;
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  if( n * 10 <= array.length ){
+    result = array.slice( 0, n ).sort( cmp );
     if( !result.length ){
       return result;
     }
-    heapify( result, cmp );
+    los = result[ result.length - 1];
     _ref = array.slice( n );
     for( _i = 0, _len = _ref.length; _i < _len; _i++ ){
       elem = _ref[ _i ];
-      heappushpop( result, elem, cmp );
-    }
-    return result.sort( cmp ).reverse();
-  };
-
-
-  /*
-  Find the n smallest elements in a dataset.
-   */
-
-  nsmallest = function( array, n, cmp ){
-    var elem, i, los, result, _i, _j, _len, _ref, _ref1, _results;
-    if( cmp == null ){
-      cmp = defaultCmp;
-    }
-    if( n * 10 <= array.length ){
-      result = array.slice( 0, n ).sort( cmp );
-      if( !result.length ){
-        return result;
+      if( cmp( elem, los ) < 0 ){
+        insort( result, elem, 0, null, cmp );
+        result.pop();
+        los = result[ result.length - 1];
       }
-      los = result[ result.length - 1];
-      _ref = array.slice( n );
-      for( _i = 0, _len = _ref.length; _i < _len; _i++ ){
-        elem = _ref[ _i ];
-        if( cmp( elem, los ) < 0 ){
-          insort( result, elem, 0, null, cmp );
-          result.pop();
-          los = result[ result.length - 1];
-        }
-      }
-      return result;
     }
-    heapify( array, cmp );
-    _results = [];
-    for( i = _j = 0, _ref1 = min( n, array.length ); 0 <= _ref1 ? _j < _ref1 : _j > _ref1; i = 0 <= _ref1 ? ++_j : --_j ){
-      _results.push( heappop( array, cmp ) );
-    }
-    return _results;
-  };
+    return result;
+  }
+  heapify( array, cmp );
+  _results = [];
+  for( i = _j = 0, _ref1 = min( n, array.length ); 0 <= _ref1 ? _j < _ref1 : _j > _ref1; i = 0 <= _ref1 ? ++_j : --_j ){
+    _results.push( heappop( array, cmp ) );
+  }
+  return _results;
+};
 
-  _siftdown = function( array, startpos, pos, cmp ){
-    var newitem, parent, parentpos;
-    if( cmp == null ){
-      cmp = defaultCmp;
+_siftdown = function( array, startpos, pos, cmp ){
+  var newitem, parent, parentpos;
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  newitem = array[ pos ];
+  while( pos > startpos ){
+    parentpos = (pos - 1) >> 1;
+    parent = array[ parentpos ];
+    if( cmp( newitem, parent ) < 0 ){
+      array[ pos ] = parent;
+      pos = parentpos;
+      continue;
     }
-    newitem = array[ pos ];
-    while( pos > startpos ){
-      parentpos = (pos - 1) >> 1;
-      parent = array[ parentpos ];
-      if( cmp( newitem, parent ) < 0 ){
-        array[ pos ] = parent;
-        pos = parentpos;
-        continue;
-      }
-      break;
-    }
-    return array[ pos ] = newitem;
-  };
+    break;
+  }
+  return array[ pos ] = newitem;
+};
 
-  _siftup = function( array, pos, cmp ){
-    var childpos, endpos, newitem, rightpos, startpos;
-    if( cmp == null ){
-      cmp = defaultCmp;
+_siftup = function( array, pos, cmp ){
+  var childpos, endpos, newitem, rightpos, startpos;
+  if( cmp == null ){
+    cmp = defaultCmp;
+  }
+  endpos = array.length;
+  startpos = pos;
+  newitem = array[ pos ];
+  childpos = 2 * pos + 1;
+  while( childpos < endpos ){
+    rightpos = childpos + 1;
+    if( rightpos < endpos && !(cmp( array[ childpos ], array[ rightpos ] ) < 0) ){
+      childpos = rightpos;
     }
-    endpos = array.length;
-    startpos = pos;
-    newitem = array[ pos ];
+    array[ pos ] = array[ childpos ];
+    pos = childpos;
     childpos = 2 * pos + 1;
-    while( childpos < endpos ){
-      rightpos = childpos + 1;
-      if( rightpos < endpos && !(cmp( array[ childpos ], array[ rightpos ] ) < 0) ){
-        childpos = rightpos;
-      }
-      array[ pos ] = array[ childpos ];
-      pos = childpos;
-      childpos = 2 * pos + 1;
-    }
-    array[ pos ] = newitem;
-    return _siftdown( array, startpos, pos, cmp );
+  }
+  array[ pos ] = newitem;
+  return _siftdown( array, startpos, pos, cmp );
+};
+
+Heap = (function(){
+  Heap.push = heappush;
+
+  Heap.pop = heappop;
+
+  Heap.replace = heapreplace;
+
+  Heap.pushpop = heappushpop;
+
+  Heap.heapify = heapify;
+
+  Heap.updateItem = updateItem;
+
+  Heap.nlargest = nlargest;
+
+  Heap.nsmallest = nsmallest;
+
+  function Heap( cmp ){
+    this.cmp = cmp != null ? cmp : defaultCmp;
+    this.nodes = [];
+  }
+
+  Heap.prototype.push = function( x ){
+    return heappush( this.nodes, x, this.cmp );
   };
 
-  Heap = (function(){
-    Heap.push = heappush;
+  Heap.prototype.pop = function(){
+    return heappop( this.nodes, this.cmp );
+  };
 
-    Heap.pop = heappop;
+  Heap.prototype.peek = function(){
+    return this.nodes[0];
+  };
 
-    Heap.replace = heapreplace;
+  Heap.prototype.contains = function( x ){
+    return this.nodes.indexOf( x ) !== -1;
+  };
 
-    Heap.pushpop = heappushpop;
+  Heap.prototype.replace = function( x ){
+    return heapreplace( this.nodes, x, this.cmp );
+  };
 
-    Heap.heapify = heapify;
+  Heap.prototype.pushpop = function( x ){
+    return heappushpop( this.nodes, x, this.cmp );
+  };
 
-    Heap.updateItem = updateItem;
+  Heap.prototype.heapify = function(){
+    return heapify( this.nodes, this.cmp );
+  };
 
-    Heap.nlargest = nlargest;
+  Heap.prototype.updateItem = function( x ){
+    return updateItem( this.nodes, x, this.cmp );
+  };
 
-    Heap.nsmallest = nsmallest;
+  Heap.prototype.clear = function(){
+    return this.nodes = [];
+  };
 
-    function Heap( cmp ){
-      this.cmp = cmp != null ? cmp : defaultCmp;
-      this.nodes = [];
-    }
+  Heap.prototype.empty = function(){
+    return this.nodes.length === 0;
+  };
 
-    Heap.prototype.push = function( x ){
-      return heappush( this.nodes, x, this.cmp );
-    };
+  Heap.prototype.size = function(){
+    return this.nodes.length;
+  };
 
-    Heap.prototype.pop = function(){
-      return heappop( this.nodes, this.cmp );
-    };
+  Heap.prototype.clone = function(){
+    var heap;
+    heap = new Heap();
+    heap.nodes = this.nodes.slice( 0 );
+    return heap;
+  };
 
-    Heap.prototype.peek = function(){
-      return this.nodes[0];
-    };
+  Heap.prototype.toArray = function(){
+    return this.nodes.slice( 0 );
+  };
 
-    Heap.prototype.contains = function( x ){
-      return this.nodes.indexOf( x ) !== -1;
-    };
+  Heap.prototype.insert = Heap.prototype.push;
 
-    Heap.prototype.replace = function( x ){
-      return heapreplace( this.nodes, x, this.cmp );
-    };
+  Heap.prototype.top = Heap.prototype.peek;
 
-    Heap.prototype.pushpop = function( x ){
-      return heappushpop( this.nodes, x, this.cmp );
-    };
+  Heap.prototype.front = Heap.prototype.peek;
 
-    Heap.prototype.heapify = function(){
-      return heapify( this.nodes, this.cmp );
-    };
+  Heap.prototype.has = Heap.prototype.contains;
 
-    Heap.prototype.updateItem = function( x ){
-      return updateItem( this.nodes, x, this.cmp );
-    };
+  Heap.prototype.copy = Heap.prototype.clone;
 
-    Heap.prototype.clear = function(){
-      return this.nodes = [];
-    };
+  return Heap;
 
-    Heap.prototype.empty = function(){
-      return this.nodes.length === 0;
-    };
+})();
 
-    Heap.prototype.size = function(){
-      return this.nodes.length;
-    };
-
-    Heap.prototype.clone = function(){
-      var heap;
-      heap = new Heap();
-      heap.nodes = this.nodes.slice( 0 );
-      return heap;
-    };
-
-    Heap.prototype.toArray = function(){
-      return this.nodes.slice( 0 );
-    };
-
-    Heap.prototype.insert = Heap.prototype.push;
-
-    Heap.prototype.top = Heap.prototype.peek;
-
-    Heap.prototype.front = Heap.prototype.peek;
-
-    Heap.prototype.has = Heap.prototype.contains;
-
-    Heap.prototype.copy = Heap.prototype.clone;
-
-    return Heap;
-
-  })();
-
-  (function( root, factory ){
-    if( typeof define === 'function' && define.amd ){
-      return define( [], factory );
-    } else if( typeof exports === 'object' ){
-      return module.exports = factory();
-    } else {
-      return root.Heap = factory();
-    }
-  })( this, function(){
-    return Heap;
-  } );
-
-}).call( this );
-
-/* jshint ignore:end */
+module.exports = Heap;
 
 },{}],82:[function(_dereq_,module,exports){
 'use strict';
@@ -20914,8 +21006,11 @@ module.exports = cytoscape;
 },{"./-preamble":1,"./core":37,"./extension":46,"./fabric":80,"./is":83,"./jquery-plugin":84,"./stylesheet":97,"./thread":98,"./version.json":106,"./window":107}],83:[function(_dereq_,module,exports){
 'use strict';
 
+/*global HTMLElement DocumentTouch */
+
 var window = _dereq_( './window' );
 var navigator = window ? window.navigator : null;
+var document = window ? window.document : null;
 
 var typeofstr = typeof '';
 var typeofobj = typeof {};
@@ -21049,15 +21144,15 @@ var is = {
   },
 
   gecko: function(){
-    return typeof InstallTrigger !== 'undefined' || ('MozAppearance' in document.documentElement.style);
+    return window && ( typeof InstallTrigger !== 'undefined' || ('MozAppearance' in document.documentElement.style) );
   },
 
   webkit: function(){
-    return typeof webkitURL !== 'undefined' || ('WebkitAppearance' in document.documentElement.style);
+    return window && ( typeof webkitURL !== 'undefined' || ('WebkitAppearance' in document.documentElement.style) );
   },
 
   chromium: function(){
-    return typeof chrome !== 'undefined';
+    return window && ( typeof chrome !== 'undefined' );
   },
 
   khtml: function(){
@@ -21698,7 +21793,7 @@ math.pointInsidePolygonPoints = function( x, y, points ){
     }
 
     if( x1 == x && x2 == x ){
-
+      // then ignore
     } else if( (x1 >= x && x >= x2)
       || (x1 <= x && x <= x2) ){
 
@@ -21969,25 +22064,46 @@ math.findMaxSqDistanceToOrigin = function( points ){
   return maxSqDistance;
 };
 
-math.finiteLinesIntersect = function(
-  x1, y1, x2, y2, x3, y3, x4, y4, infiniteLines ){
+math.midOfThree = function( a, b, c ){
+  if( (b <= a && a <= c) || (c <= a && a <= b) ){
+    return a;
+  } else if( (a <= b && b <= c) || (c <= b && b <= a) ){
+    return b;
+  } else {
+    return c;
+  }
+};
 
-  var ua_t = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3);
-  var ub_t = (x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3);
-  var u_b = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+math.finiteLinesIntersect = function( x1, y1, x2, y2, x3, y3, x4, y4, infiniteLines ){
+
+  var dx13 = x1 - x3;
+  var dx21 = x2 - x1;
+  var dx43 = x4 - x3;
+
+  var dy13 = y1 - y3;
+  var dy21 = y2 - y1;
+  var dy43 = y4 - y3;
+
+  var ua_t = dx43 * dy13 - dy43 * dx13;
+  var ub_t = dx21 * dy13 - dy21 * dx13;
+  var u_b  = dy43 * dx21 - dx43 * dy21;
 
   if( u_b !== 0 ){
     var ua = ua_t / u_b;
     var ub = ub_t / u_b;
 
-    if( 0 <= ua && ua <= 1 && 0 <= ub && ub <= 1 ){
-      return [ x1 + ua * (x2 - x1), y1 + ua * (y2 - y1) ];
+    var flptThreshold = 0.001;
+    var min = 0 - flptThreshold;
+    var max = 1 + flptThreshold;
+
+    if( min <= ua && ua <= max && min <= ub && ub <= max ){
+      return [ x1 + ua * dx21, y1 + ua * dy21 ];
 
     } else {
       if( !infiniteLines ){
         return [];
       } else {
-        return [ x1 + ua * (x2 - x1), y1 + ua * (y2 - y1) ];
+        return [ x1 + ua * dx21, y1 + ua * dy21 ];
       }
     }
   } else {
@@ -21996,17 +22112,17 @@ math.finiteLinesIntersect = function(
       // Parallel, coincident lines. Check if overlap
 
       // Check endpoint of second line
-      if( [ x1, x2, x4 ].sort()[1] === x4 ){
+      if( this.midOfThree( x1, x2, x4 ) === x4 ){
         return [ x4, y4 ];
       }
 
       // Check start point of second line
-      if( [ x1, x2, x3 ].sort()[1] === x3 ){
+      if( this.midOfThree( x1, x2, x3 ) === x3 ){
         return [ x3, y3 ];
       }
 
       // Endpoint of first line
-      if( [ x3, x4, x2 ].sort()[1] === x2 ){
+      if( this.midOfThree( x3, x4, x2 ) === x2 ){
         return [ x2, y2 ];
       }
 
@@ -22376,7 +22492,7 @@ api.reject = function( val ){
   return new api(function( resolve, reject ){ reject( val ); });
 };
 
-module.exports = typeof Promise !== 'undefined' ? Promise : api;
+module.exports = typeof Promise !== 'undefined' ? Promise : api; // eslint-disable-line no-undef
 
 },{}],87:[function(_dereq_,module,exports){
 'use strict';
@@ -22949,7 +23065,6 @@ var queryMatches = function( query, ele ){
         }
 
         var notExpr = false;
-        var handledNotExpr = false;
         if( operator.indexOf( '!' ) >= 0 ){
           operator = operator.replace( '!', '' );
           notExpr = true;
@@ -22962,42 +23077,45 @@ var queryMatches = function( query, ele ){
           fieldVal = fieldStr.toLowerCase();
         }
 
+        var isIneqCmp = false;
+
         switch( operator ){
         case '*=':
-          matches = fieldStr.search( valStr ) >= 0;
+          matches = fieldStr.indexOf( valStr ) >= 0;
           break;
         case '$=':
-          matches = new RegExp( valStr + '$' ).exec( fieldStr ) != null;
+          matches = fieldStr.indexOf( valStr, fieldStr.length - valStr.length ) >= 0;
           break;
         case '^=':
-          matches = new RegExp( '^' + valStr ).exec( fieldStr ) != null;
+          matches = fieldStr.indexOf( valStr ) === 0;
           break;
         case '=':
           matches = fieldVal === value;
           break;
-        case '!=':
-          matches = fieldVal !== value;
-          break;
         case '>':
-          matches = !notExpr ? fieldVal > value : fieldVal <= value;
-          handledNotExpr = true;
+          isIneqCmp = true;
+          matches = fieldVal > value;
           break;
         case '>=':
-          matches = !notExpr ? fieldVal >= value : fieldVal < value;
-          handledNotExpr = true;
+          isIneqCmp = true;
+          matches = fieldVal >= value;
           break;
         case '<':
-          matches = !notExpr ? fieldVal < value : fieldVal >= value;
-          handledNotExpr = true;
+          isIneqCmp = true;
+          matches = fieldVal < value;
           break;
         case '<=':
-          matches = !notExpr ? fieldVal <= value : fieldVal > value;
-          handledNotExpr = true;
+          isIneqCmp = true;
+          matches = fieldVal <= value;
           break;
         default:
           matches = false;
           break;
+        }
 
+        // apply the not op, but null vals for inequalities should always stay non-matching
+        if( notExpr && ( fieldVal != null || !isIneqCmp ) ){
+          matches = !matches;
         }
       } else if( operator != null ){
         switch( operator ){
@@ -23013,11 +23131,6 @@ var queryMatches = function( query, ele ){
         }
       } else {
         matches = !params.fieldUndefined( field );
-      }
-
-      if( notExpr && !handledNotExpr ){
-        matches = !matches;
-        handledNotExpr = true;
       }
 
       if( !matches ){
@@ -23186,11 +23299,24 @@ selfn.toString = selfn.selector = function(){
 
   var str = '';
 
-  var clean = function( obj, isValue ){
-    if( is.string( obj ) ){
-      return isValue ? '"' + obj + '"' : obj;
+  var clean = function( obj ){
+    if( obj == null ){
+      return '';
+    } else {
+      return obj;
     }
-    return '';
+  };
+
+  var cleanVal = function( val ){
+    if( is.string( val ) ){
+      return '"' + val + '"';
+    } else {
+      return clean( val );
+    }
+  };
+
+  var space = function( val ){
+    return ' ' + val + ' ';
   };
 
   var queryToString = function( query ){
@@ -23207,7 +23333,7 @@ selfn.toString = selfn.selector = function(){
       var data = query.data[ j ];
 
       if( data.value ){
-        str += '[' + data.field + clean( data.operator ) + clean( data.value, true ) + ']';
+        str += '[' + data.field + space( clean( data.operator ) ) + cleanVal( data.value ) + ']';
       } else {
         str += '[' + clean( data.operator ) + data.field + ']';
       }
@@ -23215,7 +23341,7 @@ selfn.toString = selfn.selector = function(){
 
     for( var j = 0; j < query.meta.length; j++ ){
       var meta = query.meta[ j ];
-      str += '[[' + meta.field + clean( meta.operator ) + clean( meta.value, true ) + ']]';
+      str += '[[' + meta.field + space( clean( meta.operator ) ) + cleanVal( meta.value ) + ']]';
     }
 
     for( var j = 0; j < query.colonSelectors.length; j++ ){
@@ -23283,23 +23409,20 @@ styfn.apply = function( eles ){
   var self = this;
   var _p = self._private;
 
-  if( self._private.newStyle ){ // clear style caches
+  if( _p.newStyle ){ // clear style caches
     _p.contextStyles = {};
     _p.propDiffs = {};
+
+    self.cleanElements( eles, true );
   }
 
   for( var ie = 0; ie < eles.length; ie++ ){
     var ele = eles[ ie ];
 
-    if( self._private.newStyle ){ // clear style from old sheets
-      ele._private.style = {};
-    }
-
     var cxtMeta = self.getContextMeta( ele );
     var cxtStyle = self.getContextStyle( cxtMeta );
     var app = self.applyContextStyle( cxtMeta, cxtStyle, ele );
 
-    self.enforceCompoundSizing( ele );
     self.updateTransitions( ele, app.diffProps );
     self.updateStyleHints( ele );
 
@@ -23447,7 +23570,10 @@ styfn.applyContextStyle = function( cxtMeta, cxtStyle, ele ){
     var eleProp = ele.pstyle( diffPropName );
 
     if( !cxtProp ){ // no context prop means delete
-      if( eleProp.bypass ){
+      if( !eleProp ){
+        continue; // no existing prop means nothing needs to be removed
+        // nb affects initial application on mapped values like control-point-distances
+      } else if( eleProp.bypass ){
         cxtProp = { name: diffPropName, deleteBypassed: true };
       } else {
         cxtProp = { name: diffPropName, delete: true };
@@ -23473,17 +23599,6 @@ styfn.applyContextStyle = function( cxtMeta, cxtStyle, ele ){
   return {
     diffProps: retDiffProps
   };
-};
-
-// because a node can become and unbecome a parent, it's safer to enforce auto sizing manually
-// (i.e. the style context diff could be empty, meaning the autosizing is stale)
-styfn.enforceCompoundSizing = function(ele){
-  var self = this;
-
-  if( ele.isParent() ){
-    self.applyParsedProperty( ele, self.parse('width', 'auto') );
-    self.applyParsedProperty( ele, self.parse('height', 'auto') );
-  }
 };
 
 styfn.updateStyleHints = function(ele){
@@ -23558,15 +23673,6 @@ styfn.applyParsedProperty = function( ele, parsedProp ){
   var origProp = style[ prop.name ];
   var origPropIsBypass = origProp && origProp.bypass;
   var _p = ele._private;
-
-  // can't apply auto to width or height unless it's a parent node
-  if( (parsedProp.name === 'height' || parsedProp.name === 'width') && ele.isNode() ){
-    if( parsedProp.value === 'auto' && !ele.isParent() ){
-      return false;
-    } else if( parsedProp.value !== 'auto' && ele.isParent() ){
-      prop = parsedProp = this.parse( parsedProp.name, 'auto', propIsBypass );
-    }
-  }
 
   // edges connected to compound nodes can not be haystacks
   if(
@@ -23770,10 +23876,38 @@ styfn.applyParsedProperty = function( ele, parsedProp ){
   return true;
 };
 
+styfn.cleanElements = function( eles, keepBypasses ){
+  var self = this;
+  var props = self.properties;
+
+  for( var i = 0; i < eles.length; i++ ){
+    var ele = eles[i];
+
+    if( !keepBypasses ){
+      ele._private.style = {};
+    } else {
+      var style = ele._private.style;
+
+      for( var j = 0; j < props.length; j++ ){
+        var prop = props[j];
+        var eleProp = style[ prop.name ];
+
+        if( eleProp ){
+          if( eleProp.bypass ){
+            eleProp.bypassed = null;
+          } else {
+            style[ prop.name ] = null;
+          }
+        }
+      }
+    }
+  }
+};
+
 // updates the visual style for all elements (useful for manual style modification after init)
 styfn.update = function(){
   var cy = this._private.cy;
-  var eles = cy.elements();
+  var eles = cy.mutableElements();
 
   eles.updateStyle();
 };
@@ -24140,6 +24274,11 @@ styfn.getStylePropertyValue = function( ele, propName, isRenderedVal ){
 
   if( ele ){
     var prop = self.properties[ propName ];
+
+    if( prop.alias ){
+      prop = prop.pointsTo;
+    }
+
     var type = prop.type;
     var styleProp = ele.pstyle( prop.name );
     var zoom = ele.cy().zoom();
@@ -24187,7 +24326,10 @@ styfn.getPropsList = function( propsObj ){
   var props = self.properties;
 
   if( style ){
-    for( var name in style ){
+    var names = Object.keys( style );
+
+    for( var i = 0; i < names.length; i++ ){
+      var name = names[i];
       var val = style[ name ];
       var prop = props[ name ] || props[ util.camel2dash( name ) ];
       var styleProp = this.parse( prop.name, val );
@@ -24221,13 +24363,12 @@ var Style = function( cy ){
 
   this._private = {
     cy: cy,
-    coreStyle: {},
-    newStyle: true
+    coreStyle: {}
   };
 
   this.length = 0;
 
-  this.addDefaultStylesheet();
+  this.resetToDefault();
 };
 
 var styfn = Style.prototype;
@@ -24242,7 +24383,10 @@ styfn.clear = function(){
     this[ i ] = undefined;
   }
   this.length = 0;
-  this._private.newStyle = true;
+
+  var _p = this._private;
+
+  _p.newStyle = true;
 
   return this; // chaining
 };
@@ -24384,10 +24528,12 @@ styfn.applyFromJson = function( json ){
     var context = json[ i ];
     var selector = context.selector;
     var props = context.style || context.css;
+    var names = Object.keys( props );
 
     style.selector( selector ); // apply selector
 
-    for( var name in props ){
+    for( var j = 0; j < names.length; j++ ){
+      var name = names[j];
       var value = props[ name ];
 
       style.css( name, value ); // apply property
@@ -24828,7 +24974,7 @@ var parseImpl = function( name, value, propIsBypass, propIsFlat ){
     // just return
     return {
       name: name,
-      value: value,
+      value: '' + value,
       strValue: '' + value,
       bypass: propIsBypass
     };
@@ -24872,7 +25018,7 @@ var styfn = {};
     nOneOneNumber: { number: true, min: -1, max: 1, unitless: true },
     nonNegativeInt: { number: true, min: 0, integer: true, unitless: true },
     position: { enums: [ 'parent', 'origin' ] },
-    nodeSize: { number: true, min: 0, enums: [ 'auto', 'label' ] },
+    nodeSize: { number: true, min: 0, enums: [ 'label' ] },
     number: { number: true, unitless: true },
     numbers: { number: true, unitless: true, multiple: true },
     size: { number: true, min: 0 },
@@ -24883,6 +25029,7 @@ var styfn = {};
     bgPos: { number: true, allowPercent: true },
     bgRepeat: { enums: [ 'repeat', 'repeat-x', 'repeat-y', 'no-repeat' ] },
     bgFit: { enums: [ 'none', 'contain', 'cover' ] },
+    bgCrossOrigin: { enums: [ 'anonymous', 'use-credentials' ] },
     bgClip: { enums: [ 'none', 'node' ] },
     color: { color: true },
     bool: { enums: [ 'yes', 'no' ] },
@@ -24913,7 +25060,7 @@ var styfn = {};
     mapLayoutData: { mapping: true, regex: mapData( 'mapLayoutData' ) },
     mapScratch: { mapping: true, regex: mapData( 'mapScratch' ) },
     fn: { mapping: true, fn: true },
-    url: { regex: '^url\\s*\\(\\s*([^\\s]+)\\s*\\s*\\)|none|(.+)$' },
+    url: { regex: 'url\\s*\\(\\s*[\'"]?(.+?)[\'"]?\\s*\\)|none|(.+)$' },
     propList: { propList: true },
     angle: { number: true, units: 'deg|rad', implicitUnits: 'rad' },
     textRotation: { number: true, units: 'deg|rad', implicitUnits: 'rad', enums: [ 'none', 'autorotate' ] },
@@ -25031,10 +25178,7 @@ var styfn = {};
     { name: 'background-color', type: t.color },
     { name: 'background-opacity', type: t.zeroOneNumber },
     { name: 'background-blacken', type: t.nOneOneNumber },
-    { name: 'padding-left', type: t.size },
-    { name: 'padding-right', type: t.size },
-    { name: 'padding-top', type: t.size },
-    { name: 'padding-bottom', type: t.size },
+    { name: 'padding', type: t.size },
 
     // node border
     { name: 'border-color', type: t.color },
@@ -25044,6 +25188,7 @@ var styfn = {};
 
     // node background images
     { name: 'background-image', type: t.url },
+    { name: 'background-image-crossorigin', type: t.bgCrossOrigin },
     { name: 'background-image-opacity', type: t.zeroOneNumber },
     { name: 'background-position-x', type: t.bgPos },
     { name: 'background-position-y', type: t.bgPos },
@@ -25086,7 +25231,11 @@ var styfn = {};
     { name: 'content', pointsTo: 'label' },
     { name: 'control-point-distance', pointsTo: 'control-point-distances' },
     { name: 'control-point-weight', pointsTo: 'control-point-weights' },
-    { name: 'edge-text-rotation', pointsTo: 'text-rotation' }
+    { name: 'edge-text-rotation', pointsTo: 'text-rotation' },
+    { name: 'padding-left', pointsTo: 'padding' },
+    { name: 'padding-right', pointsTo: 'padding' },
+    { name: 'padding-top', pointsTo: 'padding' },
+    { name: 'padding-bottom', pointsTo: 'padding' }
   ];
 
   // pie backgrounds for nodes
@@ -25214,6 +25363,7 @@ styfn.getDefaultProperties = util.memoize( function(){
     'background-color': '#999',
     'background-opacity': 1,
     'background-image': 'none',
+    'background-image-crossorigin': 'anonymous',
     'background-image-opacity': 1,
     'background-position-x': '50%',
     'background-position-y': '50%',
@@ -25232,10 +25382,7 @@ styfn.getDefaultProperties = util.memoize( function(){
     'shape-polygon-points': '-1, -1,   1, -1,   1, 1,   -1, 1',
 
     // compound props
-    'padding-top': 0,
-    'padding-bottom': 0,
-    'padding-left': 0,
-    'padding-right': 0,
+    'padding': 0,
     'position': 'origin',
     'compound-sizing-wrt-labels': 'include'
   }, {
@@ -25301,13 +25448,8 @@ styfn.addDefaultStylesheet = function(){
   this
     .selector( '$node > node' ) // compound (parent) node properties
       .css( {
-        'width': 'auto',
-        'height': 'auto',
         'shape': 'rectangle',
-        'padding-top': 10,
-        'padding-right': 10,
-        'padding-left': 10,
-        'padding-bottom': 10,
+        'padding': 10,
         'background-color': '#eee',
         'border-color': '#ccc',
         'border-width': 1
@@ -26373,6 +26515,8 @@ module.exports = {
 },{"../is":83}],100:[function(_dereq_,module,exports){
 'use strict';
 
+/*global console */
+
 var is = _dereq_( '../is' );
 var math = _dereq_( '../math' );
 
@@ -26386,8 +26530,8 @@ var util = {
 
   noop: function(){},
 
-  /* jshint ignore:start */
   error: function( msg ){
+    /* eslint-disable */
     if( console.error ){
       console.error.apply( console, arguments );
 
@@ -26397,8 +26541,8 @@ var util = {
 
       if( console.trace ){ console.trace(); }
     }
+    /* eslint-enable */
   },
-  /* jshint ignore:end */
 
   clone: function( obj ){
     return this.extend( {}, obj );
@@ -26455,7 +26599,13 @@ util.extend = Object.assign != null ? Object.assign : function( tgt ){
   for( var i = 1; i < args.length; i++ ){
     var obj = args[ i ];
 
-    for( var k in obj ){
+    if( !obj ){ continue; }
+
+    var keys = Object.keys( obj );
+
+    for( var j = 0; j < keys.length; j++ ){
+      var k = keys[j];
+
       tgt[ k ] = obj[ k ];
     }
   }
@@ -26525,10 +26675,7 @@ module.exports = {
     var empty = true;
 
     if( map != null ){
-      for( var i in map ){ // jshint ignore:line
-        empty = false;
-        break;
-      }
+      return Object.keys( map ).length === 0;
     }
 
     return empty;
@@ -26617,7 +26764,11 @@ module.exports = {
       if( lastKey ){
 
         if( keepChildren ){ // then only delete child fields not in keepChildren
-          for( var child in obj ){
+          var children = Object.keys( obj );
+
+          for( var j = 0; j < children.length; j++ ){
+            var child = children[j];
+
             if( !keepChildren[ child ] ){
               obj[ child ] = undefined;
             }
@@ -26637,8 +26788,6 @@ module.exports = {
 'use strict';
 
 module.exports = function memoize( fn, keyFn ){
-  var cache = {};
-
   if( !keyFn ){
     keyFn = function(){
       if( arguments.length === 1 ){
@@ -26657,11 +26806,12 @@ module.exports = function memoize( fn, keyFn ){
     };
   }
 
-  return function memoizedFn(){
+  var memoizedFn = function(){
     var self = this;
     var args = arguments;
     var ret;
     var k = keyFn.apply( self, args );
+    var cache = memoizedFn.cache;
 
     if( !(ret = cache[ k ]) ){
       ret = cache[ k ] = fn.apply( self, args );
@@ -26669,6 +26819,10 @@ module.exports = function memoize( fn, keyFn ){
 
     return ret;
   };
+
+  memoizedFn.cache = {};
+
+  return memoizedFn;
 };
 
 },{}],103:[function(_dereq_,module,exports){
@@ -26742,16 +26896,23 @@ var performance = window ? window.performance : null;
 
 var util = {};
 
-var raf = !window ? null : ( window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-      window.webkitRequestAnimationFrame || window.msRequestAnimationFrame );
-
-raf = raf || function( fn ){
+var raf = !window ? function( fn ){
   if( fn ){
     setTimeout( function(){
       fn( pnow() );
     }, 1000 / 60 );
   }
-};
+} : (function(){
+  if( window.requestAnimationFrame ){
+    return function( fn ){ window.requestAnimationFrame( fn ); };
+  } else if( window.mozRequestAnimationFrame ){
+    return function( fn ){ window.mozRequestAnimationFrame( fn ); };
+  } else if( window.webkitRequestAnimationFrame ){
+    return function( fn ){ window.webkitRequestAnimationFrame( fn ); };
+  } else if( window.msRequestAnimationFrame ){
+    return function( fn ){ window.msRequestAnimationFrame( fn ); };
+  }
+})();
 
 util.requestAnimationFrame = function( fn ){
   raf( fn );
@@ -26889,9 +27050,9 @@ util.debounce = function( func, wait, options ){ // ported lodash debounce funct
 module.exports = util;
 
 },{"../is":83,"../window":107}],106:[function(_dereq_,module,exports){
-module.exports="2.7.3"
+module.exports="2.7.13"
 },{}],107:[function(_dereq_,module,exports){
-module.exports = ( typeof window === 'undefined' ? null : window );
+module.exports = ( typeof window === 'undefined' ? null : window ); // eslint-disable-line no-undef
 
 },{}]},{},[82])(82)
 });
