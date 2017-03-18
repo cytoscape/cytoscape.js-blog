@@ -1,5 +1,4 @@
-$(function(){
-
+document.addEventListener('DOMContentLoaded', function() {
   var cy = window.cy = cytoscape({
     container: document.getElementById('cy'),
 
