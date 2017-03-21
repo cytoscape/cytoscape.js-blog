@@ -187,7 +187,8 @@ figure {
   margin: 0;
   padding: 0;
 }
-pre {
+pre,
+iframe {
   background: rgba(250, 250, 250, 0.2);
   border: 1px solid rgba(221, 221, 221, 0.666);
   border-radius: 0.25rem;
@@ -197,9 +198,9 @@ pre {
   font-size: 0.8rem;
   line-height: 1.4;
   white-space: pre;
-  white-space: pre-wrap;
   word-break: break-all;
   word-wrap: break-word;
+  overflow-x: auto;
 }
 pre code {
   padding: 0;

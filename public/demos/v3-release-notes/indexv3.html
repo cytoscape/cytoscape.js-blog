@@ -1,0 +1,46 @@
+<!DOCTYPE>
+
+<html>
+
+  <head>
+    <title>Version 3</title>
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+
+    <!--<script src="../../js/cytoscape.min.js"></script>-->
+
+    <!-- for testing with local version of cytoscape.js -->
+    <script src="./js/lib/cytoscape3.min.js"></script>
+    <script src="./js/common.js"></script>
+    <script src="./js/main-v3.js"></script>
+
+    <style>
+      body {
+        font-family: helvetica;
+        font-size: 14px;
+      }
+
+      #cy {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 999;
+      }
+
+      h1 {
+        opacity: 0.5;
+        font-size: 1em;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Grid demo</h1>
+
+    <div id="cy"></div>
+
+  </body>
+
+</html>
