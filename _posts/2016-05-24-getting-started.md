@@ -270,7 +270,7 @@ elements: [
     data: {
       id: 'ac',
       source: 'a',
-      target: 'd'
+      target: 'c'
     }
   },
   {
