@@ -52,6 +52,8 @@ Like before, we'll start with `index.html` so that the graph has an element to d
 Do the same for [jQuery 2](https://code.jquery.com/), which will be used for downloading JSON data.
 As this tutorial progresses many more Javascript files will be added so we'll place them in `assets/` to keep things organized.
 
+*Note: this tutorial was written for Cytoscape.js v2 and may require modifications to work with Cytoscape.js v3.*
+
 Now it's time to start with `main.js`.
 Like in the previous tutorials, we must wait for DOM layout to finish before giving Cytoscape.js a container.
 To accomplish this, we'll again turn to [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded).

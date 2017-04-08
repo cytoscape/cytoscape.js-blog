@@ -148,7 +148,7 @@ At this point, the workspace should be structured as follows, with `glycolysis.j
 
 ```
 glycolysis/
-    +-- cytoscape.js
+    +-- cytoscape.js (tested with v2.7.16)
     +-- gly_elements.js
     +-- glycolysis.js
     +-- index.html
