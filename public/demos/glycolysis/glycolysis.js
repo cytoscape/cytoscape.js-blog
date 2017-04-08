@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }, {
         selector: 'edge',
         style: {
+          'curve-style': 'bezier',
           'label': 'data(enzyme)',
           'text-background-color': 'yellow',
           'text-background-opacity': 0.4,

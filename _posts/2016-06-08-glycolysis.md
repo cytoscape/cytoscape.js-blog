@@ -589,7 +589,7 @@ These steps are easily accomplished with `cy.nodes('#0')`, another [selector whi
 
 ## A better style
 
-The current appearance of the graph leaves something to be desired; edges should be more visible and labels would look better if the stood out more.
+The current appearance of the graph leaves something to be desired; edges should be more visible and labels would look better if they stood out more.
 [Plenty of style options](http://js.cytoscape.org/#style) are available so we'll make use of them in the graph declaration.
 You can play around with various properties but I've settled on these for producing a reasonably good-looking graph:
 
@@ -616,6 +616,7 @@ You can play around with various properties but I've settled on these for produc
       }, {
         selector: 'edge',
         style: {
+          'curve-style': 'bezier',
           'label': 'data(enzyme)',
           'text-background-color': 'yellow',
           'text-background-opacity': 0.4,
