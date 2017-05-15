@@ -121,8 +121,9 @@ If these commands fail, make sure `gulp-cli` is installed globally with `npm ins
 
 ### Pushing changes
 
-Once you've tested and committed your changes, push your branch to GitHub with `git push -u origin`.
-The `-u origin` part is necessary here since the branch does not yet exist on GitHub.
+Once you've tested and committed your changes, push your branch to GitHub with `git push -u origin newFeature`.
+The `-u origin newFeature` part is necessary here since the branch does not yet exist on GitHub.
+Replace `newFeature` with the name of the branch you have been working on locally.
 After this initial push, later pushes (such as making additional edits to code) can be sent to GitHub with `git push` (without any additional flags).
 
 If using the GitHub desktop client, [review their guide](https://help.github.com/desktop/guides/contributing/committing-and-reviewing-changes-to-your-project/) for pushing/ syncing changes.
