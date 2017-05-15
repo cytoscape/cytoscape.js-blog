@@ -129,8 +129,25 @@ If using the GitHub desktop client, [review their guide](https://help.github.com
 
 ### Creating a pull request and receiving feedback
 
+Now that you've pushed your changes to GitHub, it's time to leave the command-line/ desktop GitHub client and open your browser to create a pull request. 
 
+> Pull requests are used to request that a project maintainer merge your changes into the target project.
+> In this case, the pull request is a request to merge your feature branch into Cytoscape.js's `unstable` branch.
+
+Navigate to [Cytoscape.js's `unstable` branch on GitHub](https://github.com/cytoscape/cytoscape.js/tree/unstable) and follow the [Creating a pull request from a fork](https://help.github.com/articles/creating-a-pull-request-from-a-fork/) guide on GitHub.
+Basing your feature/ bugfix branch off of the `unstable` fork of Cytoscape.js should help ensure that the pull request doesn't have any conflicts.
+
+To submit the pull request, open the Pull Request page, choose *Compare Across Forks*, and select `cytoscape/cytoscape.js` as the base fork and `unstable` as the base, with your feature branch of your fork as the head fork.
+Once you've selected the base and head branches, write a PR message describing your changes and click the *Create pull request* button.
+
+Once you've made the PR, you'll likely receive some feedback and requests for changes.
+To make any changes to your PR, follow the [Committing](#committing) and [Pushing changes](#pushing-changes) steps again.
+As you push your changes to GitHub, they'll automatically be reflected in the PR.
 
 ## Conclusion
 
-TODO
+After you've made any requested changes, your contribution should be merged. Congratulations!
+Now, new builds of Cytoscape.js will include your feature/ bugfix and your work will be maintained between releases.
+
+If you have any questions about the process, feel free to reach out on [Gitter](https://gitter.im/cytoscape/cytoscape.js).
+For help with the pull request process, consult the [GitHub guides](https://help.github.com/articles/about-pull-requests/) and [Atlassian's guide](https://www.atlassian.com/git) for guidance on additional topics, such as fixing merge conflicts and managing multiple branches.
