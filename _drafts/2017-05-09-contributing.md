@@ -80,6 +80,8 @@ To checkout the `unstable` branch, navigate to whichever directory you cloned Cy
 Then, create your new branch (which will be based on the `unstable` branch) with `git checkout -b feature/awesomeThing` where `feature/awesomeThing` is a descriptive name for your contribution to Cytoscape.
 `git checkout -b` will both create a new branch and checkout the new branch, so all changes to code following this command will affect your newly created branch while leaving other branches untouched.
 
+*Note: for bugfixes to the currently-released version of Cytoscape.js, use the `master` branch instead of the `unstable` branch for this step and the remainder of this guide.*
+
 If you are working with the Github Desktop client, follow [the GitHub guide](https://help.github.com/desktop/guides/contributing/creating-a-branch-for-your-work/), selecting the `unstable` branch to base your fork off of when prompted.
 
 If you are contributing multiple new features to Cytoscape.js (or fixing multiple issues), create separate branches for each feature/ bugfix to make reviewing and merging changes easier.
