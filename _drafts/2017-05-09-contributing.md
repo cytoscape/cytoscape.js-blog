@@ -13,7 +13,7 @@ tags:
 - [Introduction](#introduction)
 - [Why Contribute?](#why-contribute)
 - [Discussing Contributions](#discussing-contributions)
-- [Making a contribution](#making-a-contribution)
+- [Contributing](#contributing)
   - [Forking and cloning](#forking-and-cloning)
   - [Making a new branch](#making-a-new-branch)
   - [Writing code](#writing-code)
@@ -30,7 +30,7 @@ tags:
 ## Introduction
 
 [Cytoscape.js](https://js.cytoscape.org) is an open-source project and welcomes any and all contributions—everything from a small documentation fix to a significant new feature is appreciated.
-It was created at the [Donnely Center](http://thedonnellycentre.utoronto.ca/) at the University of Toronto and is under active development, coordinated through [Github](https://github.com/cytoscape/cytoscape.js).
+It was created at the [Donnely Center](http://thedonnellycentre.utoronto.ca/) at the University of Toronto and is under active development, coordinated through [GitHub](https://github.com/cytoscape/cytoscape.js).
 
 This guide is aimed primarily towards users without prior experience contributing to open-source software (OSS).
 For contributors familiar with the process, the [`CONTRIBUTING.md`](https://github.com/cytoscape/cytoscape.js/blob/master/CONTRIBUTING.md) file is a good place to read about Cytoscape.js-specific guidelines, such as code style.
@@ -51,7 +51,7 @@ Discussion for Cytoscape.js happens in several places: [Stack Overflow](http://s
 For code contributions, most discussion will occur on the pull request (PR) for that contribution.
 We ask that discussions 1) are kept civil and 2) are kept helpful.
 
-## Making a contribution
+## Contributing
 
 Contributing can be broken down into a series of steps:
 1. Fork the project
@@ -82,7 +82,7 @@ Then, create your new branch (which will be based on the `unstable` branch) with
 
 *Note: for bugfixes to the currently-released version of Cytoscape.js, use the `master` branch instead of the `unstable` branch for this step and the remainder of this guide.*
 
-If you are working with the Github Desktop client, follow [the GitHub guide](https://help.github.com/desktop/guides/contributing/creating-a-branch-for-your-work/), selecting the `unstable` branch to base your fork off of when prompted.
+If you are working with the GitHub Desktop client, follow [the GitHub guide](https://help.github.com/desktop/guides/contributing/creating-a-branch-for-your-work/), selecting the `unstable` branch to base your fork on when prompted.
 
 If you are contributing multiple new features to Cytoscape.js (or fixing multiple issues), create separate branches for each feature/ bugfix to make reviewing and merging changes easier.
 Running `git checkout unstable` will restore the `unstable` branch where you can run `git checkout -b feature/anotherThing` to start a second branch and then run `git checkout feature/awesomeThing` and `git checkout feature/anotherThing` to switch between branches.
@@ -95,19 +95,21 @@ Development of Cytoscape.js requires several additional packages which are defin
 Install these by navigating to the folder containing Cytoscape.js and running `npm install`.
 Cytoscape.js comes with a `.eslint.json` file which ESLint will use when inspecting your code, helping to reduce bugs and maintain a uniform style.
 
+Starting with version 3.2.0, Cytoscape.js uses [Babel](https://babeljs.io/) for transpiling, so you can take advantage of ES2015/ ES6 features.
+
 #### Style
 
 On the topic of uniform style: the Cytoscape.js doesn't have a strict style guide.
 The only rules are to use two spaces for indentation and use single-quotes around strings; other than this, just try to match the style of existing code.
 
-Code can be automatically formatted by running `gulp format`; make sure that you've commited all changes before running this command so that formatting changes are kept separate from the underlying code changes.
+Code can be automatically formatted by running `gulp format`; make sure that you've committed all changes before running this command so that formatting changes are kept separate from the underlying code changes.
 
 #### Committing
 
 As you write code, commit changes with `git add .` and `git commit -m "work on awesome feature"`.
-If using GitHub Desktop, [review the guide from GitHub](https://help.github.com/desktop/guides/contributing/committing-and-reviewing-changes-to-your-project/) about commiting changes.
+If using GitHub Desktop, [review the guide from GitHub](https://help.github.com/desktop/guides/contributing/committing-and-reviewing-changes-to-your-project/) about committing changes.
 
-> Frequency of commits is a personal preference; however, I recommend commiting after completing each "unit of work" where each unit is a block of changes to one or more files that do not break compilation of Cytoscape.js.
+> Frequency of commits is a personal preference; however, I recommend committing after completing each "unit of work" where each unit is a block of changes to one or more files that do not break compilation of Cytoscape.js.
 
 #### Code Organization
 
@@ -116,7 +118,7 @@ Important folders for development are described here:
 - `src/`: The `src/` folder is likely where you'll spend most of your time; this folder contains the many files that are combined at build-time to create the `cytoscape.js` file that is used in applications.
 - `test/`: The `test/` folder contains tests for Cytoscape.js. If you are contributing a feature that can be tested, please add tests for this feature. If you are contributing a bugfix, add a test that fails without your bugfix.
 - `documentation/`: The `documentation/` folder contains documentation for all public features of Cytoscape.js (internal/ private APIs need not be documented here). For new features, please add documentation on how to use them here.
-- `dist/`: The `dist/` folder contains the most recent publically-released version of Cytoscape.js. This is the version that is published to npm and [js.cytoscape.org/](http://js.cytoscape.org/) on each new release.
+- `dist/`: The `dist/` folder contains the most recent publicly-released version of Cytoscape.js. This is the version that is published to npm and [js.cytoscape.org/](http://js.cytoscape.org/) on each new release.
 - `build/`: Building Cytoscape.js will compile the many files within `src/` and emit two files here: one containing a non-minified build of Cytoscape.js and one containing a minified build.
 
 #### Building and Testing Cytoscape.js
