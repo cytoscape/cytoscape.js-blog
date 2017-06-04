@@ -31,15 +31,20 @@ tags:
 ## Why Contribute?
 
 - Cytoscape.js has a highly permissive [MIT License](https://github.com/cytoscape/cytoscape.js/blob/master/LICENSE), which allows users to modify the software as they see fit. Contributing changes back to Cytoscape.js makes the software better for everyone!
+- You'll join a community of several dozen other contributors who have helped to test, fix, and improve the nearly twenty-thousand lines of code that make up the core of Cytoscape.js.
 - Contributing means that your changes will be maintained as part of the project, making upgrading to newer versions of Cytoscape.js a lot easier—no more having to re-add your changes and rebuild the code for each release.
   - Releases frequently bring performance improvements; having your changes in Cytoscape.js means that your feature will automatically benefit from these performance enhancements.
 - Having your contributions in the main build of Cytoscape.js means you can take advantage of the various CDNs hosting builds of Cytoscape.js and save on bandwidth.
 - Submitting contributions means that your code can be improved through code reviews and use by others.
+- You gain experience coding for a professionally designed open source project, gaining valuable feedback on your coding and adding to your portfolio.
+- [Cytoscape.js is widely used in medical research, among other fields](http://js.cytoscape.org/#introduction/factsheet), meaning that your contributions can help make a positive difference in the world.
+- Each contribution improves Cytoscape.js, attracting additional users, which brings additional contributions, and so on. Contributing improvements to Cytoscape.js ensures that it remains the popular (over 3000 stars on GitHub!) and highly-maintained project it is today—and an active and engaged community of users and developers helps ensure the continued funding of Cytoscape.js!
 
 ## Introduction
 
 [Cytoscape.js](https://js.cytoscape.org) is an open-source project and welcomes any and all contributions—everything from a small documentation fix to a significant new feature is appreciated.
-It was created at the [Donnely Center](http://thedonnellycentre.utoronto.ca/) at the University of Toronto and is under active development, coordinated through [GitHub](https://github.com/cytoscape/cytoscape.js).
+It was created at the [Donnelly Center](http://thedonnellycentre.utoronto.ca/) at the University of Toronto and is under active development, coordinated through [GitHub](https://github.com/cytoscape/cytoscape.js).
+Intellection property rights are held by the [Cytoscape Consortium](http://www.cytoscapeconsortium.org/), a 501(c)(3) not-for-profit which promotes the use of Cytoscape.js (and other software) in bioinformatics to further the study of biological networks. [Funding] is provided through grants from the U.S. National Institutes of Health.
 
 This guide is aimed primarily towards users without prior experience contributing to open-source software (OSS).
 For contributors familiar with the process, the [`CONTRIBUTING.md`](https://github.com/cytoscape/cytoscape.js/blob/master/CONTRIBUTING.md) file is a good place to read about Cytoscape.js-specific guidelines, such as code style.
