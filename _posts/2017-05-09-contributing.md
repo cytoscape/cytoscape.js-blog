@@ -10,8 +10,8 @@ tags:
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Introduction](#introduction)
 - [Why Contribute?](#why-contribute)
+- [Introduction](#introduction)
 - [Discussing Contributions](#discussing-contributions)
 - [Contributing](#contributing)
   - [Forking and cloning](#forking-and-cloning)
@@ -27,6 +27,15 @@ tags:
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+
+## Why Contribute?
+
+- Cytoscape.js has a highly permissive [MIT License](https://github.com/cytoscape/cytoscape.js/blob/master/LICENSE), which allows users to modify the software as they see fit. Contributing changes back to Cytoscape.js makes the software better for everyone!
+- Contributing means that your changes will be maintained as part of the project, making upgrading to newer versions of Cytoscape.js a lot easier—no more having to re-add your changes and rebuild the code for each release.
+  - Releases frequently bring performance improvements; having your changes in Cytoscape.js means that your feature will automatically benefit from these performance enhancements.
+- Having your contributions in the main build of Cytoscape.js means you can take advantage of the various CDNs hosting builds of Cytoscape.js and save on bandwidth.
+- Submitting contributions means that your code can be improved through code reviews and use by others.
+
 ## Introduction
 
 [Cytoscape.js](https://js.cytoscape.org) is an open-source project and welcomes any and all contributions—everything from a small documentation fix to a significant new feature is appreciated.
@@ -36,18 +45,23 @@ This guide is aimed primarily towards users without prior experience contributin
 For contributors familiar with the process, the [`CONTRIBUTING.md`](https://github.com/cytoscape/cytoscape.js/blob/master/CONTRIBUTING.md) file is a good place to read about Cytoscape.js-specific guidelines, such as code style.
 
 Before you get started with this guide, make sure [Node.js](https://nodejs.org/en/) is installed.
-Any recent version should work.
+To test this, open a terminal and run `node --version` and `npm --version` and ensure that both commands run successfully.
+To ensure compatibility with the various build tools that Cytoscape.js uses (introduced in [Forking and cloning](#forking-and-cloning)), a recent version of Node.js is recommended (either the current branch or LTS branch).
 
-## Why Contribute?
+  > For developers on MacOS and Linux, tools such as [nvm](https://github.com/creationix/nvm) can be used instead of installing Node.js system-wide.
+  > `nvm` installs Node.js to your home directory, instead of system-wide, allowing for side-by-side installations of Node.js versions and easily switching the active Node.js installation.
 
-Cytoscape.js has a highly permissive [MIT License](https://github.com/cytoscape/cytoscape.js/blob/master/LICENSE), which allows users to modify the software as they see fit without requiring that they redistribute their changes.
-However, contributing changes back to the project is greatly appreciated, as this makes the software better for everyone.
-Additionally, it means that your changes will be maintained as part of the project, making upgrading to newer versions of Cytoscape.js a lot easier—no more having to re-add your changes and rebuild the code for each release.
-Plus, having your contributions in the main build of Cytoscape.js means you can take advantage of the various CDNs hosting builds of Cytoscape.js and save on bandwidth. 
+Additionally, downloading the code and submitting changes requires [Git](https://git-scm.com/downloads) to be installed.
+For contributors unfamiliar with Git, the [GitHub Desktop](https://desktop.github.com/) is recommended.
 
 ## Discussing Contributions
 
-Discussion for Cytoscape.js happens in several places: [Stack Overflow](http://stackoverflow.com/questions/tagged/cytoscape.js), [Gitter](https://gitter.im/cytoscape/cytoscape.js), and GitHub's [Issues](https://github.com/cytoscape/cytoscape.js/issues) and [Pull Request](https://github.com/cytoscape/cytoscape.js/pulls) pages.
+Discussion for Cytoscape.js happens in several places:
+- [Stack Overflow](http://stackoverflow.com/questions/tagged/cytoscape.js): for help and troubleshooting code which uses Cytoscape.js
+- [Gitter](https://gitter.im/cytoscape/cytoscape.js): chatroom for Cytoscape.js; good for help and troubleshooting code using Cytoscape.js
+- [GitHub Issues](https://github.com/cytoscape/cytoscape.js/issues): for bug reports and feature requests
+- [GitHub Pull Requests](https://github.com/cytoscape/cytoscape.js/pulls): for discussing code contributions before they are merged into Cytoscape.js
+
 For code contributions, most discussion will occur on the pull request (PR) for that contribution.
 We ask that discussions 1) are kept civil and 2) are kept helpful.
 
@@ -66,7 +80,18 @@ Contributing can be broken down into a series of steps:
 
 Steps 1-2 (forking and cloning) [are covered in depth by GitHub](https://guides.github.com/activities/forking/).
 
-In short, create a GitHub profile if you do not have one, [visit the GitHub page for Cytoscape.js](https://github.com/cytoscape/cytoscape.js), click the Fork button, and clone your fork to download the code to your computer (using either the GitHub Desktop client or the command line).
+In short, [create a GitHub profile](https://github.com/join) if you do not have one, [visit the GitHub page for Cytoscape.js](https://github.com/cytoscape/cytoscape.js), click the Fork button, and clone your fork to download the code to your computer (using either the GitHub Desktop client or the command line).
+
+1. To fork Cytoscape.js, [click the "Fork" button on the Cytoscape.js GitHub page](https://github.com/cytoscape/cytoscape.js).
+
+![Fork button]({{ site.url }}/public/images/contributing/fork.png)
+
+
+2. For cloning from the command line, first open a terminal and `cd` to whichever directory you want to clone Cytoscape.js into.
+Then, run `git clone https://github.com/cytoscape/cytoscape.js.git` to download the code into a directory called `cytoscape.js`.
+To clone using the GitHub desktop app, [clicking this link](github-windows://openRepo/https://github.com/cytoscape/cytoscape.js) will open the desktop app and start the cloning process.
+3. After you have cloned the reposity to your computer, open a terminal and `cd` into the Cytoscape.js directory, i.e. `cd cytoscape.js`.
+Once in the directory, run `npm install` to (locally) install all dependencies that Cytoscape.js requires for development.
 
 ### Making a new branch
 
@@ -95,14 +120,12 @@ Development of Cytoscape.js requires several additional packages which are defin
 Install these by navigating to the folder containing Cytoscape.js and running `npm install`.
 Cytoscape.js comes with a `.eslint.json` file which ESLint will use when inspecting your code, helping to reduce bugs and maintain a uniform style.
 
-Starting with version 3.2.0, Cytoscape.js uses [Babel](https://babeljs.io/) for transpiling, so you can take advantage of ES2015/ ES6 features.
+Starting with version 3.2.0, Cytoscape.js uses [Babel](https://babeljs.io/) for transpiling, so you can take advantage of ES2015/ES6 features.
 
 #### Style
 
 On the topic of uniform style: the Cytoscape.js doesn't have a strict style guide.
 The only rules are to use two spaces for indentation and use single-quotes around strings; other than this, just try to match the style of existing code.
-
-Code can be automatically formatted by running `gulp format`; make sure that you've committed all changes before running this command so that formatting changes are kept separate from the underlying code changes.
 
 #### Committing
 
@@ -118,13 +141,19 @@ Important folders for development are described here:
 - `src/`: The `src/` folder is likely where you'll spend most of your time; this folder contains the many files that are combined at build-time to create the `cytoscape.js` file that is used in applications.
 - `test/`: The `test/` folder contains tests for Cytoscape.js. If you are contributing a feature that can be tested, please add tests for this feature. If you are contributing a bugfix, add a test that fails without your bugfix.
 - `documentation/`: The `documentation/` folder contains documentation for all public features of Cytoscape.js (internal/ private APIs need not be documented here). For new features, please add documentation on how to use them here.
+  - Documentation is based on the `docmaker.json` file, which references various Markdown files in `documentation/md`. When documentation is built, the Markdown files are combined with the JSON file to create the output HTML documentation.
 - `dist/`: The `dist/` folder contains the most recent publicly-released version of Cytoscape.js. This is the version that is published to npm and [js.cytoscape.org/](http://js.cytoscape.org/) on each new release.
-- `build/`: Building Cytoscape.js will compile the many files within `src/` and emit two files here: one containing a non-minified build of Cytoscape.js and one containing a minified build.
+- `build/`: Building Cytoscape.js will compile the many files within `src/` and emit three files here:
+  - `cytoscape.js`, containing a non-minified build of Cytoscape.js
+  - `cytoscape.min.js`, containing a minified build.
+  - `cytoscape.cjs.js`, containing a non-minified build of Cytoscape.js without dependencies included (for Cytoscape.js >= 3.2.0)
+
+> Note: Although it is useful (and recommended) to build your own distribution(s) of Cytoscape.js while testing your code, you should not include these builds in the `dist/` folder when pushing to GitHub or creating a pull request. When the next version of Cytoscape.js is ready for distribution, a new "official" version will be built and moved into `dist/`.
 
 #### Building and Testing Cytoscape.js
 
-To build and test new features or bugfixes, run `gulp build` (to build Cytoscape.js without testing) or `gulp test` (to run all tests).
-If these commands fail, make sure `gulp-cli` is installed globally with `npm install -g gulp-cli` and that all dependencies of Cytoscape.js have been installed by running `npm install` in the root of the Cytoscape.js directory.
+To build and test new features or bugfixes, run `npm run build` (to build Cytoscape.js without testing) or `npm run test` (to run all tests).
+If these commands fail, make sure you followed the instructions in [Forking and cloning](#forking-and-cloning) to install dependencies.
 
 ### Pushing changes
 
