@@ -31,7 +31,7 @@ tags:
 ## Why Contribute?
 
 - Cytoscape.js has a highly permissive [MIT License](https://github.com/cytoscape/cytoscape.js/blob/master/LICENSE), which allows users to modify the software as they see fit. Contributing changes back to Cytoscape.js makes the software better for everyone!
-- You'll join a community of several dozen other contributors who have helped to test, fix, and improve the nearly twenty-thousand lines of code that make up the core of Cytoscape.js.
+- You'll join a community of several dozen other contributors who have helped to test, fix, and improve the nearly twenty-thousand lines of code that make up the core of Cytoscape.js and the thousands more that make up Cytoscape.js's [30 (and counting) extensions](http://js.cytoscape.org/#extensions).
 - Contributing means that your changes will be maintained as part of the project, making upgrading to newer versions of Cytoscape.js a lot easier—no more having to re-add your changes and rebuild the code for each release.
   - Releases frequently bring performance improvements; having your changes in Cytoscape.js means that your feature will automatically benefit from these performance enhancements.
 - Having your contributions in the main build of Cytoscape.js means you can take advantage of the various CDNs hosting builds of Cytoscape.js and save on bandwidth.
@@ -44,6 +44,7 @@ tags:
 
 [Cytoscape.js](https://js.cytoscape.org) is an open-source project and welcomes any and all contributions—everything from a small documentation fix to a significant new feature is appreciated.
 It was created at the [Donnelly Center](http://thedonnellycentre.utoronto.ca/) at the University of Toronto and is under active development, coordinated through [GitHub](https://github.com/cytoscape/cytoscape.js).
+The first commit to Cytoscape.js occurred in August 2011; since then, 49 different contributors have made more than 6 million changes to the code in over 3500 separate commits, have led the development of eight community-maintained extensions, and have helped to improve the 22 first-party extensions currently available.
 Intellection property rights are held by the [Cytoscape Consortium](http://www.cytoscapeconsortium.org/), a 501(c)(3) not-for-profit which promotes the use of Cytoscape.js (and other software) in bioinformatics to further the study of biological networks. [Funding] is provided through grants from the U.S. National Institutes of Health.
 
 This guide is aimed primarily towards users without prior experience contributing to open-source software (OSS).
