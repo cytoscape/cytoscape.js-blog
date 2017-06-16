@@ -45,7 +45,7 @@ tags:
 [Cytoscape.js](https://js.cytoscape.org) is an open-source project and welcomes any and all contributions—everything from a small documentation fix to a significant new feature is appreciated.
 It was created at the [Donnelly Center](http://thedonnellycentre.utoronto.ca/) at the University of Toronto and is under active development, coordinated through [GitHub](https://github.com/cytoscape/cytoscape.js).
 The first commit to Cytoscape.js occurred in August 2011; since then, 49 different contributors have made more than 6 million changes to the code in over 3500 separate commits, have led the development of eight community-maintained extensions, and have helped to improve the 22 first-party extensions currently available.
-Intellection property rights are held by the [Cytoscape Consortium](http://www.cytoscapeconsortium.org/), a 501(c)(3) not-for-profit which promotes the use of Cytoscape.js (and other software) in bioinformatics to further the study of biological networks. [Funding] is provided through grants from the U.S. National Institutes of Health.
+Intellectual property rights are held by the [Cytoscape Consortium](http://www.cytoscapeconsortium.org/), a 501(c)(3) not-for-profit which promotes the use of Cytoscape.js (and other software) in bioinformatics to further the study of biological networks. Funding is provided through grants from the U.S. National Institutes of Health.
 
 This guide is aimed primarily towards users without prior experience contributing to open-source software (OSS).
 For contributors familiar with the process, the [`CONTRIBUTING.md`](https://github.com/cytoscape/cytoscape.js/blob/master/CONTRIBUTING.md) file is a good place to read about Cytoscape.js-specific guidelines, such as code style.
@@ -70,6 +70,8 @@ Discussion for Cytoscape.js happens in several places:
 
 For code contributions, most discussion will occur on the pull request (PR) for that contribution.
 We ask that discussions 1) are kept civil and 2) are kept helpful.
+
+> If you are starting work on a larger feature/ significant change, open a GitHub issue before getting started to coordinate your work with other work going into Cytoscape.js. For smaller changes and bugfixes, such coordination/ approval isn't necessary.
 
 ## Contributing
 
