@@ -307,13 +307,13 @@ for (var i = 0; i < 10; i++) {
 
 This adds 10 new nodes to the graph with half the edges going to `a` and half going to `b`.
 If you examine the graph now, you may notice that the layout has been messed up.
-To fix this, add a call to [`cy.layout()`](http://js.cytoscape.org/#cy.layout) after you are done adding nodes and edges.
+To fix this, add a call to [`cy.layout().run()`](http://js.cytoscape.org/#cy.layout) after you are done adding nodes and edges.
 Here we're using `circle`, one of the [many layouts availble in Cytoscape.js](http://js.cytoscape.org/#layouts).
 
 ```javascript
 cy.layout({
     name: 'circle'
-});
+}).run();
 ```
 
 Cytoscape.js has a wealth of functions available; far more than can be covered in tutorials.
