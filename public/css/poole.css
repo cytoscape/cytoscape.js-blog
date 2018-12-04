@@ -92,9 +92,6 @@ a {
 a strong {
   color: inherit;
 }
-a:active {
-  box-shadow: 0 0 0 8px rgba(127, 127, 127, 0.5);
-}
 
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
