@@ -6,8 +6,6 @@ tags:
 - post
 ---
 
-# Wine & Cheese Map
-
 The [Wine & Cheese app](http://www.wineandcheesemap.com/) is an example app built using a Cytoscape.js visualisation.  It allows the user to explore [wine and cheese pairings](https://en.wikipedia.org/wiki/Wine_and_food_matching) interactively.
 
 The app features a good example of how to leverage Cytoscape.js to add relevant interactivity to a graph visualisation:  The user can click a wine or cheese of interest and the graph animated and reorganises itself to highlight the pairings with the chosen item.
