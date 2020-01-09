@@ -5,7 +5,7 @@ permalink:           pretty
 
 # Setup
 title:               Cytoscape.js
-tagline:             News and tutorials
+tagline:             News & tutorials
 url:                 http://blog.js.cytoscape.org
 baseurl:             ""
 paginate:            5
