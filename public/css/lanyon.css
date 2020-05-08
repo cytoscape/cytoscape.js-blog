@@ -581,3 +581,21 @@ a.pagination-item:hover {
   border: 1px solid #eee;
   border-radius: 0.25em;
 }
+
+figure {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+figure img {
+  max-height: 50vh;
+  margin: 0 auto;
+}
+
+figcaption {
+  font-style: italic;
+  margin-left: 2em;
+  margin-right: 2em;
+  margin-top: 0.25em;
+  text-align: center;
+} 

@@ -64,6 +64,11 @@ A continuous layout is asynchronous:  It runs iterations over time, without mono
 
 ### How animation affects synchronicity
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/animated.gif" alt="An animated layout">
+  <figcaption>An example of an animated layout</figcaption>
+</figure>
+
 Animation options can alter the properties of continuous and discrete layouts.  If a discrete layout is run as an animation via `animate: true`, then that layout is no longer synchronous.  Further, a continuous layout may be configured to disable animation via `animate: false`.  This makes the layout run all its iterations at once, albeit still asynchronously.  This can make a continuous layout give its end result quicker.  A continuous layout may also support `animate: 'end'`, which animates in a similar manner to a discrete layout:  The nodes are animated directly from the start positions to the end positions --- avoiding potentially unaesthetic middle iteration positions.
 
 ## Choice of graph
@@ -73,6 +78,11 @@ The first step in choosing a layout is choosing the graph or subgraph on which t
 ### The problem of large graphs
 
 The root issue with large graphs is that it is difficult for a person to visually parse so many data points at once.  Even assuming that you never have performance issues with large graphs and that you make an ideal choice of layout, large graphs usually just become visual noise.  Choice of layout can help with that issue to some degree.  Large, highly-connected graphs tend to be more or less a hairball regardless of choice of layout.  
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/hairball.png" alt="A hairball">
+  <figcaption>An example of a highly-connected hairball</figcaption>
+</figure>
 
 The problem, then, is to filter the elements to show only a relevant subset of the graph that a user could easily parse --- and to allow the user easy navigation from one chosen subset to another one.  You may load in subgraphs dynamically from your database, such as [Neo4j](https://neo4j.com) or [Neptune](https://aws.amazon.com/neptune), if your dataset is very large.  Alternatively, you may simply show and hide subgraphs using the Cytoscape API, if your dataset is small enough to load into a single Cytoscape instance.
 
@@ -89,6 +99,11 @@ Serverside graph databases, such as [Neo4j](https://neo4j.com) and [Neptune](htt
 An example of this algorithmic subgraph approach is [GeneMANIA](https://genemania.org), an app from the University of Toronto that shows relationships between [genes](https://en.wikipedia.org/wiki/Gene) in various [model organisms](https://en.wikipedia.org/wiki/Model_organism).  Just as it would be a mistake in other apps, it would be a mistake in GeneMANIA to present all the data to the user at once.  The human genome contains on the order of [20,000 genes](https://ghr.nlm.nih.gov/primer/basics/gene).  You could try to plop all that data into a single graph visualisation.  It would not be comprehensible, and further most users are probably only interested in particular subsets of the data.  (Consider Google as an example:  Do most users want to see all of Google's webpage-webpage graph at once, or are users interested in particular, relevant subsets?)  
 
 So then, GeneMANIA has a serverside [algorithm](https://academic.oup.com/nar/article/38/suppl_2/W214/1126704) that allows the user to query for a set of genes of interest ([e.g. TP53](https://genemania.org/search/homo-sapiens/TP53)).  The result is the subgraph of genes and interactions most related to the query genes.  The analytics for GeneMANIA have shown over the years that the vast majority of users are interested in only a single query gene, which reinforces the importance of using relevant subgraphs.
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/tp53.png" alt="TP53 in GeneMANIA">
+  <figcaption>The result of a query for TP53 in GeneMANIA</figcaption>
+</figure>
 
 ## Choice of layout
 
@@ -114,11 +129,31 @@ These layouts organise the graph into common geometric shapes:
 
 [`grid`](https://js.cytoscape.org/#layouts/grid) : The `grid` layout organises the nodes in a well-spaced grid.  The nodes are placed from left to right and top to bottom, in the order they are passed to the layout.  You can control the order by calling `eles.sort().layout()` or by ordering the elements as they are added to the graph.  By default, the nodes are placed in a grid that fits the available viewport space well.  If you can think of your nodes as being organised into several columns with one class of node per column --- or similarly for rows --- then the grid layout is a good fit.  You can customise exactly which nodes go in which rows or columns.  For example, a [bipartite layout](https://en.wikipedia.org/wiki/Bipartite_graph) is just a two-column case of a grid layout.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/grid.png" alt="Grid layout">
+  <figcaption>An example of the <code>grid</code> layout</figcaption>
+</figure>
+
 [`circle`](https://js.cytoscape.org/#layouts/circle) : The `circle` layout organises the nodes into a circle.  By default, the nodes are placed clockwise from the 12 o'clock position, in the order that they are passed to the layout.  You can control the order of the nodes by calling `eles.sort().layout()` or by ordering the elements as they are added to the graph.  This layout helps to highlight the density of edges connected to different nodes, especially when the edges are made semitransparent.
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/circle.png" alt="Circle layout">
+  <figcaption>An example of the <code>circle</code> layout</figcaption>
+</figure>
 
 [`concentric`](https://js.cytoscape.org/#layouts/concentric) : The `concentric` layout organises the nodes into concentric circles, based on the specified metric.  The nodes with the highest metric values are placed in the innermost circle, and the metric values of the nodes descend for each outward circle.  Each circle has nodes with metric values between a specified range, with the nodes within a circle sorted accordingly.  This layout is useful for highlighting relative importance of the nodes, and its visual effect can be reinforced by creating a style [mapper](https://js.cytoscape.org/#style/mappers) to the metric --- e.g. nodes with larger metric values are darker in colour.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/concentric.png" alt="Concentric layout">
+  <figcaption>An example of the <code>concentric</code> layout</figcaption>
+</figure>
+
 [`avsdf`](https://github.com/iVis-at-Bilkent/cytoscape.js-avsdf) : The `avsdf` layout is another circle layout.  Whereas the `circle` layout is useful when you want to order the nodes yourself, the `avsdf` layout is useful when you want to automatically order the nodes to try to avoid edge overlap.
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/avsdf.png" alt="AVSDF layout">
+  <figcaption>An example of the <code>avsdf</code> layout</figcaption>
+</figure>
 
 ### Hierarchical layouts
 
@@ -128,13 +163,38 @@ Most hierarchical layouts are fairly similar, but they differ in important ways:
 
 [`dagre`](https://github.com/cytoscape/cytoscape.js-dagre) : The `dagre` layout is a traditional hierarchical layout.  It looks like how people typically draw binary trees on a whiteboard:  It has a nice inverted V shape from one level to the next.  This should be the ones of the first layouts that you try if your graph is a DAG.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/dagre.png" alt="Dagre layout">
+  <figcaption>An example of the <code>dagre</code> layout</figcaption>
+</figure>
+
 [`breadthfirst`](https://js.cytoscape.org/#layouts/breadthfirst) : The `breadthfirst` layout organises the nodes in levels, according to the levels generated by running a [breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) on the graph.  This layout gives a less traditional result for DAGs than other layouts, but it uses space more efficiently.
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/breadthfirst.png" alt="Breadthfirst layout">
+  <figcaption>An example of the <code>breadthfirst</code> layout</figcaption>
+</figure>
 
 [`concentric`](https://js.cytoscape.org/#layouts/concentric) : The `concentric` layout can be made hierarchical by using the breadth-first search level as the metric.  Though this results in a space-efficient result, it is less traditional than a typical top-down hierarchical layout.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/concentric.png" alt="Concentric layout">
+  <figcaption>An example of the <code>concentric</code> layout</figcaption>
+</figure>
+
 [`elk`](https://github.com/cytoscape/cytoscape.js-elk) : The `elk` layout contains several different layout algorithms.  The `layered` and `mrtree` algorithms are traditional hierarchical layouts.  For many trees, the results of `elk` probably will not differ much from `dagre`, and `dagre` has a smaller file size.  The results of `elk` may differ from dagre to a greater degree for complex DAGs.  Compare the results of both layouts and see which suits your dataset best.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/elk-mrtree.png" alt="ELK layout">
+  <figcaption>An example of a hierarchical <code>elk</code> layout</figcaption>
+</figure>
+
 [`klay`](https://github.com/cytoscape/cytoscape.js-klay) : The `klay` layout is a traditional hierarchical layout.  It is the predecessor to the `layered` algorithm in `elk`.  You may want to use `klay` for its smaller file size, if the `layered` algorithm of `elk` does not differ significantly for your dataset.
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/klay.png" alt="KLAY layout">
+  <figcaption>An example of the <code>klay</code> layout</figcaption>
+</figure>
 
 ### Force-directed layouts
 
@@ -144,15 +204,45 @@ If you get a hairball with one of these layouts, consider selecting a smaller or
 
 [`fcose`](https://github.com/iVis-at-Bilkent/cytoscape.js-fcose), `cose-bilkent`, & `cose` : These layouts represent a progression in the sophistication of force-directed layouts.  As their names suggest, each of these layouts works well with [compound graphs](https://js.cytoscape.org/#notation/compound-nodes).  The `cose` layout is the first JS implementation of the CoSE algorithm, as specified in its [paper](http://www.sciencedirect.com/science/article/pii/S0020025508004799).  It is integrated into the  Cytoscape library itself.  It has a fast implementation of CoSE, but it lacks the enhancements of later versions on the algorithm.  You may have to tweak the parameters of `cose` more as compared to other force-directed layouts in order to get a good result.  The `cose-bilkent` layout is a bit more sophisticated than `cose`.  It often gives better results by default, but it can be more expensive to run.  The `fcose` layout is the latest and greatest version of CoSE.  It gives the best results of these three layouts, and it is also generally the fastest.  If you are considering a force-directed layout, `fcose` should be the first layout that you try.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/fcose.png" alt="FCOSE layout">
+  <figcaption>An example of the <code>fcose</code> layout</figcaption>
+</figure>
+
 [`cola`](https://github.com/cytoscape/cytoscape.js-cola) : The `cola` layout differentiates itself by allowing for setting constraints on top of the traditional force-directed physics simulation.  If you want to set your own rules for how some nodes are organised, then `cola` is a good fit.  This layout also tends to create smooth transitions in node position from one iteration to the next, so it is well suited to successive or infinite runs of the layout.
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/cola.png" alt="Cola layout">
+  <figcaption>An example of the <code>cola</code> layout</figcaption>
+</figure>
 
 [`cise`](https://github.com/iVis-at-Bilkent/cytoscape.js-cise) : The `cise` layout organises the nodes into clusters.  Each cluster is represented as a circle.  Similar to the `avsdf` layout, this layout tries to avoid edge overlap within each circle.  The clusters are positioned using a force-directed algorithm.  If you have well defined clusters in your graph, the `cise` layout is a good fit.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/cise.png" alt="CISE layout">
+  <figcaption>An example of the <code>cise</code> layout</figcaption>
+</figure>
+
 [`elk`](https://github.com/cytoscape/cytoscape.js-elk) : The `elk` layout contains the `stress` and `force` algorithms.  These algorithms can be combined with the `disco` algorithm of `elk` so that the disconnected components of the graph do not overlap, though most other force-directed layouts do component packing without additional configuration.  The `force` algorithm is basic, but the `stress` algorithm can give aesthetically pleasing results.  The use of `disco` is notable, as it can be used after any non-`elk` layout --- or combination of layouts --- to perform component packing.  Note that `elk` includes many different layout algorithms, so its file size is comparatively large.
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/elk-fd.png" alt="ELK layout">
+  <figcaption>An example of the <code>elk</code> layout</figcaption>
+</figure>
 
 [`euler`](https://github.com/cytoscape/cytoscape.js-euler) : The `euler` layout is a traditional force-directed algorithm.  It is fairly fast.  However, `cola` tends to give better results, and `fcose` tends to be both faster and higher quality.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/euler.png" alt="Euler layout">
+  <figcaption>An example of the <code>euler</code> layout</figcaption>
+</figure>
+
 [`spread`](https://github.com/cytoscape/cytoscape.js-spread) : The `spread` layout is a two-phased layout.  First, it runs `cose` and then it spreads out the graph to fill out the viewport as much as possible.  The `spread` layout is a good fit when you want the graph to be as spread out as possible while still having an overall force-directed organisation.
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/spread.png" alt="Spread layout">
+  <figcaption>An example of the <code>spread</code> layout</figcaption>
+</figure>
 
 ## Advanced layout use cases
 
@@ -162,13 +252,29 @@ The most obvious use for a layout is to set the initial positions of the nodes i
 
 Consider the case where the user is interested in just a particular part of the visible graph.  The [Wine & Cheese Map](http://www.wineandcheesemap.com/) is an example of this.  Say the user is the hostess of an upcoming party.  She has a number of bottles of wine at home, but she isn't sure what to serve with them.  While the default view of the app gives a good sense of the overall landscape of wine-cheese pairings --- red wine on the left, cheese in the centre, and white wine on the right --- it is difficult to see pairings for a particular wine of interest.  The user taps on one of the wines she has at home, and the app uses a layout to help her easily see exactly which cheeses pair well.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/wine-and-cheese-overview.png" alt="Wine & Cheese Map overview">
+  <figcaption>The default layout of the Wine & Cheese Map gives users an overview that can be explored in more depth through interactivity</figcaption>
+</figure>
+
 Interactivity is key to this example.  The user needs to specify which wine or cheese she wants to pair in order to give this highlighted view.  Equally important are the details of how the layout is applied.
 
 In this example, a concentric layout is applied only to neighbourhood of the tapped node, while the rest of the graph remains the same.  The tapped node remains stationary relative to the overall graph, both in the case of applying the highlight state and in the case of removing the highlight state.  This helps the user to maintain her frame of reference.
 
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/wine-and-cheese-concentric.png" alt="Using the concentric layout">
+  <figcaption>The concentric layout is applied to the neighbourhood of California Cabernet Sauvignon</figcaption>
+</figure>
+
+
 The use of animation in this layout also helps to maintain the user's frame of reference.  The animated layout provides a smooth transition between the highlighted state and the unhighlighted state.  This effect is made even more valuable to the user by always starting a highlight animation from the global frame of reference:  The user can click one node after another to explore links in a chain, all the while maintaining both a local and a global frame of reference.  
 
 For instance, perhaps the user wants a pairing with California Cabernet Sauvignon.  Cantal looks like a good pairing so she taps it out of curiousity.  She notes that Lancashire is a similar cheese, and she taps it to explore further.  She's hit the jackpot.  Lancashire not only pairs well with California Cabernet Sauvignon but it also pairs well with Syrah, which she also happens to have on hand.  This sort of exploration and discovery is only possible because of the use of interactive layout within the app.
+
+<figure>
+  <img src="{{site.baseurl}}/public/images/layouts/explore-pairings.gif" alt="Exploring pairings">
+  <figcaption>Interactivity allows users to easily explore the graph</figcaption>
+</figure>
 
 ### Headless use of layouts
 
