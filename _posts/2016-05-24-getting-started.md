@@ -333,3 +333,6 @@ Take a look at my finished graphs:
 - [Adding nodes with `cy.add()`]({{site.baseurl}}/public/demos/getting-started/index-addingNodes.html)
 
 Source code [available on Github](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/getting-started)
+
+As an additional reference, there is a [tutorial demo](https://cytoscape.github.io/cytoscape.js-tutorial-demo/) and a corresponding [introduction video](https://vimeo.com/218307423).  This demo summarises the main concepts from this tutorial with an interactive demo. 
+
