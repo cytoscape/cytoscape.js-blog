@@ -14,7 +14,7 @@ This encompasses a variety of uses, from network biology to social network analy
 
 ## A simple site
 First, create a directory for this tutorial. I will be using `getting-started/`.
-[Download Cytoscape.js](http://js.cytoscape.org) and copy `cytoscape.js` to the project folder.
+[Download Cytoscape.js (min)](https://js.cytoscape.org/#getting-started/including-cytoscape.js) and copy `cytoscape.js` to the project folder.
 In the interest of keeping this tutorial as simple as possible, all code—HTML, JavaScript, and CSS—will go in `index.html`.
 
 In `index.html`, enter the following to get started with Cytoscape.js:
