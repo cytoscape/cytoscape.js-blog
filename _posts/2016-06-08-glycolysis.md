@@ -683,7 +683,9 @@ Now you should have a fully working glycolysis graph, looking similar to this:
 
 ![finished graph]({{site.baseurl}}/public/demos/glycolysis/assets/finished_graph.png)
 
+<!--
 You can [interact with my finished graph]({{site.baseurl}}/public/demos/glycolysis/index.html) or [view the source code](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/glycolysis)
+-->
 
 Thanks to:
 

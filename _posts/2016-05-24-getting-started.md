@@ -326,6 +326,7 @@ The most common properties passed are `container`, `elements`, `style`, and `lay
 
 Once a graph has been created, it can be manipulated via a variety of methods, among them `cy.add({...})` and `cy.layout({...})`.
 
+<!--
 Take a look at my finished graphs:
 
 - [Getting started]({{site.baseurl}}/public/demos/getting-started/index.html)
@@ -335,4 +336,4 @@ Take a look at my finished graphs:
 Source code [available on Github](https://github.com/cytoscape/cytoscape.js-blog/tree/gh-pages/public/demos/getting-started)
 
 As an additional reference, there is a [tutorial demo](https://cytoscape.github.io/cytoscape.js-tutorial-demo/) and a corresponding [introduction video](https://vimeo.com/218307423).  This demo summarises the main concepts from this tutorial with an interactive demo. 
-
+-->
