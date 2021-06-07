@@ -55,7 +55,8 @@ Modify the `<head>` section of `index.html` to include these two files:
 ```
 
 `gly_elements.js` is a list of the molecules involved in glycolysis.
-Because the file is lengthy and repetitive, I will only be including an excerpt in the tutorial; however, the [full source is available for download and review]({{site.baseurl}}/public/demos/glycolysis/gly_elements.js).
+Because the file is lengthy and repetitive, I will only be including an excerpt in the tutorial.
+<!-- however, the [full source is available for download and review]({{site.baseurl}}/public/demos/glycolysis/gly_elements.js).-->
 Each intermediate metabolite will be a node of the graph.
 The enzymes that convert each metabolite to the next intermediate will be the edges connecting nodes.
 
@@ -642,7 +643,7 @@ Now all that's left is to write the function:
 
 ```javascript
   cy.on('tap', 'node', function(event) {
-    var target = event.cyTarget;
+    var target = event.target;
     cy.nodes().unselect();
     target.select();
     panIn(target);
@@ -650,7 +651,7 @@ Now all that's left is to write the function:
   });
 ```
 
-By passing [`event`](http://js.cytoscape.org/#events) to the function, the target of the event can be read with `event.cyTarget`.
+By passing [`event`](http://js.cytoscape.org/#events) to the function, the target of the event can be read with `event.target`.
 This function includes much of the functionality of `advanceByButton(previous)`; however, `advanceByButton(previous)` expects to be passed the previously selected node while this function does not care about the previously selected node.
 Instead, animation will skip forward or back to center on the tapped node.
 This node is selected and all other are unselected.
